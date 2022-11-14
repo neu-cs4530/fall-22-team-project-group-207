@@ -82,8 +82,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   private _id: string;
 
-  private _game: string;
-
   // Players playing the game (as opposed to spectating). A subset of occupants.
   private _players: PlayerController[] = [];
 
@@ -106,12 +104,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   /**
    * Create a new PoolGameAreaController
-   * @param id
+   * @param id ID of this pool area
    */
-  constructor(id: string, game: string) {
+  constructor(id: string) {
     super();
     this._id = id;
-    this._game = game;
   }
 
   /**
