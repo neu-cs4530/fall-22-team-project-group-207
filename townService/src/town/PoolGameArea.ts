@@ -54,7 +54,7 @@ export default class PoolGameArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { 
+    {
       id,
       player1ID,
       player2ID,
@@ -136,23 +136,24 @@ export default class PoolGameArea extends InteractableArea {
   public static fromMapObject(
     mapObject: ITiledMapObject,
     townEmitter: TownEmitter,
-    ): PoolGameAreaModel {
+  ): PoolGameAreaModel {
     const { name, width, height } = mapObject;
     if (!width || !height) {
       throw new Error(`Malformed pool game area ${name}`);
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
-    return new PoolGameArea({
-      id: name,
-      player1ID: undefined,
-      player2ID: undefined,
-      player1BallType: undefined,
-      player2BallType: undefined,
-      isPlayer1Turn: true,
-      poolBalls: [],
-    },
-    rect,
-    townEmitter,
+    return new PoolGameArea(
+      {
+        id: name,
+        player1ID: undefined,
+        player2ID: undefined,
+        player1BallType: undefined,
+        player2BallType: undefined,
+        isPlayer1Turn: true,
+        poolBalls: [],
+      },
+      rect,
+      townEmitter,
     );
   }
 }
