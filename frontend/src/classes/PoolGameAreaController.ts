@@ -6,7 +6,7 @@ import PlayerController from './PlayerController';
 //import PoolBall from './PoolBall';
 
 /**
- * Type representing the entirety of the pool game
+ * Type representing the entirety of the pool game to be sent to the frontend.
  *
  * POOL TODO: further documentation about state
  */
