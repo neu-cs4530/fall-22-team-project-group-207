@@ -118,11 +118,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   /**
    * Create a new PoolGameAreaController
-   * @param id ID of this pool area
+   * @param poolGameModel model representation of this pool area
    */
-  constructor(id: string) {
+  constructor(poolGameModel: PoolGameAreaModel) {
     super();
-    this._id = id;
+    this._id = poolGameModel.id;
   }
 
   /**
@@ -213,10 +213,16 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   toPoolGameAreaModel(): PoolGameAreaModel {
-    return {id: this._id, player1ID: this._players[0]?.id, player2ID: this._players[1]?.id, isPlayer1Turn: this._isPlayer1turn, poolBalls: this._poolBalls };
+    // TODO: this is placeholder, and this._players[0]/[1] is hardcoded, should definitely find a better way to do that.
+    return {
+      id: this._id,
+      player1ID: this._players[0]?.id,
+      player2ID: this._players[1]?.id,
+      isPlayer1Turn: this._isPlayer1turn,
+      poolBalls: this._poolBalls };
   }
 
-  static fromPoolGameAreaodel(updatedModel: PoolGameAreaModel) {
-    
+  public updateFrom(updatedModel: PoolGameAreaModel) {
+    // TODO: implement this (look at viewingareacontroller)
   }
 }
