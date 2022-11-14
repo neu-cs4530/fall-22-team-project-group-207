@@ -52,16 +52,13 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   private _id: string;
 
-  private _game: string;
-
   /**
    * Create a new PoolGameAreaController
-   * @param id
+   * @param id ID of this pool area
    */
-  constructor(id: string, game: string) {
+  constructor(id: string) {
     super();
     this._id = id;
-    this._game = game;
   }
 
   /**
