@@ -9,13 +9,17 @@ import {
 import InteractableArea from './InteractableArea';
 
 export default class PoolGameArea extends InteractableArea {
-
   private _player1ID: string | undefined;
+
   private _player2ID: string | undefined;
+
   // Stripes or solids, or undeclared if no balls have been pocketed yet
   private _player1BallType: string | undefined;
+
   private _player2BallType: string | undefined;
+
   private _isPlayer1Turn: boolean;
+
   private _poolBalls: PoolBall[];
 
   public get player1ID() {
@@ -50,7 +54,15 @@ export default class PoolGameArea extends InteractableArea {
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
-    { id, player1ID, player2ID, player1BallType, player2BallType, isPlayer1Turn, poolBalls}: PoolGameAreaModel,
+    { 
+      id,
+      player1ID,
+      player2ID,
+      player1BallType,
+      player2BallType,
+      isPlayer1Turn,
+      poolBalls,
+    }: PoolGameAreaModel,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
   ) {
@@ -83,7 +95,14 @@ export default class PoolGameArea extends InteractableArea {
    *
    * @param poolGameArea updated model
    */
-  public updateModel({ player1ID, player2ID, player1BallType, player2BallType, isPlayer1Turn, poolBalls }: PoolGameAreaModel) {
+  public updateModel({
+    player1ID,
+    player2ID,
+    player1BallType,
+    player2BallType,
+    isPlayer1Turn,
+    poolBalls,
+  }: PoolGameAreaModel) {
     this._player1ID = player1ID;
     this._player2ID = player2ID;
     this._player1BallType = player1BallType;
@@ -114,13 +133,26 @@ export default class PoolGameArea extends InteractableArea {
    * @param townEmitter An emitter that can be used by this pool game area to broadcast updates to players in the town
    * @returns
    */
-  public static fromMapObject(mapObject: ITiledMapObject, townEmitter: TownEmitter): PoolGameAreaModel {
+  public static fromMapObject(
+    mapObject: ITiledMapObject,
+    townEmitter: TownEmitter,
+    ): PoolGameAreaModel {
     const { name, width, height } = mapObject;
     if (!width || !height) {
       throw new Error(`Malformed pool game area ${name}`);
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
-    return new PoolGameArea({ id: name, player1ID: undefined, player2ID: undefined, 
-      player1BallType: undefined, player2BallType: undefined, isPlayer1Turn: true, poolBalls: []}, rect, townEmitter);
+    return new PoolGameArea({
+      id: name,
+      player1ID: undefined,
+      player2ID: undefined,
+      player1BallType: undefined,
+      player2BallType: undefined,
+      isPlayer1Turn: true,
+      poolBalls: [],
+    },
+    rect,
+    townEmitter,
+    );
   }
 }
