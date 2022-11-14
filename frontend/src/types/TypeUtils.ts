@@ -17,7 +17,6 @@ export function isViewingArea(interactable: Interactable): interactable is Viewi
 /**
  * Test to see if an interactable is a PoolGame area
  */
- export function isPoolGameArea(interactable: Interactable): interactable is PoolGameArea {
+export function isPoolGameArea(interactable: Interactable): interactable is PoolGameArea {
   return 'poolBalls' in interactable;
 }
-

@@ -191,7 +191,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   private _viewingAreas: ViewingAreaController[] = [];
 
-  private _PoolGameAreas: PoolGameAreaController[] = [];
+  private _poolGameAreas: PoolGameAreaController[] = [];
 
   public constructor({ userName, townID, loginController }: ConnectionProperties) {
     super();
@@ -313,11 +313,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   public get poolGameAreas() {
-    return this._PoolGameAreas;
+    return this._poolGameAreas;
   }
 
   public set poolGameAreas(newPoolGameAreas: PoolGameAreaController[]) {
-    this._PoolGameAreas = newPoolGameAreas;
+    this._poolGameAreas = newPoolGameAreas;
     this.emit('poolGameAreasChanged', newPoolGameAreas);
   }
 
@@ -557,7 +557,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
         this._conversationAreas = [];
         this._viewingAreas = [];
-        this._PoolGameAreas = [];
+        this._poolGameAreas = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -569,7 +569,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           } else if (isViewingArea(eachInteractable)) {
             this._viewingAreas.push(new ViewingAreaController(eachInteractable));
           } else if (isPoolGameArea(eachInteractable)) {
-            this._PoolGameAreas.push(new PoolGameAreaController(eachInteractable));
+            this._poolGameAreas.push(new PoolGameAreaController(eachInteractable));
           }
         });
         this._userID = initialData.userID;
