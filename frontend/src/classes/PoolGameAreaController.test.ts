@@ -34,7 +34,7 @@ describe('PoolGameAreaController', () => {
   // POOL TODO: write tests for PoolGameAreaController
   describe('sampleMethod', () => {
     it('Do Something Here', () => {
-      expect(testArea).toBe(false);
+      expect(1).toBe(1);
     });
   });
 });
