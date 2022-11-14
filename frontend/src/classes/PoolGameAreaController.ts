@@ -148,7 +148,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // POOL TODO
   startGame(): void {
     // randomly decide who is first
-    this._isPlayer1turn = Math.random() <= 0.5; 
+    this._isPlayer1turn = Math.random() <= 0.5;
 
     // set pool balls into break position
   }
@@ -161,13 +161,13 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       if (
         this._poolBalls[this._8ballIndex].isPocketed &&
         !this._poolBalls[this._cueBallIndex].isPocketed
-        ) {
+      ) {
         if (this._player1BallsPocketed === 7) {
           // player 1 wins
           return { isGameOver: true, didPlayer1Win: true };
         } else if (this._player1BallsPocketed < 7) {
           // player 1 sunk the 8 ball before all of their own, so they lost
-          return { isGameOver: true, didPlayer1Win: false }; 
+          return { isGameOver: true, didPlayer1Win: false };
         }
       }
     }
@@ -175,13 +175,13 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       if (
         this._poolBalls[this._8ballIndex].isPocketed &&
         !this._poolBalls[this._cueBallIndex].isPocketed
-        ) {
+      ) {
         if (this._player2BallsPocketed === 7) {
           // player 2 wins
           return { isGameOver: true, didPlayer1Win: false };
         } else if (this._player2BallsPocketed < 7) {
           // player 2 sunk the 8 ball before all of their own, so they lost
-          return { isGameOver: true, didPlayer1Win: false }; 
+          return { isGameOver: true, didPlayer1Win: false };
         }
       }
     }

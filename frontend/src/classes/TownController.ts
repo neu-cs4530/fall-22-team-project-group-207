@@ -441,7 +441,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         updatedViewingArea?.updateFrom(interactable);
       } else if (isPoolGameArea(interactable)) {
         const updatedPoolGameArea = this.poolGameAreas.find(
-          eachArea => eachArea.id === interactable.id
+          eachArea => eachArea.id === interactable.id,
         );
         updatedPoolGameArea?.updateFrom(interactable);
       }
