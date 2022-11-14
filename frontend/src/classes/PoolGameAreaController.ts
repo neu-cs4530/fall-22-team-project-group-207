@@ -1,7 +1,9 @@
 import EventEmitter from 'events';
 import _ from 'lodash';
 import TypedEmitter from 'typed-emitter';
+import BackgroundSelectionDialog from '../components/VideoCall/VideoFrontend/components/BackgroundSelectionDialog/BackgroundSelectionDialog';
 import PlayerController from './PlayerController';
+//import PoolBall from './PoolBall';
 
 /**
  * Type representing the entirety of the pool game
@@ -9,10 +11,24 @@ import PlayerController from './PlayerController';
  * POOL TODO: further documentation about state
  */
 export type PoolGameState = {
-  ball1Pos: number;
-  ball2Pos: number;
+  // a list of pool ball objects, each of which contains information on their current position, velocity, etc.
+  poolBalls: FrontEndPoolBall[];
+  player1BallType: BallType;
+  player2BallType: BallType;
+  isPlayer1Turn: boolean;
+
   // POOL TODO: add more
 };
+
+/**
+ * Type representing a pool ball exclusively for the front end.
+ * For sending to the front end with only the necessary information, rather than the full backend objects.
+ */
+export type FrontEndPoolBall = {
+  posX: number;
+  posY: number;
+  orientation: string;
+}
 
 /**
  * Type representing a move being made by a player
@@ -22,8 +38,25 @@ export type PoolGameState = {
 export type PoolMove = {
   playerID: string;
   velocity: number;
+  cueHitLocationX: number;
+  cueHitLocationY: number;
   // POOL TODO: add more
 };
+
+/**
+ * Type representing the two types of pool balls and the 8 ball. 
+ */
+export type BallType = 'Stripes' | 'Solids' | '8 ball';
+
+/**
+ * Type representing a pocket. Bounds are for calculations for overlapping with a Pool Ball.
+ */
+export type Pocket = {
+  leftXBound: number;
+  rightXBound: number;
+  leftYBound: number;
+  rightYBound: number;
+}
 
 /**
  * The events that the PoolGameArea emits to subscribers. These events
@@ -47,12 +80,29 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // Players in bounds of the area
   private _occupants: PlayerController[] = [];
 
-  // Players playing the game (as opposed to spectating). A subset of occupants.
-  private _players: PlayerController[] = [];
-
   private _id: string;
 
   private _game: string;
+
+  // Players playing the game (as opposed to spectating). A subset of occupants.
+  private _players: PlayerController[] = [];
+
+  // List of Pool Ball objects in the game. May contain the cue ball, TBD.
+  private _poolBalls: PoolBall[] = [];
+
+  private _pockets: Pocket[] = [];
+
+  // Number of Pool Balls each player has pocketed, for checking whether they should win/lose the game
+  private _player1BallsPocketed: number = 0;
+
+  private _player2BallsPocketed: number = 0;
+
+  // String to hold whether a player is 'Stripes' or 'Solids'.
+  private _player1BallType: BallType = 'Stripes';
+
+  private _player2BallType: BallType = 'Solids';
+
+  private _isPlayer1turn: boolean = false;
 
   /**
    * Create a new PoolGameAreaController
@@ -90,11 +140,31 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   // POOL TODO
-  startGame(): void {}
+  startGame(): void {
+    // randomly decide who is first
+    this._isPlayer1turn = (Math.random() <= 0.5); 
+
+    // set pool balls into break position
+
+    // 
+  }
+
+  // check if the game is over
+  isGameOver(): boolean {
+    // loop through each pool ball. If every pool ball of a type is pocketed, 
+    // the 8 ball is pocketed, the cue ball is NOT pocketed, and it is a certain player's turn, that player wins.
+
+    return false;
+  }
 
   // POOL TODO
-  endGame(): void {}
+  endGame(): void {
+    
+  }
 
   // whatever else needs to go here, maybe physics
-  poolPhysicsGoHere(): void {}
+  poolPhysicsGoHere(): void {
+    // loop through every pool ball, calling an update function on them and checking for collisions.
+    // if any collisions, call the collide function on both balls, passing each other as parameters.
+  }
 }
