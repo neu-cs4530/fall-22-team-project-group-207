@@ -3,6 +3,10 @@ import _ from 'lodash';
 import TypedEmitter from 'typed-emitter';
 import BackgroundSelectionDialog from '../components/VideoCall/VideoFrontend/components/BackgroundSelectionDialog/BackgroundSelectionDialog';
 import PlayerController from './PlayerController';
+import { 
+  PoolGameArea as PoolGameAreaModel,
+  PoolBall,
+} from '../types/CoveyTownSocket';
 //import PoolBall from './PoolBall';
 
 /**
@@ -11,7 +15,7 @@ import PlayerController from './PlayerController';
  * POOL TODO: further documentation about state
  */
 export type PoolGameState = {
-  // a list of pool ball objects, each of which contains information on their current position, velocity, etc.
+  // a list of pool ball objects, each of which contains information on their current position, orientation, etc.
   poolBalls: FrontEndPoolBall[];
   player1BallType: BallType;
   player2BallType: BallType;
@@ -28,6 +32,7 @@ export type FrontEndPoolBall = {
   posX: number;
   posY: number;
   orientation: string;
+  ballNumber: number;
 }
 
 /**
@@ -49,13 +54,12 @@ export type PoolMove = {
 export type BallType = 'Stripes' | 'Solids' | '8 ball';
 
 /**
- * Type representing a pocket. Bounds are for calculations for overlapping with a Pool Ball.
+ * Type representing a pocket. Radius is for calculations for overlapping with a Pool Ball.
  */
 export type Pocket = {
-  leftXBound: number;
-  rightXBound: number;
-  leftYBound: number;
-  rightYBound: number;
+  posnX: number;
+  posnY: number;
+  radius: number;
 }
 
 /**
@@ -88,6 +92,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // List of Pool Ball objects in the game. May contain the cue ball, TBD.
   private _poolBalls: PoolBall[] = [];
 
+  private _cueBallIndex: number = 0;
+
+  private _8ballIndex: number = 1;
+
   private _pockets: Pocket[] = [];
 
   // Number of Pool Balls each player has pocketed, for checking whether they should win/lose the game
@@ -101,6 +109,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _player2BallType: BallType = 'Solids';
 
   private _isPlayer1turn: boolean = false;
+
+  // Constatns representing the length and width of a 7-foot pool table. (0, 0) is the top-left corner of the playable area.
+  private _TABLE_LENGTH: number = 78;
+
+  private _TABLE_WIDTH: number = 39;
+
 
   /**
    * Create a new PoolGameAreaController
@@ -146,22 +160,63 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // 
   }
 
-  // check if the game is over
-  isGameOver(): boolean {
-    // loop through each pool ball. If every pool ball of a type is pocketed, 
+  // Checks if the game is over. Returns a struct that contains information about if the game is over, and if so, who won.
+  isGameOver(): {isGameOver: boolean, didPlayer1Win: boolean} {
+    // If a player has 8 balls pocketed (all 7 of theirs and the 8 ball) 
     // the 8 ball is pocketed, the cue ball is NOT pocketed, and it is a certain player's turn, that player wins.
+    if (this._isPlayer1turn) {
+      if (this._poolBalls[this._8ballIndex].isPocketed
+        && !this._poolBalls[this._cueBallIndex].isPocketed) {
+          if (this._player1BallsPocketed === 7) {
+            // player 1 wins
+            return {isGameOver: true, didPlayer1Win: true};
+          }
+          else if (this._player1BallsPocketed < 7) {
+            // player 1 sunk the 8 ball before all of their own, so they lost
+            return {isGameOver: true, didPlayer1Win: false}; 
+          }
+      }
+    } 
+    if (!this._isPlayer1turn) {
+      if (this._poolBalls[this._8ballIndex].isPocketed
+        && !this._poolBalls[this._cueBallIndex].isPocketed) {
+          if (this._player2BallsPocketed === 7) {
+            // player 2 wins
+            return {isGameOver: true, didPlayer1Win: false};
+          }
+          else if (this._player2BallsPocketed < 7) {
+            // player 2 sunk the 8 ball before all of their own, so they lost
+            return {isGameOver: true, didPlayer1Win: false}; 
+          }
+      }
+    } 
 
-    return false;
+    return {isGameOver: false, didPlayer1Win: false};
   }
 
   // POOL TODO
   endGame(): void {
-    
+    const gameOverStruct: {isGameOver: boolean, didPlayer1Win: boolean} = this.isGameOver();
+
+    if (gameOverStruct.didPlayer1Win) {
+      // send update to frontend saying that player 1 won.
+    }
+    else if (!gameOverStruct.didPlayer1Win) {
+      // send update to frontend saying that player 2 won.
+    }
   }
 
   // whatever else needs to go here, maybe physics
   poolPhysicsGoHere(): void {
     // loop through every pool ball, calling an update function on them and checking for collisions.
     // if any collisions, call the collide function on both balls, passing each other as parameters.
+  }
+
+  toPoolGameAreaModel(): PoolGameAreaModel {
+    return {id: this._id, player1ID: this._players[0]?.id, player2ID: this._players[1]?.id, isPlayer1Turn: this._isPlayer1turn, poolBalls: this._poolBalls };
+  }
+
+  static fromPoolGameAreaodel(updatedModel: PoolGameAreaModel) {
+    
   }
 }
