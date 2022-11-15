@@ -1,9 +1,9 @@
-import { mock, mockClear, MockProxy } from 'jest-mock-extended';
+import { mock, mockClear, /*MockProxy*/ } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { PlayerLocation } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
 import PoolGameAreaController, { PoolGameAreaEvents } from './PoolGameAreaController';
-import TownController from './TownController';
+//import TownController from './TownController';
 describe('PoolGameAreaController', () => {
   // A valid PoolGameAreaController to be reused within the tests
   let testArea: PoolGameAreaController;
