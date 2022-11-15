@@ -70,7 +70,7 @@ export type TownEvents = {
    * the town controller's record of viewing areas.
    */
   viewingAreasChanged: (newViewingAreas: ViewingAreaController[]) => void;
-    /**
+  /**
    * An event that indicates that the set of pool game areas has changed. This event is emitted after updating
    * the town controller's record of pool game areas.
    */
