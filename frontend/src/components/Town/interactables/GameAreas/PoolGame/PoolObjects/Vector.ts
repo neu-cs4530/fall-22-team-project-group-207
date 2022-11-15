@@ -43,5 +43,5 @@ export function crossProduct(v1: vector, v2: vector): vector {
 
 // find the small (acute) angle between 2 vectors
 export function angleBetween(v1: vector, v2: vector): number {
-    return dotProduct(v1, v2) / (magnitude(v1) * magnitude(v2));
+    return Math.acos(dotProduct(v1, v2) / (magnitude(v1) * magnitude(v2)));
 }
