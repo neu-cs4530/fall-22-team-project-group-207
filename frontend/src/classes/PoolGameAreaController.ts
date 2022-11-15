@@ -219,5 +219,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   public updateFrom(updatedModel: PoolGameAreaModel) {
     // TODO: implement this (look at viewingareacontroller)
+    updatedModel;
   }
 }

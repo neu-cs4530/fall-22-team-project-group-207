@@ -7,7 +7,7 @@ import TownController from './TownController';
 describe('PoolGameAreaController', () => {
   // A valid PoolGameAreaController to be reused within the tests
   let testArea: PoolGameAreaController;
-  const townController: MockProxy<TownController> = mock<TownController>();
+  //const townController: MockProxy<TownController> = mock<TownController>();
   const mockListeners = mock<PoolGameAreaEvents>();
   beforeEach(() => {
     const playerLocation: PlayerLocation = {

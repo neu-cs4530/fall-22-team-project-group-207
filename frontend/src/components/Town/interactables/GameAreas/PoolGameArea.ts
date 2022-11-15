@@ -33,5 +33,6 @@ export default class PoolGameArea extends GameArea {
 
   private _updatePoolGameAreas(areas: PoolGameAreaController[]) {
     // POOL TODO: look at _updateWhateverAreas in other Areas for reference
+    areas;
   }
 }
