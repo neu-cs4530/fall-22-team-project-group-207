@@ -1,4 +1,4 @@
-import { mock, mockClear/*, MockProxy*/ } from 'jest-mock-extended';
+import { mock, mockClear /*, MockProxy*/ } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { PlayerLocation } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
