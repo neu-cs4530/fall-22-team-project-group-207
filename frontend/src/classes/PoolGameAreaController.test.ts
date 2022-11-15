@@ -1,6 +1,6 @@
 import { mock, mockClear /*, MockProxy*/ } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
-import { PlayerLocation } from '../types/CoveyTownSocket';
+import { PlayerLocation, PoolBall, PoolGameArea } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
 import PoolGameAreaController, { PoolGameAreaEvents } from './PoolGameAreaController';
 //import TownController from './TownController';
@@ -16,7 +16,19 @@ describe('PoolGameAreaController', () => {
       y: 0,
       rotation: 'front',
     };
-    testArea = new PoolGameAreaController(nanoid());
+    const id = nanoid();
+    const testAreaBox = { x: 100, y: 100, width: 100, height: 100 };
+    const townEmitter = mock<TownEmitter>();
+    const player1ID = nanoid();
+    const player2ID = nanoid();
+    const player1BallType = 'Stripes';
+    const player2BallType = 'Solids';
+    const isPlayer1Turn = true;
+    const poolBall1: PoolBall = {posnX: 0, posnY: 0, ballNumber: 0, ballType: 'Cue', orientation: '', isPocketed: false};
+    const poolBall2: PoolBall = {posnX: 5, posnY: 0, ballNumber: 1, ballType: 'Solid', orientation: '', isPocketed: false};
+    const poolBalls: PoolBall[] = [poolBall1, poolBall2];
+    testArea = new PoolGameAreaController({ id, player1ID, player2ID, player1BallType, player2BallType, isPlayer1Turn, poolBalls });
+    // testArea = new PoolGameAreaController(nanoid());
     testArea.occupants = [
       new PlayerController(nanoid(), nanoid(), playerLocation),
       new PlayerController(nanoid(), nanoid(), playerLocation),
