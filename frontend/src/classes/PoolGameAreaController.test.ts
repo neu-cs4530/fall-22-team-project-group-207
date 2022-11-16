@@ -1,13 +1,13 @@
-import { mock, mockClear, MockProxy } from 'jest-mock-extended';
+import { mock, mockClear /*, MockProxy*/ } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
-import { PlayerLocation } from '../types/CoveyTownSocket';
+import { PlayerLocation, PoolBall } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
 import PoolGameAreaController, { PoolGameAreaEvents } from './PoolGameAreaController';
-import TownController from './TownController';
+//import TownController from './TownController';
 describe('PoolGameAreaController', () => {
   // A valid PoolGameAreaController to be reused within the tests
   let testArea: PoolGameAreaController;
-  const townController: MockProxy<TownController> = mock<TownController>();
+  //const townController: MockProxy<TownController> = mock<TownController>();
   const mockListeners = mock<PoolGameAreaEvents>();
   beforeEach(() => {
     const playerLocation: PlayerLocation = {
@@ -16,7 +16,39 @@ describe('PoolGameAreaController', () => {
       y: 0,
       rotation: 'front',
     };
-    testArea = new PoolGameAreaController(nanoid());
+    const id = nanoid();
+    const player1ID = nanoid();
+    const player2ID = nanoid();
+    const player1BallType = 'Stripes';
+    const player2BallType = 'Solids';
+    const isPlayer1Turn = true;
+    const poolBall1: PoolBall = {
+      posnX: 0,
+      posnY: 0,
+      ballNumber: 0,
+      ballType: 'Cue',
+      orientation: '',
+      isPocketed: false,
+    };
+    const poolBall2: PoolBall = {
+      posnX: 5,
+      posnY: 0,
+      ballNumber: 1,
+      ballType: 'Solid',
+      orientation: '',
+      isPocketed: false,
+    };
+    const poolBalls: PoolBall[] = [poolBall1, poolBall2];
+    testArea = new PoolGameAreaController({
+      id,
+      player1ID,
+      player2ID,
+      player1BallType,
+      player2BallType,
+      isPlayer1Turn,
+      poolBalls,
+    });
+    // testArea = new PoolGameAreaController(nanoid());
     testArea.occupants = [
       new PlayerController(nanoid(), nanoid(), playerLocation),
       new PlayerController(nanoid(), nanoid(), playerLocation),

@@ -17,7 +17,7 @@ export type TownJoinResponse = {
   interactables: Interactable[];
 }
 
-export type Interactable = ViewingArea | ConversationArea;
+export type Interactable = ViewingArea | ConversationArea | PoolGameArea;
 
 export type TownSettingsUpdate = {
   friendlyName?: string;
@@ -67,7 +67,31 @@ export interface ViewingArea {
   video?: string;
   isPlaying: boolean;
   elapsedTimeSec: number;
-}
+};
+
+export type PoolBall = {
+  // Position on the board
+  posnX: number;
+  posnY: number;
+  // Number on the ball 1 - 15 (0 for cue ball)
+  ballNumber: number;
+  // Stripes or solids or 8ball or cue ball
+  ballType: string;
+  // Rotation for display purposes 
+  orientation: string;
+  isPocketed: boolean;
+};
+
+export interface PoolGameArea {
+  id: string;
+  player1ID?: string;
+  player2ID?: string;
+  // Stripes or solids, or undeclared if no balls have been pocketed yet
+  player1BallType?: string;
+  player2BallType?: string;
+  isPlayer1Turn: boolean;
+  poolBalls: PoolBall[];
+};
 
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;

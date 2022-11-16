@@ -16,9 +16,10 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
-import { isConversationArea, isViewingArea } from '../types/TypeUtils';
+import { isConversationArea, isPoolGameArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
 import PlayerController from './PlayerController';
+import PoolGameAreaController from './PoolGameAreaController';
 import ViewingAreaController from './ViewingAreaController';
 
 const CALCULATE_NEARBY_PLAYERS_DELAY = 300;
@@ -69,6 +70,11 @@ export type TownEvents = {
    * the town controller's record of viewing areas.
    */
   viewingAreasChanged: (newViewingAreas: ViewingAreaController[]) => void;
+  /**
+   * An event that indicates that the set of pool game areas has changed. This event is emitted after updating
+   * the town controller's record of pool game areas.
+   */
+  poolGameAreasChanged: (newPoolGameAreas: PoolGameAreaController[]) => void;
   /**
    * An event that indicates that a new chat message has been received, which is the parameter passed to the listener
    */
@@ -190,6 +196,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
   private _viewingAreas: ViewingAreaController[] = [];
 
+  private _poolGameAreas: PoolGameAreaController[] = [];
+
   public constructor({ userName, townID, loginController }: ConnectionProperties) {
     super();
     this._townID = townID;
@@ -307,6 +315,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   public set viewingAreas(newViewingAreas: ViewingAreaController[]) {
     this._viewingAreas = newViewingAreas;
     this.emit('viewingAreasChanged', newViewingAreas);
+  }
+
+  public get poolGameAreas() {
+    return this._poolGameAreas;
+  }
+
+  public set poolGameAreas(newPoolGameAreas: PoolGameAreaController[]) {
+    this._poolGameAreas = newPoolGameAreas;
+    this.emit('poolGameAreasChanged', newPoolGameAreas);
   }
 
   /**
@@ -427,6 +444,11 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
           eachArea => eachArea.id === interactable.id,
         );
         updatedViewingArea?.updateFrom(interactable);
+      } else if (isPoolGameArea(interactable)) {
+        const updatedPoolGameArea = this.poolGameAreas.find(
+          eachArea => eachArea.id === interactable.id,
+        );
+        updatedPoolGameArea?.updateFrom(interactable);
       }
     });
   }
@@ -540,6 +562,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
 
         this._conversationAreas = [];
         this._viewingAreas = [];
+        this._poolGameAreas = [];
         initialData.interactables.forEach(eachInteractable => {
           if (isConversationArea(eachInteractable)) {
             this._conversationAreasInternal.push(
@@ -550,6 +573,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
             );
           } else if (isViewingArea(eachInteractable)) {
             this._viewingAreas.push(new ViewingAreaController(eachInteractable));
+          } else if (isPoolGameArea(eachInteractable)) {
+            this._poolGameAreas.push(new PoolGameAreaController(eachInteractable));
           }
         });
         this._userID = initialData.userID;
