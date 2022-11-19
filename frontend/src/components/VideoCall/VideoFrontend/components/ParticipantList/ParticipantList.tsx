@@ -125,6 +125,7 @@ export default function ParticipantList() {
         slot={0}
       />
       <ViewingAreaVideo />
+      <PoolGameAreaViewer />
 
       {participants
         .filter((p) => nearbyPlayers.find((player) => player.id == p.participant.identity))

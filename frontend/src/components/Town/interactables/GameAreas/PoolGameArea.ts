@@ -1,5 +1,6 @@
 import PoolGameAreaController from '../../../../classes/PoolGameAreaController';
 import TownController from '../../../../classes/TownController';
+import { KnownInteractableTypes } from '../../Interactable';
 import TownGameScene from '../../TownGameScene';
 import GameArea from '../GameArea';
 
