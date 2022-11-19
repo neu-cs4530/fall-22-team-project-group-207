@@ -13,6 +13,7 @@ import {
   ChatMessage,
   CoveyTownSocket,
   PlayerLocation,
+  PoolBall,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -71,11 +72,6 @@ export type TownEvents = {
    */
   viewingAreasChanged: (newViewingAreas: ViewingAreaController[]) => void;
 
-  /**
-   * An event that indicates that the set of viewing areas has changed. This event is emitted after updating
-   * the town controller's record of viewing areas.
-   */
-  poolGamingAreasChanged: (newPoolGamingAreas: PoolGameAreaController[]) => void;
   /**
    * An event that indicates that the set of pool game areas has changed. This event is emitted after updating
    * the town controller's record of pool game areas.
@@ -532,7 +528,15 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    *
    * @param newArea
    */
-  async createPoolGamingArea(newArea: { id: string; isPlaying: boolean }) {
+  async createPoolGameArea(newArea: {
+    id: string;
+    player1ID?: string;
+    player2ID?: string;
+    player1BallType?: string;
+    player2BallType?: string;
+    isPlayer1Turn: boolean;
+    poolBalls: PoolBall[];
+  }) {
     await this._townsService.createPoolGameArea(this.townID, this.sessionToken, newArea);
   }
 
