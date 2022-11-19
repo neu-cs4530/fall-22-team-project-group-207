@@ -127,6 +127,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     return this._id;
   }
 
+  get isPlaying() {
+    return this._players.length >= 2 && !this.isGameOver;
+  }
+
   /**
    * The list of occupants in this pool area. Changing the set of occupants
    * will emit an occupantsChange event.

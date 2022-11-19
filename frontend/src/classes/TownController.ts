@@ -70,6 +70,12 @@ export type TownEvents = {
    * the town controller's record of viewing areas.
    */
   viewingAreasChanged: (newViewingAreas: ViewingAreaController[]) => void;
+
+  /**
+   * An event that indicates that the set of viewing areas has changed. This event is emitted after updating
+   * the town controller's record of viewing areas.
+   */
+  poolGamingAreasChanged: (newPoolGamingAreas: PoolGameAreaController[]) => void;
   /**
    * An event that indicates that the set of pool game areas has changed. This event is emitted after updating
    * the town controller's record of pool game areas.
@@ -698,6 +704,28 @@ export function useViewingAreaController(viewingAreaID: string): ViewingAreaCont
     throw new Error(`Requested viewing area ${viewingAreaID} does not exist`);
   }
   return viewingArea;
+}
+
+/**
+ * TODO FIX
+ * A react hook to retrieve a viewing area controller.
+ *
+ * This function will throw an error if the viewing area controller does not exist.
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @param viewingAreaID The ID of the viewing area to retrieve the controller for
+ *
+ * @throws Error if there is no viewing area controller matching the specifeid ID
+ */
+export function usePoolGameAreaController(poolGameAreaID: string): PoolGameAreaController {
+  const townController = useTownController();
+
+  const poolGameArea = townController.poolGameAreas.find(eachArea => eachArea.id == poolGameAreaID);
+  if (!poolGameArea) {
+    throw new Error(`Requested viewing area ${poolGameAreaID} does not exist`);
+  }
+  return poolGameArea;
 }
 
 /**
