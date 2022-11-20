@@ -135,17 +135,18 @@ export default function NewPoolGameModal(): JSX.Element {
 
   return (
     <Modal
+      closeOnOverlayClick={false}
       isOpen={isOpen}
       onClose={() => {
         closeModal();
         coveyTownController.unPause();
       }}>
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent maxW='1000px'>
         <ModalHeader>Play Pool!!!</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <canvas id='canvas' width='490' height='490'></canvas>
+          <canvas id='canvas' width='800' height='490'></canvas>
           <p>
             there is a canvas above this... it&apos;s just invisible for now xD trust me its there
             :)
