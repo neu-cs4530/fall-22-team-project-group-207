@@ -521,10 +521,10 @@
                  "y":1056.00016666667
                 }, 
                 {
-                 "type":"ConversationArea",
+                 "type":"PoolGameArea",
                  "height":224,
                  "id":31,
-                 "name":"Basement Dining Table 2",
+                 "name":"Pool",
                  "rotation":0,
                  "visible":true,
                  "width":164.667,

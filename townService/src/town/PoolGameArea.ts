@@ -133,10 +133,7 @@ export default class PoolGameArea extends InteractableArea {
    * @param townEmitter An emitter that can be used by this pool game area to broadcast updates to players in the town
    * @returns
    */
-  public static fromMapObject(
-    mapObject: ITiledMapObject,
-    townEmitter: TownEmitter,
-  ): PoolGameAreaModel {
+  public static fromMapObject(mapObject: ITiledMapObject, townEmitter: TownEmitter): PoolGameArea {
     const { name, width, height } = mapObject;
     if (!width || !height) {
       throw new Error(`Malformed pool game area ${name}`);
