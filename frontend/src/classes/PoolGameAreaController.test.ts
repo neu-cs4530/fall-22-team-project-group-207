@@ -58,6 +58,7 @@ describe('PoolGameAreaController', () => {
     mockClear(mockListeners.onPlayerMove);
     mockClear(mockListeners.onTick);
     mockClear(mockListeners.playersChange);
+    testArea.addListener('occupantsChange', mockListeners.occupantsChange);
 
     // POOL TODO: make and add listeners
     // testArea.addListener('occupantsChange', mockListeners.occupantsChange);
@@ -67,6 +68,29 @@ describe('PoolGameAreaController', () => {
   describe('sampleMethod', () => {
     it('Do Something Here', () => {
       expect(1).toBe(1);
+    });
+  });
+  describe('setting the occupants property', () => {
+    it('does not update the property if the new occupants are the same set as the old', () => {
+      const origOccupants = testArea.occupants;
+      const occupantsCopy = testArea.occupants.concat([]);
+      const shuffledOccupants = occupantsCopy.reverse();
+      testArea.occupants = shuffledOccupants;
+      expect(testArea.occupants).toEqual(origOccupants);
+      expect(mockListeners.occupantsChange).not.toBeCalled();
+    });
+    it('emits the occupantsChange event when setting the property and updates the model', () => {
+      const newOccupants = testArea.occupants.slice(1);
+      testArea.occupants = newOccupants;
+      expect(testArea.occupants).toEqual(newOccupants);
+      expect(mockListeners.occupantsChange).toBeCalledWith(newOccupants);
+      expect(testArea.toPoolGameAreaModel()).toEqual({
+        id: testArea.id,
+        player1ID: undefined,
+        player2ID: undefined,
+        isPlayer1Turn: false,
+        poolBalls: [],
+      });
     });
   });
 });

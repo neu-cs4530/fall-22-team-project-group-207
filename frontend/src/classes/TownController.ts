@@ -450,7 +450,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         const updatedPoolGameArea = this.poolGameAreas.find(
           eachArea => eachArea.id === interactable.id,
         );
-        updatedPoolGameArea?.updateFrom(interactable);
+        updatedPoolGameArea?.updateFrom(interactable, this._playersByIDs.bind(this));
       }
     });
   }
