@@ -42,6 +42,7 @@ export default function PoolGameAreaViewer(): JSX.Element {
 
   const createConversation = useCallback(async () => {
     if (topic && newConversation) {
+      console.log('attempting to create pool area');
       const conversationToCreate: ConversationArea = {
         topic,
         id: newConversation.name,
