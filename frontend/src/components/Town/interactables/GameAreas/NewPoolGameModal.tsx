@@ -132,62 +132,6 @@ export default function NewPoolGameModal(): JSX.Element {
     }
   }, [gameState, setGameState, coveyTownController, newPoolGame, closeModal, toast]);
 
-  /**
-   * Draw method to draw a single rectangle onto the canvas
-   * POOL TODO: get this to work
-   * @param info
-   * @param style
-   */
-  const drawRect = (
-    info = { x: 0, y: 0, width: 1, height: 1 },
-    style = { borderColor: 'black', borderWidth: 1 },
-  ) => {
-    const { x, y, width, height } = info;
-    const { borderColor, borderWidth } = style;
-
-    // ctx.beginPath();
-    // ctx.strokeStyle = borderColor;
-    // ctx.lineWidth = borderWidth;
-    // ctx.rect(x, y, w, h);
-    // ctx.stroke();
-  };
-
-  /**
-   * Draw method to draw a single sphere onto the canvas
-   * POOL TODO: get this to work
-   * @param info
-   * @param style
-   */
-  const drawSphere = (
-    info = { x: 0, y: 0, radius: 1 },
-    style = { borderColor: 'black', borderWidth: 1 },
-  ) => {
-    const { x, y, radius } = info;
-    const { borderColor, borderWidth } = style;
-  };
-
-  /**
-   * Draw method to draw the pool table onto the canvas
-   * @param table
-   * @returns
-   */
-  const drawTable = (table = { x: 10, y: 10, width: 100, height: 100 }) => {
-    return;
-  };
-
-  /**
-   * Draw method to draw a pool ball onto the canvas
-   * @param ball
-   * @param table
-   * @returns
-   */
-  const drawBall = (
-    ball = { x: 1, y: 2, z: 3, rotation: '123' },
-    table = { x: 10, y: 10, width: 100, height: 100 },
-  ) => {
-    return;
-  };
-
   return (
     <Modal
       closeOnOverlayClick={false}

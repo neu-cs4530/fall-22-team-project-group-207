@@ -256,26 +256,28 @@ export default class Town {
   }
 
   /**
-   * Creates a new conversation area in this town if there is not currently an active
-   * conversation with the same ID. The conversation area ID must match the name of a
-   * conversation area that exists in this town's map, and the conversation area must not
-   * already have a topic set.
+   * Creates a new pool game area in this town if there is not currently an active
+   * pool game with the same ID. The pool game area ID must match the name of a
+   * pool game area that exists in this town's map
    *
-   * If successful creating the conversation area, this method:
-   *  Adds any players who are in the region defined by the conversation area to it.
-   *  Notifies all players in the town that the conversation area has been updated
+   * If successful creating the pool game area, this method:
+   *  Adds any players who are in the region defined by the pool game area to it.
+   *  Notifies all players in the town that the pool game area has been updated
    *
-   * @param conversationArea Information describing the conversation area to create. Ignores any
-   *  occupantsById that are set on the conversation area that is passed to this method.
+   * @param poolGameArea Information describing the pool game area to create. Ignores any
+   *  occupantsById that are set on the pool game area that is passed to this method.
    *
-   * @returns true if the conversation is successfully created, or false if there is no known
-   * conversation area with the specified ID or if there is already an active conversation area
+   * @returns true if the pool game is successfully created, or false if there is no known
+   * pool game area with the specified ID or if there is already an active pool game area
    * with the specified ID
    */
   public addPoolGameArea(poolGameArea: PoolGameAreaModel): boolean {
     const area = this._interactables.find(
       eachArea => eachArea.id === poolGameArea.id,
     ) as PoolGameArea;
+    if (!area) {
+      return false;
+    }
     area.addPlayersWithinBounds(this._players);
     this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;

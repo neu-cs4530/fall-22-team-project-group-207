@@ -90,7 +90,7 @@ export default function PoolGameCanvas(): JSX.Element {
   return (
     <div>
       <canvas id='canvas' ref={canvasRef} width='800' height='500'></canvas>
-      {/* POOL TODO: delete this
+      {/* POOL TODO: delete this div
       <img src={ball1}></img>*/}
     </div>
   );
