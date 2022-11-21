@@ -15,8 +15,8 @@ describe('PoolGameArea', () => {
     mockClear(townEmitter);
     // POOL TODO: finish these tests
     // testArea = new PoolGameArea({}, testAreaBox, townEmitter);
-    newPlayer = new Player(nanoid(), mock<TownEmitter>());
-    testArea.add(newPlayer);
+    // newPlayer = new Player(nanoid(), mock<TownEmitter>());
+    // testArea.add(newPlayer);
   });
 
   describe('POOL TODO: sample method here', () => {
