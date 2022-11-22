@@ -53,16 +53,21 @@ export default function PoolGameCanvas(): JSX.Element {
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
 
+  /**
+   * Maps ball number to the image source path for rendering
+   * @param ballNumber Ball number
+   * @returns Source path
+   */
   function getBallSrc(ballNumber: number): string {
     switch (ballNumber) {
       case 0:
         return ball0; // cue ball
       case 1:
-        return ball1;
+        return ball1; // 1 ball
       case 2:
-        return ball2;
+        return ball2; // 2 ball
       case 3:
-        return ball3;
+        return ball3; // etc...
       default:
         return '';
     }
@@ -94,13 +99,16 @@ export default function PoolGameCanvas(): JSX.Element {
       handleMouseMove(event);
     };
 
+    // Listeners
     window.addEventListener('mousemove', handleWindowMouseMove);
     return () => {
       window.removeEventListener('mousemove', handleWindowMouseMove);
     };
   }, []);
 
-  // Main drawing method for the board
+  /**
+   * useEffect to render the board state and ball movements
+   */
   useEffect(() => {
     // Set up context for board
     const boardCanvas = boardCanvasRef.current;
@@ -113,19 +121,26 @@ export default function PoolGameCanvas(): JSX.Element {
       return;
     }
 
-    // Draw the game state
-
-    // Draw one ball
+    /**
+     * Draws one ball on the canvas, using the ball's coordinates as the center of the ball
+     * (as opposed to top left)
+     * @param ctx Canvas context
+     * @param ball Pool ball to be drawn
+     */
     function drawBall(ctx: CanvasRenderingContext2D, ball: FrontEndPoolBall) {
       const img = new Image();
       img.src = getBallSrc(ball.ballNumber);
-      // console.log('img src ' + ball1);
+      const width = img.width * 0.7;
+      const height = img.height * 0.7;
       img.onload = function () {
-        // console.log('onload');
-        ctx.drawImage(img, ball.posX, ball.posY, img.width * 0.7, img.height * 0.7);
+        ctx.drawImage(img, ball.posX - width / 2, ball.posY - height / 2, width, height);
       };
     }
-    // Draw all balls
+    /**
+     * Draw all balls on the canvas
+     * @param ctx Canvas context
+     * @param balls Pool balls to be drawn
+     */
     function drawAllBalls(ctx: CanvasRenderingContext2D, balls: FrontEndPoolBall[]) {
       balls.map(ball => drawBall(ctx, ball));
     }
@@ -142,9 +157,11 @@ export default function PoolGameCanvas(): JSX.Element {
     boardCanvasCtx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
     drawBoard(boardCanvasCtx);
     drawAllBalls(boardCanvasCtx, TEST_POOL_BALLS);
-  }, [coords]);
+  }, []);
 
-  // Main drawing method for user input
+  /**
+   * useEffect to render the player's inputs to the game
+   */
   useEffect(() => {
     // Set up context for player input
     const inputCanvas = inputCanvasRef.current;
@@ -168,12 +185,13 @@ export default function PoolGameCanvas(): JSX.Element {
       ctx.stroke();
     }
 
+    // Draw the player's inputs
     inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
     drawPlayerInput(inputCanvasCtx);
   }, [coords]);
 
   return (
-    <div>
+    <div data-style='position: relative'>
       <canvas
         id='board canvas'
         ref={boardCanvasRef}
