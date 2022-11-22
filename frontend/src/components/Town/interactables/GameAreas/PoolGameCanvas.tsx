@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FrontEndPoolBall } from '../../../../classes/PoolGameAreaController';
-import context from '../../../../contexts/LoginControllerContext';
 import ball0 from './PoolGameAssets/ball_0.png';
 import ball1 from './PoolGameAssets/ball_1.png';
 import ball2 from './PoolGameAssets/ball_2.png';
@@ -49,8 +48,10 @@ export default function PoolGameCanvas(): JSX.Element {
   const [globalCoords, setGlobalCoords] = useState({ x: 0, y: 0 });
 
   // canvas for rendering the game
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const boardCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const boardCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const inputCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
 
   function getBallSrc(ballNumber: number): string {
     switch (ballNumber) {
@@ -71,7 +72,7 @@ export default function PoolGameCanvas(): JSX.Element {
   useEffect(() => {
     // Get local mouse coordinates
     const handleMouseMove = (event: { screenX: number; screenY: number }) => {
-      const canvas = canvasRef.current;
+      const canvas = boardCanvasRef.current;
       if (!canvas) {
         console.log('could not find canvasRef.current');
         return;
@@ -99,18 +100,16 @@ export default function PoolGameCanvas(): JSX.Element {
     };
   }, []);
 
-  // Main drawing method
+  // Main drawing method for the board
   useEffect(() => {
-    // Set up context
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      console.log('could not find canvasRef.current');
+    // Set up context for board
+    const boardCanvas = boardCanvasRef.current;
+    if (!boardCanvas) {
       return;
     }
-    canvasCtxRef.current = canvas.getContext('2d');
-    const canvasCtx = canvasCtxRef.current;
-    if (!canvasCtx) {
-      console.log('could not find canvasCtxRef.current');
+    boardCanvasCtxRef.current = boardCanvas.getContext('2d');
+    const boardCanvasCtx = boardCanvasCtxRef.current;
+    if (!boardCanvasCtx) {
       return;
     }
 
@@ -139,19 +138,57 @@ export default function PoolGameCanvas(): JSX.Element {
       };
     }
 
-    console.log('coords ' + canvas.offsetTop + ' ' + canvas.offsetLeft);
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-    drawBoard(canvasCtx);
-    drawAllBalls(canvasCtx, TEST_POOL_BALLS);
-  }, []);
+    // Actually draw stuff
+    boardCanvasCtx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
+    drawBoard(boardCanvasCtx);
+    drawAllBalls(boardCanvasCtx, TEST_POOL_BALLS);
+  }, [coords]);
+
+  // Main drawing method for user input
+  useEffect(() => {
+    // Set up context for player input
+    const inputCanvas = inputCanvasRef.current;
+    if (!inputCanvas) {
+      return;
+    }
+    inputCanvasCtxRef.current = inputCanvas.getContext('2d');
+    const inputCanvasCtx = inputCanvasCtxRef.current;
+    if (!inputCanvasCtx) {
+      return;
+    }
+
+    // Draw the player's input
+    function drawPlayerInput(ctx: CanvasRenderingContext2D) {
+      ctx.beginPath();
+      ctx.moveTo(coords.x, coords.y);
+
+      ctx.lineTo(TEST_POOL_BALLS[0].posX, TEST_POOL_BALLS[0].posY);
+      ctx.strokeStyle = 'black';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
+    drawPlayerInput(inputCanvasCtx);
+  }, [coords]);
 
   return (
     <div>
-      <canvas id='canvas' ref={canvasRef} width='800' height='500'></canvas>
-      {/* POOL TODO: delete this div
-      <img src={ball1}></img>*/}
+      <canvas
+        id='board canvas'
+        ref={boardCanvasRef}
+        width='800'
+        height='500'
+        data-style='position: absolute; left: 0; top: 0; z-index: 1;'></canvas>
+      <canvas
+        id='input canvas'
+        ref={inputCanvasRef}
+        width='800'
+        height='500'
+        data-style='position: absolute; left: 0; top: 0; z-index: 2;'></canvas>
+      {/* POOL TODO: delete this div*/}
       <div>
-        {/* 👇️ Get mouse coordinates relative to element */}
+        {/* Get mouse coordinates relative to element */}
         <div style={{ padding: '3rem', backgroundColor: 'lightgray' }}>
           <h2>
             Canvas coords: {coords.x} {coords.y}
