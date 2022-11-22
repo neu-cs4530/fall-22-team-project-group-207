@@ -146,25 +146,13 @@ export default function NewPoolGameModal(): JSX.Element {
         <ModalCloseButton />
         <ModalBody pb={6}>
           <PoolGameCanvas />
-          <p>
-            there is a canvas above this... it&apos;s just invisible for now xD trust me its there
-            :)
-          </p>
-          <p>
-            the code for this is visible in NewPoolGameModal.tsx in interactables/GameAreas folder
-          </p>
-          <p>
-            Stuff todo: make the pool thingy actually draw in the canvas... need to figure out how
-            to find the canvas through the code to update it through react...
-          </p>
           {/**
            * some references:
            * https://kernhanda.github.io/tutorial-typescript-canvas-drawing/
            * https://www.cluemediator.com/draw-a-line-on-canvas-using-react/
            */}
-          <p>also maybe figure out how to make the modal bigger lol</p>
         </ModalBody>
-        <ModalFooter>footer here</ModalFooter>
+        <ModalFooter>exit</ModalFooter>
       </ModalContent>
     </Modal>
   );
