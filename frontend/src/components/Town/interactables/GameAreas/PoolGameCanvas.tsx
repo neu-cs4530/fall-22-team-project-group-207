@@ -176,12 +176,26 @@ export default function PoolGameCanvas(): JSX.Element {
 
     // Draw the player's input
     function drawPlayerInput(ctx: CanvasRenderingContext2D) {
+      const ballX = TEST_POOL_BALLS[0].posX; // POOL TODO: fix this to actually use the cue ball
+      const ballY = TEST_POOL_BALLS[0].posY;
+      /*
+      // This code draws a line from the mouse to the cue ball
       ctx.beginPath();
       ctx.moveTo(coords.x, coords.y);
-
-      ctx.lineTo(TEST_POOL_BALLS[0].posX, TEST_POOL_BALLS[0].posY);
+      ctx.lineTo(ballX, ballY);
       ctx.strokeStyle = 'black';
       ctx.lineWidth = 2;
+      ctx.stroke();
+      */
+
+      const r = Math.atan2(coords.y - TEST_POOL_BALLS[0].posY, coords.x - TEST_POOL_BALLS[0].posX);
+      const ballOffset = 35;
+      const handleOffset = 300;
+      ctx.beginPath();
+      ctx.moveTo(ballOffset * Math.cos(r) + ballX, ballOffset * Math.sin(r) + ballY);
+      ctx.lineTo(handleOffset * Math.cos(r) + ballX, handleOffset * Math.sin(r) + ballY);
+      ctx.strokeStyle = 'brown';
+      ctx.lineWidth = 6;
       ctx.stroke();
     }
 
@@ -191,22 +205,28 @@ export default function PoolGameCanvas(): JSX.Element {
   }, [coords]);
 
   return (
-    <div data-style='position: relative'>
+    <div id='container'>
       <canvas
         id='board canvas'
+        className='canvas'
         ref={boardCanvasRef}
         width='800'
         height='500'
-        data-style='position: absolute; left: 0; top: 0; z-index: 1;'></canvas>
+        style={{ backgroundImage: pool_table, position: 'absolute' }}></canvas>
       <canvas
         id='input canvas'
+        className='canvas'
         ref={inputCanvasRef}
         width='800'
         height='500'
-        data-style='position: absolute; left: 0; top: 0; z-index: 2;'></canvas>
-      {/* POOL TODO: delete this div*/}
+        style={{ backgroundImage: pool_table, position: 'absolute' }}></canvas>
+      <div style={{ height: '500px' }}>{/* div to hold space for canvas */}</div>
       <div>
+        {/* POOL TODO: delete this div*/}
         {/* Get mouse coordinates relative to element */}
+        <hr />
+        <hr />
+        <hr />
         <div style={{ padding: '3rem', backgroundColor: 'lightgray' }}>
           <h2>
             Canvas coords: {coords.x} {coords.y}

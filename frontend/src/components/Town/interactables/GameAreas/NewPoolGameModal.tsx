@@ -141,7 +141,7 @@ export default function NewPoolGameModal(): JSX.Element {
         coveyTownController.unPause();
       }}>
       <ModalOverlay />
-      <ModalContent maxW='1000px'>
+      <ModalContent maxW='1000px' height='800px'>
         <ModalHeader>Play Pool!!!</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
