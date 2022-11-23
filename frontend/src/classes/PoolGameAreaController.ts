@@ -1,8 +1,10 @@
 import EventEmitter from 'events';
 import _ from 'lodash';
+import { useEffect, useState } from 'react';
 import TypedEmitter from 'typed-emitter';
 import PlayerController from './PlayerController';
-import { PoolGameArea as PoolGameAreaModel, PoolBall } from '../types/CoveyTownSocket';
+import { PoolGameArea as PoolGameAreaModel, PoolBall, Player } from '../types/CoveyTownSocket';
+import TownController from './TownController';
 //import PoolBall from './PoolBall';
 
 /**
@@ -10,12 +12,13 @@ import { PoolGameArea as PoolGameAreaModel, PoolBall } from '../types/CoveyTownS
  *
  * POOL TODO: further documentation about state
  */
-export type PoolGameState = {
+export type PoolGameModel = {
   // a list of pool ball objects, each of which contains information on their current position, orientation, etc.
-  poolBalls: FrontEndPoolBall[];
-  player1BallType: BallType;
-  player2BallType: BallType;
+  poolBalls: PoolBallModel[];
+  player1BallType: string | undefined;
+  player2BallType: string | undefined;
   isPlayer1Turn: boolean;
+  isBallBeingPlaced: boolean;
 
   // POOL TODO: add more
 };
@@ -24,9 +27,9 @@ export type PoolGameState = {
  * Type representing a pool ball exclusively for the front end.
  * For sending to the front end with only the necessary information, rather than the full backend objects.
  */
-export type FrontEndPoolBall = {
-  posX: number;
-  posY: number;
+export type PoolBallModel = {
+  posnX: number;
+  posnY: number;
   orientation: string;
   ballNumber: number;
 };
@@ -41,6 +44,7 @@ export type PoolMove = {
   velocity: number;
   cueHitLocationX: number;
   cueHitLocationY: number;
+  cueHitLocationZ: number;
   // POOL TODO: add more
 };
 
@@ -64,7 +68,7 @@ export type Pocket = {
  */
 export type PoolGameAreaEvents = {
   // To animate the game playing
-  onTick: () => void;
+  onTick: (newModel: PoolGameModel) => void;
 
   // To tell other clients that a player has made a move
   onPlayerMove: (newMove: PoolMove) => void;
@@ -81,6 +85,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _occupants: PlayerController[] = [];
 
   private _id: string;
+
+  // Current state of the game that we send to the front end for rendering
+  public currentModel: PoolGameModel; 
+
+  // Current move inputted by a player. Information in here is passed to the physics,
+  public currentMove: PoolMove | undefined = undefined;
 
   // Players playing the game (as opposed to spectating). A subset of occupants.
   private _players: PlayerController[] = [];
@@ -100,11 +110,14 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _player2BallsPocketed = 0;
 
   // String to hold whether a player is 'Stripes' or 'Solids'.
-  private _player1BallType: BallType = 'Stripes';
+  private _player1BallType: string | undefined = undefined;
 
-  private _player2BallType: BallType = 'Solids';
+  private _player2BallType: string | undefined = undefined;
 
   private _isPlayer1turn = false;
+
+  // Boolean that represents whether a player has to replace a ball or not
+  private _isBallBeingPlaced = false;
 
   // Constatns representing the length and width of a 7-foot pool table. (0, 0) is the top-left corner of the playable area.
   private _tableLength = 78;
@@ -118,6 +131,13 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   constructor(poolGameModel: PoolGameAreaModel) {
     super();
     this._id = poolGameModel.id;
+    this.currentModel = {
+      poolBalls: this._poolBalls,
+      player1BallType: this._player1BallType,
+      player2BallType: this._player2BallType,
+      isPlayer1Turn: this._isPlayer1turn,
+      isBallBeingPlaced: this._isBallBeingPlaced,
+    };
   }
 
   /**
@@ -125,6 +145,13 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    */
   get id() {
     return this._id;
+  }
+
+   /**
+   * The Current Turn of this pool area (read only)
+   */
+  get isPlayer1Turn() {
+    return this._isPlayer1turn;
   }
 
   /**
@@ -143,6 +170,20 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   get occupants() {
     return this._occupants;
+  }
+
+  /**
+   * The list of players in this pool area. Changing the set of players
+   * will emit an playersChange event.
+   */
+  set players(newPlayers: PlayerController[]) {
+    if (
+      newPlayers.length !== this._players.length ||
+      _.xor(newPlayers, this._players).length > 0
+    ) {
+      this.emit('playersChange', newPlayers);
+      this._players = newPlayers;
+    }
   }
 
   // POOL TODO
@@ -202,8 +243,85 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   // whatever else needs to go here, maybe physics
   poolPhysicsGoHere(): void {
+    // call physics update function with the currentMove information
+    // physics(this.currentMove?.cueHitLocationX, this.currentMove?.cueHitLocationY)
+
+
     // loop through every pool ball, calling an update function on them and checking for collisions.
     // if any collisions, call the collide function on both balls, passing each other as parameters.
+    this._poolBalls.forEach(ball => {
+      if (ball.isMoving) {
+        this._poolBalls.forEach(otherBall => {
+          if(ball.ballNumber === 0 || otherBall.ballNumber === 0) {
+            // call cue/ball collision check
+
+            // otherBall is the cue
+            if (this.isPlayer1Turn
+              && ball.ballNumber === 0
+              && otherBall.ballType !== this._player1BallType) {
+              // player 1 hit the wrong ball, scratch
+              this._isBallBeingPlaced = true;
+            }
+            if (!this.isPlayer1Turn
+              && ball.ballNumber === 0
+              && otherBall.ballType !== this._player2BallType) {
+              // player 2 hit the wrong ball, scratch
+              this._isBallBeingPlaced = true;
+            }
+            
+            // ball is the cue
+            if (this.isPlayer1Turn
+              && ball.ballNumber !== 0
+              && ball.ballType !== this._player1BallType) {
+              // player 1 hit the wrong ball, scratch
+              this._isBallBeingPlaced = true;
+            }
+            if (!this.isPlayer1Turn
+              && ball.ballNumber !== 0
+              && ball.ballType !== this._player2BallType) {
+              // player 2 hit the wrong ball, scratch
+              this._isBallBeingPlaced = true;
+            }
+          }
+          else {
+            // call check collision between the two balls
+          }
+        })
+        // call check if ball goes in pocket
+        // if (ball collides with pocket) {
+        //   ball.isMoving = false;
+        //   ball.isPocketed = true;
+        //   (this.isPlayer1Turn) ? this._player1BallsPocketed++ : this._player2BallsPocketed++;
+        // }
+
+        // check if the ball has gone off the board/ over the rails
+        // let haveWeScratched = false;
+        // if (ball.posnX > rightSideRailX) {
+        //   ball.posnX = rightSideRailX - ballRadius;
+        //   haveWeScratched = ball.ballNumber === 0;
+        // }
+        // if (ball.posnX < leftSideRailX) {
+        //   ball.posnX = leftSideRailX + ballRadius;
+        //   haveWeScratched = ball.ballNumber === 0;
+        // }
+        // if (ball.posnY > bottomSideRailY) {
+        //   ball.posnY = bottomSideRailY + ballRadius;
+        //   haveWeScratched = ball.ballNumber === 0;
+        // }
+        // if (ball.posnX > topSideRailY) {
+        //   ball.posnX = topSideRailY - ballRadius;
+        //   haveWeScratched = ball.ballNumber === 0;
+        // }
+        // if (haveWeScratched) {
+        //   this._isBallBeingPlaced = true;
+        // }
+      }
+    });
+
+    // update the current PoolGameModel variable (currentModel). Might be worth moving this into its own function? so we can emit a onTick?
+    this.currentModel.isBallBeingPlaced = this._isBallBeingPlaced;
+    this.currentModel.isPlayer1Turn = this.isPlayer1Turn;
+    this.currentModel.poolBalls = this._poolBalls;
   }
 
   toPoolGameAreaModel(): PoolGameAreaModel {
@@ -219,6 +337,57 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   public updateFrom(updatedModel: PoolGameAreaModel) {
     // TODO: implement this (look at viewingareacontroller)
+    this._isPlayer1turn = updatedModel.isPlayer1Turn;
+    this._player1BallType = updatedModel.player1BallType;
+    this._player2BallType = updatedModel.player2BallType;
     this._poolBalls = updatedModel.poolBalls;
   }
+}
+
+/**
+ * A react hook to retrieve the occupants of a PoolGameAreaController, returning an array of PlayerController.
+ *
+ * This hook will re-render any components that use it when the set of occupants changes.
+ */
+ export function usePoolGameAreaOccupants(area: PoolGameAreaController): PlayerController[] {
+  const [occupants, setOccupants] = useState(area.occupants);
+  useEffect(() => {
+    area.addListener('occupantsChange', setOccupants);
+    return () => {
+      area.removeListener('occupantsChange', setOccupants);
+    };
+  }, [area]);
+  return occupants;
+}
+
+/**
+ * A react hook to retrieve the PoolGameModel of a PoolGameAreaController, returning a PoolGameModel.
+ *
+ * This hook will re-render any components that use it when the current PoolGameModel changes.
+ */
+ export function usePoolGameModel(area: PoolGameAreaController): PoolGameModel {
+  const [gameModel, setGameModel] = useState(area.currentModel);
+  useEffect(() => {
+    area.addListener('onTick', setGameModel);
+    return () => {
+      area.removeListener('onTick', setGameModel);
+    };
+  }, [area, setGameModel]);
+  return gameModel;
+}
+
+/**
+ * A react hook to retrieve the current PoolMove of a PoolGameAreaController, returning a PoolMove.
+ *
+ * This hook will re-render any components that use it when the current PoolMove changes.
+ */
+ export function usePoolGameMove(area: PoolGameAreaController): PoolMove {
+  const [playerMove, setPlayerMove] = useState(area.currentMove);
+  useEffect(() => {
+    area.addListener('playerMove', setPlayerMove);
+    return () => {
+      area.removeListener('playerMove', setPlayerMove);
+    };
+  }, [area, setPlayerMove]);
+  return playerMove;
 }
