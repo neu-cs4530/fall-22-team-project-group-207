@@ -1,6 +1,6 @@
-#container {
+#pool-canvas-container {
   position: relative;
 }
-.canvas {
+.pool-canvas {
   position: absolute;
 }

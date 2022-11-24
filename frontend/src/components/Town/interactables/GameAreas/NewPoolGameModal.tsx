@@ -35,6 +35,7 @@ export default function NewPoolGameModal(): JSX.Element {
   canvasRef.current?.getContext('2d');
   const canvasCtxRef = React.useRef<CanvasRenderingContext2D | null>(null);
 
+  // POOL TODO: this useEffect could probably be removed, as drawing is handled in PoolGameCanvas now
   useEffect(() => {
     // Initialize
     console.log('attempting to find canvasRef.current');
@@ -145,8 +146,9 @@ export default function NewPoolGameModal(): JSX.Element {
         <ModalHeader>Play Pool!!!</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <PoolGameCanvas />
+          <PoolGameCanvas poolGameArea={undefined} />
           {/**
+           * POOL TODO: update poolGameArea above to be not undefined
            * some references:
            * https://kernhanda.github.io/tutorial-typescript-canvas-drawing/
            * https://www.cluemediator.com/draw-a-line-on-canvas-using-react/
