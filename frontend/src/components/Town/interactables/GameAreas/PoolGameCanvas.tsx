@@ -2,11 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FrontEndPoolBall } from '../../../../classes/PoolGameAreaController';
 import { usePoolGameAreaController } from '../../../../classes/TownController';
 import PoolGameArea from './PoolGameArea';
-import ball0 from './PoolGameAssets/ball_0.png';
-import ball1 from './PoolGameAssets/ball_1.png';
-import ball2 from './PoolGameAssets/ball_2.png';
-import ball3 from './PoolGameAssets/ball_3.png';
-import pool_table from './PoolGameAssets/pool_table.png';
+import { POOL_BALL_PATHS, POOL_TABLE_PATH } from './PoolGameAssets/assets';
 // POOL TODO: add the rest of the imports
 
 // POOL TODO: remove test balls
@@ -65,32 +61,12 @@ export default function PoolGameCanvas({
   const spectating = false;
 
   /**
-   * Maps ball number to the image source path for rendering
-   * @param ballNumber Ball number
-   * @returns Source path
-   */
-  function getBallSrc(ballNumber: number): string {
-    switch (ballNumber) {
-      case 0:
-        return ball0; // cue ball
-      case 1:
-        return ball1; // 1 ball
-      case 2:
-        return ball2; // 2 ball
-      case 3:
-        return ball3; // etc...
-      default:
-        return '';
-    }
-  }
-
-  /**
    * Draws the board on the canvas
    * @param ctx Canvas context
    */
   function drawBoard(ctx: CanvasRenderingContext2D) {
     const img = new Image();
-    img.src = pool_table;
+    img.src = POOL_TABLE_PATH;
     img.onload = function () {
       ctx.drawImage(img, 0, 0, img.width * 1.5, img.height * 1.5);
     };
@@ -167,7 +143,7 @@ export default function PoolGameCanvas({
      */
     function drawBall(ctx: CanvasRenderingContext2D, ball: FrontEndPoolBall) {
       const img = new Image();
-      img.src = getBallSrc(ball.ballNumber);
+      img.src = POOL_BALL_PATHS[ball.ballNumber];
       const width = img.width * 0.7;
       const height = img.height * 0.7;
       img.onload = function () {
