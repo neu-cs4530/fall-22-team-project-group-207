@@ -1,15 +1,15 @@
-import ball0 from 'ball_0.jpg';
-import ball1 from 'ball_1.jpg';
-import ball10 from 'ball_10.jpg';
-import ball2 from 'ball_2.jpg';
-import ball3 from 'ball_3.jpg';
-import ball4 from 'ball_4.jpg';
-import ball5 from 'ball_5.jpg';
-import ball6 from 'ball_6.jpg';
-import ball7 from 'ball_7.jpg';
-import ball8 from 'ball_8.jpg';
-import ball9 from 'ball_9.jpg';
-import pool_table from 'pool_table.jpg';
+import ball0 from './ball_0.png';
+import ball1 from './ball_1.png';
+import ball10 from './ball_10.png';
+import ball2 from './ball_2.png';
+import ball3 from './ball_3.png';
+import ball4 from './ball_4.png';
+import ball5 from './ball_5.png';
+import ball6 from './ball_6.png';
+import ball7 from './ball_7.png';
+import ball8 from './ball_8.png';
+import ball9 from './ball_9.png';
+import pool_table from './pool_table.png';
 
 // POOL TODO: add in the rest of the pool balls
 export const POOL_BALL_PATHS = [

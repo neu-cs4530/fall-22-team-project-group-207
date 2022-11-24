@@ -245,14 +245,14 @@ export default function PoolGameCanvas({
         ref={boardCanvasRef}
         width='800'
         height='500'
-        style={{ backgroundImage: pool_table, position: 'absolute' }}></canvas>
+        style={{ backgroundImage: POOL_TABLE_PATH, position: 'absolute' }}></canvas>
       <canvas
         id='input canvas'
         className='pool-canvas'
         ref={inputCanvasRef}
         width='800'
         height='500'
-        style={{ backgroundImage: pool_table, position: 'absolute' }}></canvas>
+        style={{ backgroundImage: POOL_TABLE_PATH, position: 'absolute' }}></canvas>
       <div style={{ height: '500px' }}>{/* div to hold space for canvas */}</div>
       <div>
         {/* POOL TODO: delete this div*/}
