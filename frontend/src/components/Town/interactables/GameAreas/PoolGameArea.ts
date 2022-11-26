@@ -70,6 +70,7 @@ export default class PoolGameArea extends GameArea {
   }
 
   interact(): void {
+    console.log('hello');
     this._labelText?.setVisible(false);
     this._isInteracting = true;
   }
@@ -91,17 +92,20 @@ export default class PoolGameArea extends GameArea {
         }
         // This might be useful if we want to update a text box saying whos turn it is?
         const updateListener = (newTurn: boolean) => {
-          if (newTurn) {
-            if (this._infoTextBox && this._infoTextBox.visible) {
-              this._infoTextBox.setVisible(false);
+          if (this._infoTextBox) {
+            if (newTurn) {
+              if (this._infoTextBox.visible) {
+                this._infoTextBox.setVisible(false);
+              }
+              this._infoTextBox.text = 'Player 1 Turn';
+            } else {
+              this._infoTextBox.text = 'Player 2 Turn';
             }
-            this._infoTextBox.text = 'Player 1 Turn';
-          } else {
-            this._infoTextBox.text = 'Player 2 Turn';
           }
         };
         updateListener(area.isPlayer1Turn);
-        area.addListener('turnChange', updateListener);
+        // POOL TODO: add this event??
+        // area.addListener('turnChange', updateListener);
       }
     }
   }

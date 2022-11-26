@@ -13,7 +13,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { PoolGameState } from '../../../../classes/PoolGameAreaController';
+import { PoolGameModel } from '../../../../classes/PoolGameAreaController';
 import { useInteractable } from '../../../../classes/TownController';
 import { PoolGameArea } from '../../../../generated/client';
 import useTownController from '../../../../hooks/useTownController';
@@ -26,7 +26,7 @@ import PoolGameCanvas from './PoolGameCanvas';
 export default function NewPoolGameModal(): JSX.Element {
   const coveyTownController = useTownController();
   const newPoolGame = useInteractable('gameArea');
-  const [gameState, setGameState] = useState<PoolGameState>();
+  const [gameState, setGameState] = useState<PoolGameModel>();
 
   const isOpen = newPoolGame !== undefined;
 
@@ -88,22 +88,23 @@ export default function NewPoolGameModal(): JSX.Element {
       poolBalls: Array<PoolBall>;
     };
 
-    type PoolGameState = {
+    type PoolGameModel = {
       poolBalls: FrontEndPoolBall[];
       player1BallType: BallType;
       player2BallType: BallType;
       isPlayer1Turn: boolean;
     }
    */
-  const createPoolGame = useCallback(async () => {
+  /* const createPoolGame = useCallback(async () => {
     if (gameState && newPoolGame) {
-      const poolGameToCreate: PoolGameArea = {
-        id: newPoolGame.id,
+      const poolGameToCreate: PoolGameModel = {
+        // id: newPoolGame.id,
         // player1ID: ,
         // player2ID: ,
         isPlayer1Turn: gameState.isPlayer1Turn,
         player1BallType: gameState.player1BallType,
         player2BallType: gameState.player2BallType,
+        isBallBeingPlaced: false,
         poolBalls: [], //gameState.poolBalls.map(b => b), // POOL TODO: convert from frontend to backend balls
       };
       try {
@@ -131,7 +132,7 @@ export default function NewPoolGameModal(): JSX.Element {
         }
       }
     }
-  }, [gameState, setGameState, coveyTownController, newPoolGame, closeModal, toast]);
+  }, [gameState, setGameState, coveyTownController, newPoolGame, closeModal, toast]); */
 
   return (
     <Modal

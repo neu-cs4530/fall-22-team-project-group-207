@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { FrontEndPoolBall } from '../../../../classes/PoolGameAreaController';
+import { PoolBallModel } from '../../../../classes/PoolGameAreaController';
 import { usePoolGameAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
@@ -8,28 +8,28 @@ import { POOL_BALL_PATHS, POOL_TABLE_PATH } from './PoolGameAssets/assets';
 // POOL TODO: add the rest of the imports
 
 // POOL TODO: remove test balls
-const TEST_POOL_BALLS = [
+const TEST_POOL_BALLS: PoolBallModel[] = [
   {
-    posX: 380,
-    posY: 260,
+    posnX: 380,
+    posnY: 260,
     orientation: '',
     ballNumber: 0,
   },
   {
-    posX: 500,
-    posY: 200,
+    posnX: 500,
+    posnY: 200,
     orientation: '',
     ballNumber: 1,
   },
   {
-    posX: 100,
-    posY: 140,
+    posnX: 100,
+    posnY: 140,
     orientation: '',
     ballNumber: 2,
   },
   {
-    posX: 400,
-    posY: 340,
+    posnX: 400,
+    posnY: 340,
     orientation: '',
     ballNumber: 3,
   },
@@ -45,8 +45,8 @@ export default function PoolGameCanvas({
   poolGameArea: PoolGameArea | undefined;
 }): JSX.Element {
   // POOL TODO: add react hooks for game state so we can update this with the pool balls
-  const coveyTownController = useTownController(); // not sure if we need this
-  const poolGameAreaController = usePoolGameAreaController(poolGameArea?.name);
+  // const coveyTownController = useTownController(); // not sure if we need this
+  // const poolGameAreaController = usePoolGameAreaController(poolGameArea?.name);
   // const [poolBalls, setPoolBalls] = useState<FrontEndPoolBall>(poolGameArea?.poolBalls);
 
   // Coordinates of mouse
@@ -100,6 +100,7 @@ export default function PoolGameCanvas({
       }
       // When the current player needs to input a hit
       else if (isPlayersTurn) {
+        /*
         const velocityUnitVector: Vector = unitVector(
           subtractVectors(cueBall.position, cueTip.position),
         );
@@ -111,6 +112,7 @@ export default function PoolGameCanvas({
         );
 
         poolGameAreaController.poolPhysicsGoHere(); // POOL TODO: pass the vectors to the controller to handle physics
+        */
       }
       // When the current player is spectating or waiting on the other player's move
       else if (spectating) {
@@ -130,7 +132,7 @@ export default function PoolGameCanvas({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mousedown', handleMouseClick);
     };
-  }, [isPlayersTurn, mousePos, poolGameAreaController, scratch, spectating]);
+  }, [isPlayersTurn, mousePos, scratch, spectating]);
 
   /**
    * useEffect to render the board state and ball movements
@@ -153,13 +155,13 @@ export default function PoolGameCanvas({
      * @param ctx Canvas context
      * @param ball Pool ball to be drawn
      */
-    function drawBall(ctx: CanvasRenderingContext2D, ball: FrontEndPoolBall) {
+    function drawBall(ctx: CanvasRenderingContext2D, ball: PoolBallModel) {
       const img = new Image();
       img.src = POOL_BALL_PATHS[ball.ballNumber];
       const width = img.width * 0.7;
       const height = img.height * 0.7;
       img.onload = function () {
-        ctx.drawImage(img, ball.posX - width / 2, ball.posY - height / 2, width, height);
+        ctx.drawImage(img, ball.posnX - width / 2, ball.posnY - height / 2, width, height);
       };
     }
 
@@ -168,7 +170,7 @@ export default function PoolGameCanvas({
      * @param ctx Canvas context
      * @param balls Pool balls to be drawn
      */
-    function drawAllBalls(ctx: CanvasRenderingContext2D, balls: FrontEndPoolBall[]) {
+    function drawAllBalls(ctx: CanvasRenderingContext2D, balls: PoolBallModel[]) {
       balls.map(ball => drawBall(ctx, ball));
     }
 
@@ -198,8 +200,8 @@ export default function PoolGameCanvas({
      * @param ctx Canvas context
      */
     function drawCueStick(ctx: CanvasRenderingContext2D) {
-      const ballX = TEST_POOL_BALLS[0].posX; // POOL TODO: fix this to actually use the cue ball
-      const ballY = TEST_POOL_BALLS[0].posY;
+      const ballX = TEST_POOL_BALLS[0].posnX; // POOL TODO: fix this to actually use the cue ball
+      const ballY = TEST_POOL_BALLS[0].posnY;
       /*
       // This code draws a line from the mouse to the cue ball
       ctx.beginPath();
@@ -223,8 +225,8 @@ export default function PoolGameCanvas({
 
     // Draw the player placing down the cue ball
     function drawPlaceCueBall(ctx: CanvasRenderingContext2D) {
-      TEST_POOL_BALLS[0].posX = mousePos.x;
-      TEST_POOL_BALLS[0].posY = mousePos.y;
+      TEST_POOL_BALLS[0].posnX = mousePos.x;
+      TEST_POOL_BALLS[0].posnY = mousePos.y;
       // drawBall(ctx, TEST_POOL_BALLS[0]);
     }
 
