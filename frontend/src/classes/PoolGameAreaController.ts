@@ -93,7 +93,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   public currentMove: PoolMove | undefined = undefined;
 
   // Players playing the game (as opposed to spectating). A subset of occupants.
-  private _players: PlayerController[] = [];
+  private _players: PlayerController[];
 
   // List of Pool Ball objects in the game. May contain the cue ball, TBD.
   private _poolBalls: PoolBall[] = [];
@@ -148,6 +148,31 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    */
   get id() {
     return this._id;
+  }
+
+  get isPlaying() {
+    return this._players.length >= 2 && !this.isGameOver;
+  }
+
+  /**
+   * The Current Turn of this pool area (read only)
+   */
+  get isPlayer1Turn() {
+    return this._isPlayer1turn;
+  }
+
+  /**
+   * Whether the game has started.
+   */
+  get isGameStarted() {
+    return this._isGameStarted;
+  }
+
+  /**
+   * Whether the game has started. Setting this to true will allow gameTick() to start updating the game.
+   */
+  set isGameStarted(hasGameStarted: boolean) {
+    this._isGameStarted = hasGameStarted;
   }
 
   /**
@@ -398,12 +423,22 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     };
   }
 
-  public updateFrom(updatedModel: PoolGameAreaModel) {
-    // TODO: implement this (look at viewingareacontroller)
+  public updateFrom(
+    updatedModel: PoolGameAreaModel,
+    playerFinder: (playerIDs: string[]) => PlayerController[],
+  ) {
     this._isPlayer1turn = updatedModel.isPlayer1Turn;
     this._player1BallType = updatedModel.player1BallType;
     this._player2BallType = updatedModel.player2BallType;
     this._poolBalls = updatedModel.poolBalls;
+    this._id = updatedModel.id;
+    this._players[0] = playerFinder([
+      updatedModel.player1ID !== undefined ? updatedModel.player1ID : '',
+    ])[0];
+    this._players[1] = playerFinder([
+      updatedModel.player2ID !== undefined ? updatedModel.player2ID : '',
+    ])[0];
+    this._isPlayer1turn = updatedModel.isPlayer1Turn;
   }
 }
 

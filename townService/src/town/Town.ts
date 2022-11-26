@@ -14,9 +14,11 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea as ViewingAreaModel,
+  PoolGameArea as PoolGameAreaModel,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
+import PoolGameArea from './PoolGameArea';
 import ViewingArea from './ViewingArea';
 
 /**
@@ -254,6 +256,32 @@ export default class Town {
   }
 
   /**
+   * Creates a new conversation area in this town if there is not currently an active
+   * conversation with the same ID. The conversation area ID must match the name of a
+   * conversation area that exists in this town's map, and the conversation area must not
+   * already have a topic set.
+   *
+   * If successful creating the conversation area, this method:
+   *  Adds any players who are in the region defined by the conversation area to it.
+   *  Notifies all players in the town that the conversation area has been updated
+   *
+   * @param conversationArea Information describing the conversation area to create. Ignores any
+   *  occupantsById that are set on the conversation area that is passed to this method.
+   *
+   * @returns true if the conversation is successfully created, or false if there is no known
+   * conversation area with the specified ID or if there is already an active conversation area
+   * with the specified ID
+   */
+  public addPoolGameArea(poolGameArea: PoolGameAreaModel): boolean {
+    const area = this._interactables.find(
+      eachArea => eachArea.id === poolGameArea.id,
+    ) as PoolGameArea;
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+  }
+
+  /**
    * Creates a new viewing area in this town if there is not currently an active
    * viewing area with the same ID. The viewing area ID must match the name of a
    * viewing area that exists in this town's map, and the viewing area must not
@@ -352,7 +380,14 @@ export default class Town {
         ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
       );
 
+    const poolGameAreas = objectLayer.objects
+      .filter(eachObject => eachObject.type === 'PoolGameArea')
+      .map(eachPoolGameAreaObj =>
+        PoolGameArea.fromMapObject(eachPoolGameAreaObj, this._broadcastEmitter),
+      );
+
     this._interactables = this._interactables.concat(viewingAreas).concat(conversationAreas);
+    this._interactables = this._interactables.concat(poolGameAreas);
     this._validateInteractables();
   }
 

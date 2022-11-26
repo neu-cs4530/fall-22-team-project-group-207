@@ -13,6 +13,7 @@ import {
   ChatMessage,
   CoveyTownSocket,
   PlayerLocation,
+  PoolBall,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -70,6 +71,7 @@ export type TownEvents = {
    * the town controller's record of viewing areas.
    */
   viewingAreasChanged: (newViewingAreas: ViewingAreaController[]) => void;
+
   /**
    * An event that indicates that the set of pool game areas has changed. This event is emitted after updating
    * the town controller's record of pool game areas.
@@ -448,7 +450,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         const updatedPoolGameArea = this.poolGameAreas.find(
           eachArea => eachArea.id === interactable.id,
         );
-        updatedPoolGameArea?.updateFrom(interactable);
+        updatedPoolGameArea?.updateFrom(interactable, this._playersByIDs.bind(this));
       }
     });
   }
@@ -517,6 +519,25 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
     occupantsByID: Array<string>;
   }) {
     await this._townsService.createConversationArea(this.townID, this.sessionToken, newArea);
+  }
+
+  /**
+   * Create a new conversation area, sending the request to the townService. Throws an error if the request
+   * is not successful. Does not immediately update local state about the new conversation area - it will be
+   * updated once the townService creates the area and emits an interactableUpdate
+   *
+   * @param newArea
+   */
+  async createPoolGameArea(newArea: {
+    id: string;
+    player1ID?: string;
+    player2ID?: string;
+    player1BallType?: string;
+    player2BallType?: string;
+    isPlayer1Turn: boolean;
+    poolBalls: PoolBall[];
+  }) {
+    await this._townsService.createPoolGameArea(this.townID, this.sessionToken, newArea);
   }
 
   /**
@@ -701,6 +722,28 @@ export function useViewingAreaController(viewingAreaID: string): ViewingAreaCont
 }
 
 /**
+ * TODO FIX
+ * A react hook to retrieve a viewing area controller.
+ *
+ * This function will throw an error if the viewing area controller does not exist.
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @param viewingAreaID The ID of the viewing area to retrieve the controller for
+ *
+ * @throws Error if there is no viewing area controller matching the specifeid ID
+ */
+export function usePoolGameAreaController(poolGameAreaID: string): PoolGameAreaController {
+  const townController = useTownController();
+
+  const poolGameArea = townController.poolGameAreas.find(eachArea => eachArea.id == poolGameAreaID);
+  if (!poolGameArea) {
+    throw new Error(`Requested viewing area ${poolGameAreaID} does not exist`);
+  }
+  return poolGameArea;
+}
+
+/**
  * A react hook to retrieve the active conversation areas. This hook will re-render any components
  * that use it when the set of conversation areas changes. It does *not* re-render its dependent components
  * when the state of one of those areas changes - if that is desired, @see useConversationAreaTopic and @see useConversationAreaOccupants
@@ -724,6 +767,32 @@ export function useActiveConversationAreas(): ConversationAreaController[] {
     };
   }, [townController, setConversationAreas]);
   return conversationAreas;
+}
+
+/**
+ * A react hook to retrieve the active conversation areas. This hook will re-render any components
+ * that use it when the set of conversation areas changes. It does *not* re-render its dependent components
+ * when the state of one of those areas changes - if that is desired, @see useConversationAreaTopic and @see useConversationAreaOccupants
+ *
+ * This hook relies on the TownControllerContext.
+ *
+ * @returns the list of conversation area controllers that are currently "active"
+ */
+export function usePoolGameAreas(): PoolGameAreaController[] {
+  const townController = useTownController();
+  const [poolGameAreas, setPoolGameAreas] = useState<PoolGameAreaController[]>(
+    townController.poolGameAreas.filter(eachArea => eachArea.isPlaying),
+  );
+  useEffect(() => {
+    const updater = (allAreas: PoolGameAreaController[]) => {
+      setPoolGameAreas(allAreas.filter(eachArea => eachArea.isPlaying));
+    };
+    townController.addListener('poolGameAreasChanged', updater);
+    return () => {
+      townController.removeListener('poolGameAreasChanged', updater);
+    };
+  }, [townController, setPoolGameAreas]);
+  return poolGameAreas;
 }
 
 /**
