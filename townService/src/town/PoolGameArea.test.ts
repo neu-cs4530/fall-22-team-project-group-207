@@ -7,8 +7,8 @@ import PoolGameArea from './PoolGameArea';
 
 describe('PoolGameArea', () => {
   const testAreaBox = {
-    x: 100, 
-    y: 100, 
+    x: 100,
+    y: 100,
     width: 100,
     height: 100,
   };
@@ -44,15 +44,19 @@ describe('PoolGameArea', () => {
 
   beforeEach(() => {
     mockClear(townEmitter);
-    testArea = new PoolGameArea({
-      id,
-      player1ID,
-      player2ID,
-      player1BallType,
-      player2BallType,
-      isPlayer1Turn,
-      poolBalls 
-    }, testAreaBox, townEmitter);
+    testArea = new PoolGameArea(
+      {
+        id,
+        player1ID,
+        player2ID,
+        player1BallType,
+        player2BallType,
+        isPlayer1Turn,
+        poolBalls,
+      },
+      testAreaBox,
+      townEmitter,
+    );
     newPlayer1 = new Player(nanoid(), mock<TownEmitter>());
     newPlayer2 = new Player(nanoid(), mock<TownEmitter>());
     testArea.add(newPlayer1);
@@ -65,9 +69,17 @@ describe('PoolGameArea', () => {
 
       expect(testArea.occupantsByID).toEqual([newPlayer2.id]);
       const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
-      expect(lastEmittedUpdate).toEqual({ id, player1ID, player2ID, player1BallType, player2BallType, isPlayer1Turn, poolBalls });
+      expect(lastEmittedUpdate).toEqual({
+        id,
+        player1ID,
+        player2ID,
+        player1BallType,
+        player2BallType,
+        isPlayer1Turn,
+        poolBalls,
+      });
     });
-    it("Emits an update for their location", () => {
+    it('Emits an update for their location', () => {
       testArea.remove(newPlayer1);
       expect(newPlayer1.location.interactableID).toBeUndefined();
       const lastEmittedMovement = getLastEmittedEvent(townEmitter, 'playerMoved');
@@ -77,14 +89,22 @@ describe('PoolGameArea', () => {
       testArea.remove(newPlayer1);
       testArea.remove(newPlayer2);
       const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
-      expect(lastEmittedUpdate).toEqual({ id, player1ID, player2ID, player1BallType, player2BallType, isPlayer1Turn, poolBalls });
+      expect(lastEmittedUpdate).toEqual({
+        id,
+        player1ID,
+        player2ID,
+        player1BallType,
+        player2BallType,
+        isPlayer1Turn,
+        poolBalls,
+      });
     });
   });
   describe('add', () => {
     it('Adds the player to the occupants list', () => {
       expect(testArea.occupantsByID).toEqual([newPlayer1.id, newPlayer2.id]);
     });
-    it("Emits an update for their location", () => {
+    it('Emits an update for their location', () => {
       expect(newPlayer1.location.interactableID).toEqual(id);
 
       const lastEmittedMovement = getLastEmittedEvent(townEmitter, 'playerMoved');
@@ -93,25 +113,25 @@ describe('PoolGameArea', () => {
   });
   test('toModel sets the ID, player1&2 ID, player1&2 Ball Type, isPlayer1Turn, and poolBalls', () => {
     const model = testArea.toModel();
-    expect(model).toEqual({ 
+    expect(model).toEqual({
       id,
       player1ID,
       player2ID,
       player1BallType,
       player2BallType,
       isPlayer1Turn,
-      poolBalls
+      poolBalls,
     });
   });
   test('updateModel sets video, isPlaying and elapsedTimeSec', () => {
-    testArea.updateModel({ 
+    testArea.updateModel({
       id: 'ignore',
       player1ID: '123',
       player2ID: '150',
       player1BallType: 'Stripes',
       player2BallType: 'Solids',
       isPlayer1Turn: true,
-      poolBalls: poolBalls,
+      poolBalls,
     });
     expect(testArea.player1ID).toBe('123');
     expect(testArea.player2ID).toBe('150');
@@ -124,12 +144,13 @@ describe('PoolGameArea', () => {
   describe('fromMapObject', () => {
     it('Throws an error if the width or height are missing', () => {
       expect(() =>
-        PoolGameArea.fromMapObject({
+        PoolGameArea.fromMapObject(
+          {
             id: 1,
             name: nanoid(),
             visible: true,
             x: 0,
-            y: 0, 
+            y: 0,
           },
           townEmitter,
         ),
@@ -141,12 +162,13 @@ describe('PoolGameArea', () => {
       const width = 10;
       const height = 20;
       const name = 'name';
-      const val = PoolGameArea.fromMapObject({ 
-          x, 
-          y, 
-          width, 
+      const val = PoolGameArea.fromMapObject(
+        {
+          x,
+          y,
+          width,
           height,
-          name, 
+          name,
           id: 10,
           visible: true,
         },
