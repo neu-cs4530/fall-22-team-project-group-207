@@ -80,6 +80,7 @@ export type PoolBall = {
   // Rotation for display purposes 
   orientation: string;
   isPocketed: boolean;
+  isMoving: boolean;
 };
 
 export interface PoolGameArea {
