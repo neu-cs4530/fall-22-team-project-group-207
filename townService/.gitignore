@@ -7,3 +7,4 @@ generated
 # stryker temp files
 .stryker-tmp
 reports
+node_modules
