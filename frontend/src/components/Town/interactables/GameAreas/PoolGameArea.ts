@@ -52,13 +52,12 @@ export default class PoolGameArea extends GameArea {
   }
 
   overlap(): void {
-    if (!this._labelText) {
-      throw new Error('Should not be able to overlap with this interactable before added to scene');
+    if (this._labelText) {
+      const location = this.townController.ourPlayer.location;
+      this._labelText.setX(location.x);
+      this._labelText.setY(location.y);
+      this._labelText.setVisible(true);
     }
-    const location = this.townController.ourPlayer.location;
-    this._labelText.setX(location.x);
-    this._labelText.setY(location.y);
-    this._labelText.setVisible(true);
   }
 
   overlapExit(): void {
