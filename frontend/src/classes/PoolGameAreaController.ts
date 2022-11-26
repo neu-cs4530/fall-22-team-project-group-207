@@ -93,7 +93,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   public currentMove: PoolMove | undefined = undefined;
 
   // Players playing the game (as opposed to spectating). A subset of occupants.
-  private _players: PlayerController[];
+  private _players: PlayerController[] = [];
 
   // List of Pool Ball objects in the game. May contain the cue ball, TBD.
   private _poolBalls: PoolBall[] = [];
@@ -152,27 +152,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   get isPlaying() {
     return this._players.length >= 2 && !this.isGameOver;
-  }
-
-  /**
-   * The Current Turn of this pool area (read only)
-   */
-  get isPlayer1Turn() {
-    return this._isPlayer1turn;
-  }
-
-  /**
-   * Whether the game has started.
-   */
-  get isGameStarted() {
-    return this._isGameStarted;
-  }
-
-  /**
-   * Whether the game has started. Setting this to true will allow gameTick() to start updating the game.
-   */
-  set isGameStarted(hasGameStarted: boolean) {
-    this._isGameStarted = hasGameStarted;
   }
 
   /**
