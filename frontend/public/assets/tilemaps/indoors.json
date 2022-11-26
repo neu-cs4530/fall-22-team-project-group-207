@@ -530,6 +530,17 @@
                  "width":164.667,
                  "x":3482.99983333333,
                  "y":1058.66666666667
+                },  
+                {
+                 "type":"PoolGameArea",
+                 "height":224,
+                 "id":31,
+                 "name":"Pool",
+                 "rotation":0,
+                 "visible":true,
+                 "width":164.667,
+                 "x":3155.4166666666965,
+                 "y":889.5833333333327
                 }, 
                 {
                  "type":"ViewingArea",
