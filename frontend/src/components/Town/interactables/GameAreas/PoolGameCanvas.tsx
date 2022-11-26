@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FrontEndPoolBall } from '../../../../classes/PoolGameAreaController';
 import { usePoolGameAreaController } from '../../../../classes/TownController';
+import useTownController from '../../../../hooks/useTownController';
+import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
 import PoolGameArea from './PoolGameArea';
 import { POOL_BALL_PATHS, POOL_TABLE_PATH } from './PoolGameAssets/assets';
 // POOL TODO: add the rest of the imports
@@ -43,8 +45,8 @@ export default function PoolGameCanvas({
   poolGameArea: PoolGameArea | undefined;
 }): JSX.Element {
   // POOL TODO: add react hooks for game state so we can update this with the pool balls
-  // const coveyTownController = useTownController(); // not sure if we need this
-  // const poolGameAreaController = usePoolGameAreaController(poolGameArea?.name);
+  const coveyTownController = useTownController(); // not sure if we need this
+  const poolGameAreaController = usePoolGameAreaController(poolGameArea?.name);
   // const [poolBalls, setPoolBalls] = useState<FrontEndPoolBall>(poolGameArea?.poolBalls);
 
   // Coordinates of mouse
@@ -98,7 +100,17 @@ export default function PoolGameCanvas({
       }
       // When the current player needs to input a hit
       else if (isPlayersTurn) {
-        // POOL TODO: handle player input and update game controller with move vector
+        const velocityUnitVector: Vector = unitVector(
+          subtractVectors(cueBall.position, cueTip.position),
+        );
+        const velocity: Vector = scale(velocityUnitVector, 1); // POOL TODO: get scalar for velocity
+
+        const collisionPoint: Vector = addVectors(
+          cueBall.position,
+          scale(velocityUnitVector, -cueBall.radius),
+        );
+
+        poolGameAreaController.poolPhysicsGoHere(); // POOL TODO: pass the vectors to the controller to handle physics
       }
       // When the current player is spectating or waiting on the other player's move
       else if (spectating) {
@@ -118,7 +130,7 @@ export default function PoolGameCanvas({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mousedown', handleMouseClick);
     };
-  }, [isPlayersTurn, mousePos, scratch, spectating]);
+  }, [isPlayersTurn, mousePos, poolGameAreaController, scratch, spectating]);
 
   /**
    * useEffect to render the board state and ball movements
