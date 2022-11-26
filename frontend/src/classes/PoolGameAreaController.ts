@@ -2,9 +2,8 @@ import EventEmitter from 'events';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import TypedEmitter from 'typed-emitter';
+import { PoolBall, PoolGameArea as PoolGameAreaModel } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
-import { PoolGameArea as PoolGameAreaModel, PoolBall, Player } from '../types/CoveyTownSocket';
-import TownController from './TownController';
 //import PoolBall from './PoolBall';
 
 /**
@@ -13,6 +12,9 @@ import TownController from './TownController';
  * POOL TODO: further documentation about state
  */
 export type PoolGameModel = {
+  // POOL TODO: add in id, player1ID, player2ID for telling whose move it is
+  // id: string;
+
   // a list of pool ball objects, each of which contains information on their current position, orientation, etc.
   poolBalls: PoolBallModel[];
   player1BallType: string | undefined;
@@ -40,6 +42,7 @@ export type PoolBallModel = {
  * POOL TODO: further documentation about state
  */
 export type PoolMove = {
+  // POOL TODO: add in id to tell which game this move is for
   playerID: string;
   velocity: number;
   cueHitLocationX: number;

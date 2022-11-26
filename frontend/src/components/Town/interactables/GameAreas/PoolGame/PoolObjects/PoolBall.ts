@@ -1,11 +1,10 @@
 import {
   addVectors,
-  angleBetween,
   crossProduct,
   magnitude,
-  unitVector,
   scale,
   subtractVectors,
+  unitVector,
   Vector,
 } from '../Vector';
 
