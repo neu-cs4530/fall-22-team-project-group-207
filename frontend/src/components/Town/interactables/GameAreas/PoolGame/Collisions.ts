@@ -19,7 +19,7 @@ const BALL_BALL_FRICTION = 0.1; // tentative
 const CUE_MASS = 0.53864; // kg
 const CUE_TIP_BALL_FRICTION = 0.6;
 const CUE_TIP_BALL_RESTITUTION = 0.75;
-const CUSHION_HEIGHT = BALL_RADIUS * 1.2;
+const CUSHION_HEIGHT = BALL_RADIUS * 0.2;
 const BALL_SLATE_RESTITUTION = 0.5; // tentative
 
 export function ballBallCollisionWithFriction(ball1: PoolBall, ball2: PoolBall) {
