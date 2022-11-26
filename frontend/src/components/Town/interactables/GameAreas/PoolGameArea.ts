@@ -51,22 +51,6 @@ export default class PoolGameArea extends GameArea {
     this._updatePoolGameAreas(this._townController.poolGameAreas);
   }
 
-  addedToScene() {
-    super.addedToScene();
-    this.setTintFill();
-    this.setAlpha(0.3);
-
-    this._labelText = this.scene.add.text(
-      this.x - this.displayWidth / 2,
-      this.y - this.displayHeight / 2,
-      `Press space to join the ${this.name} game`,
-      { color: '#FFFFFF', backgroundColor: '#000000' },
-    );
-    this._labelText.setVisible(false);
-    //this.townController.getViewingAreaController(this);
-    this.setDepth(-1);
-  }
-
   overlap(): void {
     if (!this._labelText) {
       throw new Error('Should not be able to overlap with this interactable before added to scene');

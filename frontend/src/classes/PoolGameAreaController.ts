@@ -87,7 +87,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _id: string;
 
   // Current state of the game that we send to the front end for rendering
-  public currentModel: PoolGameModel; 
+  public currentModel: PoolGameModel;
 
   // Current move inputted by a player. Information in here is passed to the physics. Starts off undefined as there is no move by default.
   public currentMove: PoolMove | undefined = undefined;
@@ -198,10 +198,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    * will emit an playersChange event.
    */
   set players(newPlayers: PlayerController[]) {
-    if (
-      newPlayers.length !== this._players.length ||
-      _.xor(newPlayers, this._players).length > 0
-    ) {
+    if (newPlayers.length !== this._players.length ||_.xor(newPlayers, this._players).length > 0) {
       this.emit('playersChange', newPlayers);
       this._players = newPlayers;
     }
@@ -212,7 +209,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   /**
-   * The list of pool balls in this pool area. 
+   * The list of pool balls in this pool area.
    */
   set poolBalls(newPoolBalls: PoolBall[]) {
     if (
@@ -238,7 +235,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // only tick the game if we've actually started it. Assuming we'll start via an input in covey.town.
     if (this.isGameStarted) {
       this.poolPhysicsGoHere();
-      
+
       if (this.isGameOver().isGameOver) {
         this.endGame();
       }
@@ -247,7 +244,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   /**
    * Checks if the game is over. Returns a struct that contains information about if the game is over, and if so, who won.
-   */ 
+   */
   isGameOver(): { isGameOver: boolean; didPlayer1Win: boolean } {
     // If a player has 8 balls pocketed (all 7 of theirs and the 8 ball)
     // the 8 ball is pocketed, the cue ball is NOT pocketed, and it is a certain player's turn, that player wins.
@@ -302,10 +299,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // this.currentMove = undefined;
 
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
-    let movingBalls: PoolBall[] = this.poolBalls.filter(ball => ball.isMoving);
+    const movingBalls: PoolBall[] = this.poolBalls.filter(ball => ball.isMoving);
     // holds all of the pool balls we've already checked for collisions to prevent duplicate collisions
-    let alreadyCheckedBalls: PoolBall[] = [];
-    
+    const alreadyCheckedBalls: PoolBall[] = [];
+
     // loop through every pool ball, calling an update function on them and checking for collisions.
     // if any collisions, call the collide function on both balls, passing each other as parameters.
     movingBalls.forEach(ball => {
@@ -318,33 +315,36 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         // ball-ball collisions
         this._poolBalls.forEach(otherBall => {
           if (ball !== otherBall) {
-            if(ball.ballNumber === 0 || otherBall.ballNumber === 0) {
+            if (ball.ballNumber === 0 || otherBall.ballNumber === 0) {
               // call cue/ball collision check
 
               // otherBall is the cue
-              if (this.isPlayer1Turn
-                && ball.ballNumber === 0
-                && otherBall.ballType !== this._player1BallType) {
+              if (this.isPlayer1Turn &&
+                ball.ballNumber === 0 &&
+                otherBall.ballType !== this._player1BallType
+                ) {
                 // player 1 hit the wrong ball, scratch
                 this._isBallBeingPlaced = true;
               }
-              if (!this.isPlayer1Turn
-                && ball.ballNumber === 0
-                && otherBall.ballType !== this._player2BallType) {
+              if (!this.isPlayer1Turn &&
+                ball.ballNumber === 0 &&
+                otherBall.ballType !== this._player2BallType
+                ) {
                 // player 2 hit the wrong ball, scratch
                 this._isBallBeingPlaced = true;
               }
-              
+
               // ball is the cue
-              if (this.isPlayer1Turn
-                && ball.ballNumber !== 0
-                && ball.ballType !== this._player1BallType) {
+              if (this.isPlayer1Turn &&
+                ball.ballNumber !== 0 &&
+                ball.ballType !== this._player1BallType
+                ) {
                 // player 1 hit the wrong ball, scratch
                 this._isBallBeingPlaced = true;
               }
-              if (!this.isPlayer1Turn
-                && ball.ballNumber !== 0
-                && ball.ballType !== this._player2BallType) {
+              if (!this.isPlayer1Turn &&
+                ball.ballNumber !== 0 &&
+                ball.ballType !== this._player2BallType) {
                 // player 2 hit the wrong ball, scratch
                 this._isBallBeingPlaced = true;
               }
@@ -353,7 +353,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
               // call check collision between the two balls
             }
           }
-        })
+        });
         // call check if ball goes in pocket
         // if (ball collides with pocket) {
         //   ball.isMoving = false;
@@ -426,7 +426,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
  *
  * This hook will re-render any components that use it when the set of occupants changes.
  */
- export function usePoolGameAreaOccupants(area: PoolGameAreaController): PlayerController[] {
+export function usePoolGameAreaOccupants(area: PoolGameAreaController): PlayerController[] {
   const [occupants, setOccupants] = useState(area.occupants);
   useEffect(() => {
     area.addListener('occupantsChange', setOccupants);
@@ -442,7 +442,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
  *
  * This hook will re-render any components that use it when the current PoolGameModel changes.
  */
- export function usePoolGameModel(area: PoolGameAreaController): PoolGameModel {
+export function usePoolGameModel(area: PoolGameAreaController): PoolGameModel {
   const [gameModel, setGameModel] = useState(area.currentModel);
   useEffect(() => {
     area.addListener('onTick', setGameModel);
@@ -458,7 +458,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
  *
  * This hook will re-render any components that use it when the current PoolMove changes.
  */
- export function usePoolGameMove(area: PoolGameAreaController): PoolMove {
+export function usePoolGameMove(area: PoolGameAreaController): PoolMove {
   const [playerMove, setPlayerMove] = useState(area.currentMove);
   useEffect(() => {
     area.addListener('playerMove', setPlayerMove);
