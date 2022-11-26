@@ -59,10 +59,6 @@ describe('PoolGameAreaController', () => {
     mockClear(mockListeners.onTick);
     mockClear(mockListeners.playersChange);
     testArea.addListener('occupantsChange', mockListeners.occupantsChange);
-
-    // POOL TODO: make and add listeners
-    // testArea.addListener('occupantsChange', mockListeners.occupantsChange);
-    // testArea.addListener('topicChange', mockListeners.topicChange);
   });
   // POOL TODO: write tests for PoolGameAreaController
   describe('sampleMethod', () => {
