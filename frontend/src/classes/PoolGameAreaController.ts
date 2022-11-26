@@ -198,7 +198,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    * will emit an playersChange event.
    */
   set players(newPlayers: PlayerController[]) {
-    if (newPlayers.length !== this._players.length ||_.xor(newPlayers, this._players).length > 0) {
+    if (newPlayers.length !== this._players.length || _.xor(newPlayers, this._players).length > 0) {
       this.emit('playersChange', newPlayers);
       this._players = newPlayers;
     }
@@ -319,37 +319,41 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
               // call cue/ball collision check
 
               // otherBall is the cue
-              if (this.isPlayer1Turn &&
+              if (
+                this.isPlayer1Turn &&
                 ball.ballNumber === 0 &&
                 otherBall.ballType !== this._player1BallType
-                ) {
+              ) {
                 // player 1 hit the wrong ball, scratch
                 this._isBallBeingPlaced = true;
               }
-              if (!this.isPlayer1Turn &&
+              if (
+                !this.isPlayer1Turn &&
                 ball.ballNumber === 0 &&
                 otherBall.ballType !== this._player2BallType
-                ) {
+              ) {
                 // player 2 hit the wrong ball, scratch
                 this._isBallBeingPlaced = true;
               }
 
               // ball is the cue
-              if (this.isPlayer1Turn &&
+              if (
+                this.isPlayer1Turn &&
                 ball.ballNumber !== 0 &&
                 ball.ballType !== this._player1BallType
-                ) {
+              ) {
                 // player 1 hit the wrong ball, scratch
                 this._isBallBeingPlaced = true;
               }
-              if (!this.isPlayer1Turn &&
+              if (
+                !this.isPlayer1Turn &&
                 ball.ballNumber !== 0 &&
-                ball.ballType !== this._player2BallType) {
+                ball.ballType !== this._player2BallType
+              ) {
                 // player 2 hit the wrong ball, scratch
                 this._isBallBeingPlaced = true;
               }
-            }
-            else {
+            } else {
               // call check collision between the two balls
             }
           }
