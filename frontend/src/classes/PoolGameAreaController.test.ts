@@ -29,6 +29,7 @@ describe('PoolGameAreaController', () => {
       ballType: 'Cue',
       orientation: '',
       isPocketed: false,
+      isMoving: false,
     };
     const poolBall2: PoolBall = {
       posnX: 5,
@@ -37,6 +38,7 @@ describe('PoolGameAreaController', () => {
       ballType: 'Solid',
       orientation: '',
       isPocketed: false,
+      isMoving: false,
     };
     const poolBalls: PoolBall[] = [poolBall1, poolBall2];
     testArea = new PoolGameAreaController({

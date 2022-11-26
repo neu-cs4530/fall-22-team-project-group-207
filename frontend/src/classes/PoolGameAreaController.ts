@@ -462,12 +462,12 @@ export function usePoolGameModel(area: PoolGameAreaController): PoolGameModel {
  *
  * This hook will re-render any components that use it when the current PoolMove changes.
  */
-export function usePoolGameMove(area: PoolGameAreaController): PoolMove {
+export function usePoolGameMove(area: PoolGameAreaController): PoolMove | undefined {
   const [playerMove, setPlayerMove] = useState(area.currentMove);
   useEffect(() => {
-    area.addListener('playerMove', setPlayerMove);
+    area.addListener('onPlayerMove', setPlayerMove);
     return () => {
-      area.removeListener('playerMove', setPlayerMove);
+      area.removeListener('onPlayerMove', setPlayerMove);
     };
   }, [area, setPlayerMove]);
   return playerMove;
