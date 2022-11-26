@@ -96,6 +96,10 @@ export default class PoolBall {
     return this._isPocketed;
   }
 
+  get isMoving() {
+    return this._isMoving;
+  }
+
   public tick(elapsedTime: number) {
     if (this._isMoving) {
       this._updatePosition(elapsedTime);
