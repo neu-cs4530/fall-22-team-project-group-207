@@ -15,12 +15,12 @@ const BALL_MASS = 0.16726; // kg
 const BALL_BALL_RESTITUTION = 0.96;
 const BALL_RADIUS = 0.028575; // m
 const BALL_MOMENT_OF_INERTIA = (2 / 5) * BALL_MASS * BALL_RADIUS ** 2;
-const BALL_BALL_FRICTION = 0.1; // tentative
+const BALL_BALL_FRICTION = 0.05;
 const CUE_MASS = 0.53864; // kg
 const CUE_TIP_BALL_FRICTION = 0.6;
 const CUE_TIP_BALL_RESTITUTION = 0.75;
-const CUSHION_HEIGHT = BALL_RADIUS * 1.2;
-const BALL_SLATE_RESTITUTION = 0.5; // tentative
+const CUSHION_HEIGHT = BALL_RADIUS * 0.2;
+const BALL_SLATE_RESTITUTION = 0.5;
 
 export function ballBallCollisionWithFriction(ball1: PoolBall, ball2: PoolBall) {
   // v0 is the velocity vector of ball 1 as it's approaching. We multiply by the coeff of restitution for ball-ball collision to account for the small

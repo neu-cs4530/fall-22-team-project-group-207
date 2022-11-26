@@ -25,17 +25,23 @@ export default class PoolBall {
 
   private _velocity: Vector;
 
+  private _ballNumber: number;
+
   private _isMoving: boolean;
 
   private _isAirborne: boolean;
 
-  constructor(xPosition: number, yPosition: number) {
+  private _isPocketed: boolean;
+
+  constructor(xPosition: number, yPosition: number, ballNumber: number) {
+    this._ballNumber = ballNumber;
     this._angularOrientation = { x: 0, y: 0, z: 0 };
     this._angularVelocity = { x: 0, y: 0, z: 0 };
     this._position = { x: xPosition, y: yPosition, z: BALL_RADIUS };
     this._velocity = { x: 0, y: 0, z: 0 };
     this._isMoving = false;
     this._isAirborne = false;
+    this._isPocketed = false;
   }
 
   get angularVelocity() {
@@ -75,6 +81,22 @@ export default class PoolBall {
 
   get isAirborne() {
     return this._isAirborne;
+  }
+
+  get ballNumber() {
+    return this._ballNumber;
+  }
+
+  set isPocketed(isPocketed: boolean) {
+    this._isPocketed = isPocketed;
+  }
+
+  get isPocketed() {
+    return this._isPocketed;
+  }
+
+  get isMoving() {
+    return this._isMoving;
   }
 
   public tick(elapsedTime: number) {
