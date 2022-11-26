@@ -1,25 +1,26 @@
-import { vector } from "../Vector"
+import { Vector } from '../Vector';
 
-const CUE_MASS = 0.5386 // kg
+const CUE_MASS = 0.5386; // kg
 
 export default class PoolCue {
-    private _velocity: vector;
-    private _position: vector;
+  private _velocity: Vector;
 
-    constructor() {
-        this._velocity = {x: 0, y: 0, z: 0};
-        this._position = {x: 0, y: 0, z: 0};
-    }
+  private _position: Vector;
 
-    get velocity() {
-        return this._velocity;
-    }
+  constructor() {
+    this._velocity = { x: 0, y: 0, z: 0 };
+    this._position = { x: 0, y: 0, z: 0 };
+  }
 
-    get position() {
-        return this._position;
-    }
+  get velocity() {
+    return this._velocity;
+  }
 
-    get mass(): number {
-        return CUE_MASS;
-    }
+  get position() {
+    return this._position;
+  }
+
+  get mass(): number {
+    return CUE_MASS;
+  }
 }
