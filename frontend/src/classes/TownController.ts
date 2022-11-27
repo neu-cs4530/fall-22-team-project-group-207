@@ -522,8 +522,8 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
-   * Create a new conversation area, sending the request to the townService. Throws an error if the request
-   * is not successful. Does not immediately update local state about the new conversation area - it will be
+   * Create a new pool game area, sending the request to the townService. Throws an error if the request
+   * is not successful. Does not immediately update local state about the new pool game area - it will be
    * updated once the townService creates the area and emits an interactableUpdate
    *
    * @param newArea
@@ -723,15 +723,15 @@ export function useViewingAreaController(viewingAreaID: string): ViewingAreaCont
 
 /**
  * TODO FIX
- * A react hook to retrieve a viewing area controller.
+ * A react hook to retrieve a pool game area controller.
  *
- * This function will throw an error if the viewing area controller does not exist.
+ * This function will throw an error if the pool game area controller does not exist.
  *
  * This hook relies on the TownControllerContext.
  *
- * @param viewingAreaID The ID of the viewing area to retrieve the controller for
+ * @param poolGameAreaID The ID of the pool game area to retrieve the controller for
  *
- * @throws Error if there is no viewing area controller matching the specifeid ID
+ * @throws Error if there is no pool game area controller matching the specifeid ID
  */
 export function usePoolGameAreaController(poolGameAreaID: string): PoolGameAreaController {
   const townController = useTownController();
@@ -770,13 +770,13 @@ export function useActiveConversationAreas(): ConversationAreaController[] {
 }
 
 /**
- * A react hook to retrieve the active conversation areas. This hook will re-render any components
- * that use it when the set of conversation areas changes. It does *not* re-render its dependent components
- * when the state of one of those areas changes - if that is desired, @see useConversationAreaTopic and @see useConversationAreaOccupants
+ * A react hook to retrieve the active pool game areas. This hook will re-render any components
+ * that use it when the set of pool game areas changes. It does *not* re-render its dependent components
+ * when the state of one of those areas changes
  *
  * This hook relies on the TownControllerContext.
  *
- * @returns the list of conversation area controllers that are currently "active"
+ * @returns the list of pool game area controllers that are currently "active"
  */
 export function usePoolGameAreas(): PoolGameAreaController[] {
   const townController = useTownController();

@@ -1,8 +1,8 @@
 import {
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
+  // Button,
+  // FormControl,
+  // FormLabel,
+  // Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -10,23 +10,53 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useToast,
+  // useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
-import { PoolGameState } from '../../../../classes/PoolGameAreaController';
+import React, { useCallback, useEffect, useRef } from 'react'; // useState
+// import { PoolGameModel } from '../../../../classes/PoolGameAreaController';
 import { useInteractable } from '../../../../classes/TownController';
-import { PoolGameArea } from '../../../../generated/client';
+// import { PoolGameArea } from '../../../../generated/client';
 import useTownController from '../../../../hooks/useTownController';
+import PoolGameCanvas from './PoolGameCanvas';
 
+/**
+ * Returns a modal that contains a display for the pool game
+ * @returns HTML modal containing pool game display
+ */
 export default function NewPoolGameModal(): JSX.Element {
   const coveyTownController = useTownController();
   const newPoolGame = useInteractable('gameArea');
-  const [gameState, setGameState] = useState<PoolGameState>();
+  // const [gameState, setGameState] = useState<PoolGameModel>();
 
   const isOpen = newPoolGame !== undefined;
 
+  // canvas for rendering the game
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  canvasRef.current?.getContext('2d');
+  const canvasCtxRef = React.useRef<CanvasRenderingContext2D | null>(null);
+
+  //POOL TODO: this useEffect could probably be removed, as drawing is handled in PoolGameCanvas now
   useEffect(() => {
-    console.log('interacted with pool area');
+    // Initialize
+    console.log('attempting to find canvasRef.current');
+    if (!canvasRef.current) {
+      console.log('could not find canvasRef.current');
+      return;
+    }
+    canvasCtxRef.current = canvasRef.current.getContext('2d');
+    if (!canvasCtxRef.current) {
+      console.log('could not find canvasCtxRef.current');
+      return;
+    }
+    const ctx = canvasCtxRef.current;
+    console.log('attempting to draw');
+
+    ctx.beginPath();
+    ctx.arc(95, 50, 40, 0, 2 * Math.PI);
+    ctx.stroke();
+  }, [canvasRef]);
+
+  useEffect(() => {
     if (newPoolGame) {
       coveyTownController.pause();
       console.log('started game and paused coveytown');
@@ -42,9 +72,12 @@ export default function NewPoolGameModal(): JSX.Element {
     }
   }, [coveyTownController, newPoolGame]);
 
-  const toast = useToast();
+  // const toast = useToast();
 
   /**
+   * The datatypes we are working with
+   * POOL TODO: finalize these and update once datatype for frontend-backend communication is finalized
+   * 
     export type PoolGameArea = {
       id: string;
       player1ID?: string;
@@ -55,22 +88,23 @@ export default function NewPoolGameModal(): JSX.Element {
       poolBalls: Array<PoolBall>;
     };
 
-    type PoolGameState = {
+    type PoolGameModel = {
       poolBalls: FrontEndPoolBall[];
       player1BallType: BallType;
       player2BallType: BallType;
       isPlayer1Turn: boolean;
     }
    */
-  const createPoolGame = useCallback(async () => {
+  /* const createPoolGame = useCallback(async () => {
     if (gameState && newPoolGame) {
-      const poolGameToCreate: PoolGameArea = {
-        id: newPoolGame.id,
+      const poolGameToCreate: PoolGameModel = {
+        // id: newPoolGame.id,
         // player1ID: ,
         // player2ID: ,
         isPlayer1Turn: gameState.isPlayer1Turn,
         player1BallType: gameState.player1BallType,
         player2BallType: gameState.player2BallType,
+        isBallBeingPlaced: false,
         poolBalls: [], //gameState.poolBalls.map(b => b), // POOL TODO: convert from frontend to backend balls
       };
       try {
@@ -98,40 +132,7 @@ export default function NewPoolGameModal(): JSX.Element {
         }
       }
     }
-  }, [gameState, setGameState, coveyTownController, newPoolGame, closeModal, toast]);
-
-  const drawRect = (
-    info = { x: 0, y: 0, width: 1, height: 1 },
-    style = { borderColor: 'black', borderWidth: 1 },
-  ) => {
-    const { x, y, width, height } = info;
-    const { borderColor, borderWidth } = style;
-
-    // ctx.beginPath();
-    // ctx.strokeStyle = borderColor;
-    // ctx.lineWidth = borderWidth;
-    // ctx.rect(x, y, w, h);
-    // ctx.stroke();
-  };
-
-  const drawSphere = (
-    info = { x: 0, y: 0, radius: 1 },
-    style = { borderColor: 'black', borderWidth: 1 },
-  ) => {
-    const { x, y, radius } = info;
-    const { borderColor, borderWidth } = style;
-  };
-
-  const drawTable = (table = { x: 10, y: 10, width: 100, height: 100 }) => {
-    return;
-  };
-
-  const drawBall = (
-    ball = { x: 1, y: 2, z: 3, rotation: '123' },
-    table = { x: 10, y: 10, width: 100, height: 100 },
-  ) => {
-    return;
-  };
+  }, [gameState, setGameState, coveyTownController, newPoolGame, closeModal, toast]); */
 
   return (
     <Modal
@@ -142,30 +143,19 @@ export default function NewPoolGameModal(): JSX.Element {
         coveyTownController.unPause();
       }}>
       <ModalOverlay />
-      <ModalContent maxW='1000px'>
+      <ModalContent maxW='1000px' height='800px'>
         <ModalHeader>Play Pool!!!</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <canvas id='canvas' width='800' height='490'></canvas>
-          <p>
-            there is a canvas above this... it&apos;s just invisible for now xD trust me its there
-            :)
-          </p>
-          <p>
-            the code for this is visible in NewPoolGameModal.tsx in interactables/GameAreas folder
-          </p>
-          <p>
-            Stuff todo: make the pool thingy actually draw in the canvas... need to figure out how
-            to find the canvas through the code to update it through react...
-          </p>
+          <PoolGameCanvas poolGameArea={undefined} />
           {/**
+           * POOL TODO: update poolGameArea above to be not undefined
            * some references:
            * https://kernhanda.github.io/tutorial-typescript-canvas-drawing/
            * https://www.cluemediator.com/draw-a-line-on-canvas-using-react/
            */}
-          <p>also maybe figure out how to make the modal bigger lol</p>
         </ModalBody>
-        <ModalFooter>footer here</ModalFooter>
+        <ModalFooter>exit</ModalFooter>
       </ModalContent>
     </Modal>
   );
