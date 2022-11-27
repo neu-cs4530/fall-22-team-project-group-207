@@ -23,20 +23,20 @@ describe('PoolGameArea', () => {
   const player2BallType = 'Solids';
   const isPlayer1Turn = true;
   const poolBall1: PoolBall = {
-    angularOrientation: {x: 0, y: 0, z: 0},
-    angularVelocity: {x: 0, y: 0, z: 0},
-    position: {x: 0, y: 0, z: 0},
-    velocity: {x: 0, y: 0, z: 0},
+    angularOrientation: { x: 0, y: 0, z: 0 },
+    angularVelocity: { x: 0, y: 0, z: 0 },
+    position: { x: 0, y: 0, z: 0 },
+    velocity: { x: 0, y: 0, z: 0 },
     ballNumber: 0,
     isMoving: false,
     isAirborne: false,
     isPocketed: false,
   };
   const poolBall2: PoolBall = {
-    angularOrientation: {x: 0, y: 0, z: 0},
-    angularVelocity: {x: 0, y: 0, z: 0},
-    position: {x: 5, y: 0, z: 0},
-    velocity: {x: 0, y: 0, z: 0},
+    angularOrientation: { x: 0, y: 0, z: 0 },
+    angularVelocity: { x: 0, y: 0, z: 0 },
+    position: { x: 5, y: 0, z: 0 },
+    velocity: { x: 0, y: 0, z: 0 },
     ballNumber: 1,
     isMoving: false,
     isAirborne: false,
