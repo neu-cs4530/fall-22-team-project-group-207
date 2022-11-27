@@ -4,7 +4,7 @@ import { usePoolGameAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
 import PoolGameArea from './PoolGameArea';
-import { POOL_BALL_PATHS, POOL_TABLE_PATH } from './PoolGameAssets/assets';
+import { POOL_BALL_IMAGES, POOL_TABLE_IMAGE } from './PoolGameAssets/assets';
 // POOL TODO: add the rest of the imports
 
 // POOL TODO: remove test balls
@@ -52,7 +52,7 @@ export default function PoolGameCanvas({
   // Coordinates of mouse
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  // canvas for rendering the game
+  // Canvas for rendering the game
   const boardCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const boardCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -61,18 +61,6 @@ export default function PoolGameCanvas({
   const scratch = false; // POOL TODO: use pool controller for these
   const isPlayersTurn = true;
   const spectating = false;
-
-  /**
-   * Draws the board on the canvas
-   * @param ctx Canvas context
-   */
-  function drawBoard(ctx: CanvasRenderingContext2D) {
-    const img = new Image();
-    img.src = POOL_TABLE_PATH;
-    img.onload = function () {
-      ctx.drawImage(img, 0, 0, img.width * 1.5, img.height * 1.5);
-    };
-  }
 
   // Handle mouse events, namely movement and clicking
   useEffect(() => {
@@ -138,6 +126,7 @@ export default function PoolGameCanvas({
    * useEffect to render the board state and ball movements
    */
   useEffect(() => {
+    console.log('redraw board canvas');
     // Set up context for board
     const boardCanvas = boardCanvasRef.current;
     if (!boardCanvas) {
@@ -150,19 +139,27 @@ export default function PoolGameCanvas({
     }
 
     /**
+     * Draws the board on the canvas
+     * @param ctx Canvas context
+     */
+    function drawBoard(ctx: CanvasRenderingContext2D) {
+      const img = POOL_TABLE_IMAGE[0];
+      const width = img.width * 1.5;
+      const height = img.height * 1.5;
+      ctx.drawImage(img, 0, 0, width, height);
+    }
+
+    /**
      * Draws one ball on the canvas, using the ball's coordinates as the center of the ball
      * (as opposed to top left)
      * @param ctx Canvas context
      * @param ball Pool ball to be drawn
      */
     function drawBall(ctx: CanvasRenderingContext2D, ball: PoolBallModel) {
-      const img = new Image();
-      img.src = POOL_BALL_PATHS[ball.ballNumber];
-      const width = img.width * 0.7;
-      const height = img.height * 0.7;
-      img.onload = function () {
-        ctx.drawImage(img, ball.posnX - width / 2, ball.posnY - height / 2, width, height);
-      };
+      const img = POOL_BALL_IMAGES[ball.ballNumber];
+      const width = img.width * 0.6;
+      const height = img.height * 0.6;
+      ctx.drawImage(img, ball.posnX - width / 2, ball.posnY - height / 2, width, height);
     }
 
     /**
@@ -184,6 +181,7 @@ export default function PoolGameCanvas({
    * useEffect to render the player's inputs to the game
    */
   useEffect(() => {
+    console.log('redraw player input canvas');
     // Set up context for player input
     const inputCanvas = inputCanvasRef.current;
     if (!inputCanvas) {
@@ -259,14 +257,14 @@ export default function PoolGameCanvas({
         ref={boardCanvasRef}
         width='800'
         height='500'
-        style={{ backgroundImage: POOL_TABLE_PATH, position: 'absolute' }}></canvas>
+        style={{ position: 'absolute' }}></canvas>
       <canvas
         id='input canvas'
         className='pool-canvas'
         ref={inputCanvasRef}
         width='800'
         height='500'
-        style={{ backgroundImage: POOL_TABLE_PATH, position: 'absolute' }}></canvas>
+        style={{ position: 'absolute' }}></canvas>
       <div style={{ height: '500px' }}>{/* div to hold space for canvas */}</div>
       <div>
         {/* POOL TODO: delete this div*/}
