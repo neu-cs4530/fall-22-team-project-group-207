@@ -143,7 +143,6 @@ export default class PoolBall {
   }
 
   private _updateRollingBall(elapsedTime: number) {
-    const oldVelocityMagnitude = magnitude(this.velocity);
     const frictionVector: Vector = scale(
       unitVector(this.velocity),
       BALL_CLOTH_ROLLING_FRICTION * GRAVITATIONAL_CONSTANT * elapsedTime,

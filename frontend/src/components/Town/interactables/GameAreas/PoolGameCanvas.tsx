@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PoolBall, PoolGameArea as PoolGameAreaModel } from '../../../../types/CoveyTownSocket';
-import { useInteractable, usePoolGameAreaController } from '../../../../classes/TownController';
-import useTownController from '../../../../hooks/useTownController';
+import { usePoolGameAreaController } from '../../../../classes/TownController';
 import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
 import PoolGameArea from './PoolGameArea';
 import { POOL_BALL_IMAGES, POOL_TABLE_IMAGE } from './PoolGameAssets/assets';
@@ -22,6 +21,7 @@ export default function PoolGameCanvas({
   const [gameState, setGameState] = useState<PoolGameAreaModel>(
     poolGameAreaController.currentModel,
   );
+  console.log('POOL TODO: setGameState log to remove eslint error' + setGameState);
 
   // Coordinates of mouse
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });

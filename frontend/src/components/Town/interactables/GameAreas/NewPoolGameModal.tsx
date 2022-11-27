@@ -1,8 +1,4 @@
 import {
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -13,7 +9,7 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useInteractable, usePoolGameAreaController } from '../../../../classes/TownController';
+import { useInteractable } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import PoolGameCanvas from './PoolGameCanvas';
 import { PoolGameArea as PoolGameAreaModel } from '../../../../types/CoveyTownSocket';
@@ -110,6 +106,7 @@ export default function NewPoolGameModal(): JSX.Element {
       }
     }
   }, [gameState, setGameState, townController, poolGameArea, closeModal, toast]);
+  console.log('POOL TODO create pool game log to remove eslint error' + createPoolGame);
 
   if (poolGameArea) {
     return (
