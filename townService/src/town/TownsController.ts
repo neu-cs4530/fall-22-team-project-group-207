@@ -163,15 +163,15 @@ export class TownsController extends Controller {
   }
 
   /**
-   * Creates a viewing area in a given town
+   * Creates a pool game area in a given town
    *
-   * @param townID ID of the town in which to create the new viewing area
+   * @param townID ID of the town in which to create the new pool game area
    * @param sessionToken session token of the player making the request, must
    *        match the session token returned when the player joined the town
-   * @param requestBody The new viewing area to create
+   * @param requestBody The new pool game area to create
    *
    * @throws InvalidParametersError if the session token is not valid, or if the
-   *          viewing area could not be created
+   *          pool game area could not be created
    */
   @Post('{townID}/poolGameArea')
   @Response<InvalidParametersError>(400, 'Invalid values specified')
