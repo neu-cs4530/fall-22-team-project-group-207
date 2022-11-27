@@ -69,6 +69,23 @@ export interface ViewingArea {
   elapsedTimeSec: number;
 };
 
+export type Vector = {
+  x: number;
+  y: number;
+  z: number;
+};
+
+export type PoolBall = {
+  angularOrientation: Vector;
+  angularVelocity: Vector;
+  position: Vector;
+  velocity: Vector;
+  ballNumber: number;
+  isMoving: boolean;
+  isAirborne: boolean;
+  isPocketed: boolean;
+}
+
 export interface PoolGameArea {
   id: string;
   player1ID?: string;

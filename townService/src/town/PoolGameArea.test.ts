@@ -23,22 +23,24 @@ describe('PoolGameArea', () => {
   const player2BallType = 'Solids';
   const isPlayer1Turn = true;
   const poolBall1: PoolBall = {
-    posnX: 0,
-    posnY: 0,
+    angularOrientation: {x: 0, y: 0, z: 0},
+    angularVelocity: {x: 0, y: 0, z: 0},
+    position: {x: 0, y: 0, z: 0},
+    velocity: {x: 0, y: 0, z: 0},
     ballNumber: 0,
-    ballType: 'Cue',
-    orientation: '',
-    isPocketed: false,
     isMoving: false,
+    isAirborne: false,
+    isPocketed: false,
   };
   const poolBall2: PoolBall = {
-    posnX: 5,
-    posnY: 0,
+    angularOrientation: {x: 0, y: 0, z: 0},
+    angularVelocity: {x: 0, y: 0, z: 0},
+    position: {x: 5, y: 0, z: 0},
+    velocity: {x: 0, y: 0, z: 0},
     ballNumber: 1,
-    ballType: 'Solid',
-    orientation: '',
-    isPocketed: false,
     isMoving: false,
+    isAirborne: false,
+    isPocketed: false,
   };
   const poolBalls: PoolBall[] = [poolBall1, poolBall2];
 
