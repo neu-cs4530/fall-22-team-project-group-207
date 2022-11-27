@@ -1,8 +1,8 @@
 import {
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
+  // Button,
+  // FormControl,
+  // FormLabel,
+  // Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -10,12 +10,12 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useToast,
+  // useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { PoolGameModel } from '../../../../classes/PoolGameAreaController';
 import { useInteractable } from '../../../../classes/TownController';
-import { PoolGameArea } from '../../../../generated/client';
+// import { PoolGameArea } from '../../../../generated/client';
 import useTownController from '../../../../hooks/useTownController';
 import PoolGameCanvas from './PoolGameCanvas';
 
@@ -27,6 +27,8 @@ export default function NewPoolGameModal(): JSX.Element {
   const coveyTownController = useTownController();
   const newPoolGame = useInteractable('gameArea');
   const [gameState, setGameState] = useState<PoolGameModel>();
+  console.log(gameState);
+  setGameState(gameState);
 
   const isOpen = newPoolGame !== undefined;
 
@@ -72,7 +74,7 @@ export default function NewPoolGameModal(): JSX.Element {
     }
   }, [coveyTownController, newPoolGame]);
 
-  const toast = useToast();
+  // const toast = useToast();
 
   /**
    * The datatypes we are working with
