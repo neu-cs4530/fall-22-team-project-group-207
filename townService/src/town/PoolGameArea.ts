@@ -3,7 +3,6 @@ import Player from '../lib/Player';
 import {
   BoundingBox,
   TownEmitter,
-  PoolBall,
   PoolGameArea as PoolGameAreaModel,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';

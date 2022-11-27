@@ -3,9 +3,11 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import TypedEmitter from 'typed-emitter';
 import PlayerController from './PlayerController';
-import { PoolGameArea as PoolGameAreaModel, PoolBall, Player } from '../types/CoveyTownSocket';
+import { PoolGameArea as PoolGameAreaModel, PoolBallModel, Player } from '../types/CoveyTownSocket';
 import TownController from './TownController';
-//import PoolBall from './PoolBall';
+import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
+import { Vector } from '../components/Town/interactables/GameAreas/PoolGame/Vector';
+import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
 
 /**
  * Type representing the entirety of the pool game to be sent to the frontend.
@@ -14,37 +16,15 @@ import TownController from './TownController';
  */
 export type PoolGameModel = {
   // a list of pool ball objects, each of which contains information on their current position, orientation, etc.
+  id: number;
   poolBalls: PoolBallModel[];
   player1BallType: string | undefined;
   player2BallType: string | undefined;
+  player1ID: number;
+  player2ID: number;
   isPlayer1Turn: boolean;
   isBallBeingPlaced: boolean;
 
-  // POOL TODO: add more
-};
-
-/**
- * Type representing a pool ball exclusively for the front end.
- * For sending to the front end with only the necessary information, rather than the full backend objects.
- */
-export type PoolBallModel = {
-  posnX: number;
-  posnY: number;
-  orientation: string;
-  ballNumber: number;
-};
-
-/**
- * Type representing a move being made by a player
- *
- * POOL TODO: further documentation about state
- */
-export type PoolMove = {
-  playerID: string;
-  velocity: number;
-  cueHitLocationX: number;
-  cueHitLocationY: number;
-  cueHitLocationZ: number;
   // POOL TODO: add more
 };
 
@@ -71,7 +51,7 @@ export type PoolGameAreaEvents = {
   onTick: (newModel: PoolGameModel) => void;
 
   // To tell other clients that a player has made a move
-  onPlayerMove: (newMove: PoolMove) => void;
+  onPlayerMove: () => void;
 
   // Player enters or leaves area
   occupantsChange: (newOccupants: PlayerController[]) => void;
@@ -89,14 +69,13 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // Current state of the game that we send to the front end for rendering
   public currentModel: PoolGameModel;
 
-  // Current move inputted by a player. Information in here is passed to the physics. Starts off undefined as there is no move by default.
-  public currentMove: PoolMove | undefined = undefined;
-
   // Players playing the game (as opposed to spectating). A subset of occupants.
   private _players: PlayerController[] = [];
 
   // List of Pool Ball objects in the game. May contain the cue ball, TBD.
   private _poolBalls: PoolBall[] = [];
+
+  private _cue: PoolCue = new PoolCue();
 
   private _cueBallIndex = 0;
 
@@ -117,12 +96,14 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _isPlayer1turn = false;
 
   // Boolean that represents whether a player has to replace a ball or not
-  private _isBallBeingPlaced = false;
+  public _isBallBeingPlaced = false;
 
   // Constants representing the length and width of a 7-foot pool table. (0, 0) is the top-left corner of the playable area.
-  private _tableLength = 78;
+  private _tableLength = 2.54; //m
 
-  private _tableWidth = 39;
+  private _tableWidth = 1.27; //m
+
+  private _cushionHeight = 0.005715; //m
 
   // Boolean that represents whether the game has started or not.
   private _isGameStarted = false;
@@ -228,6 +209,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // set pool balls into break position
   }
 
+  poolMove() {
+
+  }
+
   /**
    * Placeholder function that is called every tick. Checks for collisions, scratches, game overs, etc.
    */
@@ -296,7 +281,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // call physics update function with the currentMove information
     // physics(this.currentMove?.cueHitLocationX, this.currentMove?.cueHitLocationY)
     // we only want to update once, so we reset current move to undefined.
-    // this.currentMove = undefined;
 
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
     const movingBalls: PoolBall[] = this.poolBalls.filter(ball => ball.isMoving);
@@ -316,7 +300,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         this._poolBalls.forEach(otherBall => {
           if (ball !== otherBall) {
             if (ball.ballNumber === 0 || otherBall.ballNumber === 0) {
-              // call cue/ball collision check
+              // call cue/ball collision
 
               // otherBall is the cue
               if (
@@ -455,20 +439,4 @@ export function usePoolGameModel(area: PoolGameAreaController): PoolGameModel {
     };
   }, [area, setGameModel]);
   return gameModel;
-}
-
-/**
- * A react hook to retrieve the current PoolMove of a PoolGameAreaController, returning a PoolMove.
- *
- * This hook will re-render any components that use it when the current PoolMove changes.
- */
-export function usePoolGameMove(area: PoolGameAreaController): PoolMove | undefined {
-  const [playerMove, setPlayerMove] = useState(area.currentMove);
-  useEffect(() => {
-    area.addListener('onPlayerMove', setPlayerMove);
-    return () => {
-      area.removeListener('onPlayerMove', setPlayerMove);
-    };
-  }, [area, setPlayerMove]);
-  return playerMove;
 }

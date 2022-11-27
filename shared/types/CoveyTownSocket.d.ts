@@ -69,20 +69,6 @@ export interface ViewingArea {
   elapsedTimeSec: number;
 };
 
-export type PoolBall = {
-  // Position on the board
-  posnX: number;
-  posnY: number;
-  // Number on the ball 1 - 15 (0 for cue ball)
-  ballNumber: number;
-  // Stripes or solids or 8ball or cue ball
-  ballType: string;
-  // Rotation for display purposes 
-  orientation: string;
-  isPocketed: boolean;
-  isMoving: boolean;
-};
-
 export interface PoolGameArea {
   id: string;
   player1ID?: string;
