@@ -3,12 +3,19 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import TypedEmitter from 'typed-emitter';
 import PlayerController from './PlayerController';
-import { PoolGameArea as PoolGameAreaModel, Player } from '../types/CoveyTownSocket';
-import TownController from './TownController';
+import { PoolGameArea as PoolGameAreaModel } from '../types/CoveyTownSocket';
 import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
-import { addVectors, magnitude, subtractVectors, Vector } from '../components/Town/interactables/GameAreas/PoolGame/Vector';
+import { 
+  magnitude,
+  subtractVectors,
+} from '../components/Town/interactables/GameAreas/PoolGame/Vector';
 import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
-import { ballBallCollision, ballSlateCollision, cueBallCollision, cushionBallCollision } from '../components/Town/interactables/GameAreas/PoolGame/Collisions';
+import {
+  ballBallCollision,
+  ballSlateCollision,
+  cueBallCollision,
+  cushionBallCollision,
+} from '../components/Town/interactables/GameAreas/PoolGame/Collisions';
 
 /**
  * Type representing the entirety of the pool game to be sent to the frontend.
@@ -63,7 +70,7 @@ export type PoolGameAreaEvents = {
 };
 
 const BALL_RADIUS = 0.028575; // m
-const TICK_RATE = 0.10; // s
+const TICK_RATE = 0.1; // s
 const POCKET_RADIUS = 0.05; // m
 const RAIL_WIDTH = 0.051; // m
 
@@ -112,7 +119,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _isGameStarted = false;
 
   // list of all pockets, which hold their own location and radius
-  private _pockets: Pocket[] = [{ posnX: 0, posnY: 0, radius: POCKET_RADIUS },
+  private _pockets: Pocket[] = [
+    { posnX: 0, posnY: 0, radius: POCKET_RADIUS },
     { posnX: this._tableLength / 2, posnY: 0, radius: POCKET_RADIUS },
     { posnX: this._tableLength, posnY: 0, radius: POCKET_RADIUS },
     { posnX: 0, posnY: this._tableWidth, radius: POCKET_RADIUS },
@@ -226,23 +234,23 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       // front of triangle
       new PoolBall(1.905, 0.634, 1),
       // second row
-      new PoolBall(1.905 + (2 * BALL_RADIUS), 0.634 - BALL_RADIUS, 2),
-      new PoolBall(1.905 + (2 * BALL_RADIUS), 0.634 + BALL_RADIUS, 9),
+      new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 - BALL_RADIUS, 2),
+      new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 + BALL_RADIUS, 9),
       // third row
-      new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634 - (2 * BALL_RADIUS), 3),
-      new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634, 8),
-      new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634 + (2 * BALL_RADIUS), 10),
+      new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 3),
+      new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634, 8),
+      new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 10),
       // fourth row
-      new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 - (3 * BALL_RADIUS), 4),
-      new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 - BALL_RADIUS, 14),
-      new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 + BALL_RADIUS, 7),
-      new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 + (3 * BALL_RADIUS), 11),
+      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - 3 * BALL_RADIUS, 4),
+      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - BALL_RADIUS, 14),
+      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 + BALL_RADIUS, 7),
+      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 + 3 * BALL_RADIUS, 11),
       // fifth row
-      new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 - (4 * BALL_RADIUS), 12),
-      new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 - (2 * BALL_RADIUS), 6),
-      new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634, 15),
-      new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 + (2 * BALL_RADIUS), 13),
-      new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 + (4 * BALL_RADIUS), 5),
+      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 - 4 * BALL_RADIUS, 12),
+      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 6),
+      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634, 15),
+      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 13),
+      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 + 4 * BALL_RADIUS, 5),
     ];
   }
 
@@ -259,7 +267,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
     this._isBallBeingPlaced = false;
 
-    // set pool balls into break position. Declaring new pool balls is to reset their fields. 
+    // set pool balls into break position. Declaring new pool balls is to reset their fields.
     this._poolBalls = this.resetPoolBalls();
 
     // start the game
@@ -347,7 +355,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   // whatever else needs to go here, maybe physics
-  poolPhysicsGoHere(cue: PoolCue | undefined = undefined, cueBall: PoolBall | undefined = undefined): void {
+  poolPhysicsGoHere(
+    cue: PoolCue | undefined = undefined, 
+    cueBall: PoolBall | undefined = undefined,
+    ): void {
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
     const movingBalls: PoolBall[] = this.poolBalls.filter(ball => ball.isMoving);
     // holds all of the pool balls we've already checked for collisions to prevent duplicate collisions
@@ -366,7 +377,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       ball.tick(TICK_RATE);
       if (!alreadyCheckedBalls.includes(ball)) {
         // ball-table collisions
-        if (ball.position.z = 0 && ball.velocity.z < 0) {
+        if (ball.position.z === 0 && ball.velocity.z < 0) {
           ballSlateCollision(ball);
         }
 
@@ -374,14 +385,18 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         this._poolBalls.forEach(otherBall => {
           // check if the two current poolballs are different, and have not already been checked
           if (ball !== otherBall && !alreadyCheckedBalls.includes(otherBall)) {
-            if (magnitude(subtractVectors(ball.position, otherBall.position)) <= (BALL_RADIUS * 2)) {
+            if (magnitude(subtractVectors(ball.position, otherBall.position)) <= BALL_RADIUS * 2) {
               ballBallCollision(ball, otherBall);
               alreadyCheckedBalls.push(ball);
               alreadyCheckedBalls.push(otherBall);
 
-              // can only scratch on the first cue/ball collision 
-              if (canScratch && (this.getBallTypeByNumber(ball.ballNumber) === 'CueBall' || this.getBallTypeByNumber(otherBall.ballNumber) === 'CueBall')) {
-                // check for scratches 
+              // can only scratch on the first cue/ball collision
+              if (
+                canScratch &&
+                (this.getBallTypeByNumber(ball.ballNumber) === 'CueBall' ||
+                this.getBallTypeByNumber(otherBall.ballNumber) === 'CueBall')
+                ) {
+                // check for scratches
                 if (this._player1BallType) {
                   // ball is the cue ball
                   if (
@@ -438,7 +453,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
         // check if ball goes in pocket
         this._pockets.forEach(pocket => {
-          if (magnitude(subtractVectors(ball.position, {x: pocket.posnX, y: pocket.posnY, z: 0})) <= (BALL_RADIUS + pocket.radius)) {
+          if (
+            magnitude(subtractVectors(ball.position, { x: pocket.posnX, y: pocket.posnY, z: 0 })) <=
+            (BALL_RADIUS + pocket.radius
+            )) {
             ball.isPocketed = true;
             const ballType = this.getBallTypeByNumber(ball.ballNumber);
 
@@ -446,10 +464,14 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             if (this._player1BallType === undefined && this._player2BallType == undefined) {
               if (this._isPlayer1Turn) {
                 this._player1BallType = ballType;
-                (ballType === 'Stripes') ? this._player2BallType = 'Solids': this._player2BallType = 'Stripes';
+                ballType === 'Stripes'
+                ? (this._player2BallType = 'Solids')
+                : (this._player2BallType = 'Stripes');
               } else {
                 this._player2BallType = ballType;
-                (ballType === 'Stripes') ? this._player1BallType = 'Solids': this._player1BallType = 'Stripes';
+                ballType === 'Stripes'
+                ? (this._player1BallType = 'Solids')
+                : (this._player1BallType = 'Stripes');
               }
             }
 
@@ -469,22 +491,54 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         // check if the ball has collided with the side rails
         if (
           ball.velocity.x > 0 &&
-          magnitude(subtractVectors(ball.position, {x: this._tableLength + RAIL_WIDTH, y: ball.position.y, z: this._cushionHeight})) <= (2 * BALL_RADIUS)) {
+          magnitude(
+            subtractVectors(ball.position, {
+              x: this._tableLength + RAIL_WIDTH, 
+              y: ball.position.y, 
+              z: this._cushionHeight,
+            }),
+            ) <=
+            2 * BALL_RADIUS
+            ) {
           // collided with right rail
           cushionBallCollision(ball, false);
         } else if (
           ball.velocity.x > 0 &&
-          magnitude(subtractVectors(ball.position, {x: RAIL_WIDTH, y: ball.position.y, z: this._cushionHeight})) <= (2 * BALL_RADIUS)) {
+          magnitude(
+            subtractVectors(ball.position, {
+              x: RAIL_WIDTH,
+              y: ball.position.y,
+              z: this._cushionHeight,
+            }),
+            ) <=
+            2 * BALL_RADIUS
+            ) {
           // collided with left rail
           cushionBallCollision(ball, false);
         } else if (
           ball.velocity.y > 0 &&
-          magnitude(subtractVectors(ball.position, {x: ball.position.x, y: RAIL_WIDTH, z: this._cushionHeight})) <= (2 * BALL_RADIUS)) {
+          magnitude(
+            subtractVectors(ball.position, {
+              x: ball.position.x,
+              y: RAIL_WIDTH, 
+              z: this._cushionHeight,
+            }),
+            ) <=
+            2 * BALL_RADIUS
+            ) {
           // collided with top rail
           cushionBallCollision(ball, true);
         } else if (
           ball.velocity.y > 0 &&
-          magnitude(subtractVectors(ball.position, {x: ball.position.x, y: this._tableWidth + RAIL_WIDTH, z: this._cushionHeight})) <= (2 * BALL_RADIUS)) {
+          magnitude(
+            subtractVectors(ball.position, {
+              x: ball.position.x,
+              y: this._tableWidth + RAIL_WIDTH,
+              z: this._cushionHeight,
+            }),
+            ) <=
+            2 * BALL_RADIUS
+            ) {
           // collided with bottom rail
           cushionBallCollision(ball, true);
         }
