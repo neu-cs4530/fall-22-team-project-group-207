@@ -1,6 +1,7 @@
 import { mock, mockClear /*, MockProxy*/ } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
-import { PlayerLocation, PoolBall } from '../types/CoveyTownSocket';
+import { PlayerLocation } from '../types/CoveyTownSocket';
+import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
 import PlayerController from './PlayerController';
 import PoolGameAreaController, { PoolGameAreaEvents } from './PoolGameAreaController';
 //import TownController from './TownController';
@@ -22,24 +23,8 @@ describe('PoolGameAreaController', () => {
     const player1BallType = 'Stripes';
     const player2BallType = 'Solids';
     const isPlayer1Turn = true;
-    const poolBall1: PoolBall = {
-      posnX: 0,
-      posnY: 0,
-      ballNumber: 0,
-      ballType: 'Cue',
-      orientation: '',
-      isPocketed: false,
-      isMoving: false,
-    };
-    const poolBall2: PoolBall = {
-      posnX: 5,
-      posnY: 0,
-      ballNumber: 1,
-      ballType: 'Solid',
-      orientation: '',
-      isPocketed: false,
-      isMoving: false,
-    };
+    const poolBall1: PoolBall = new PoolBall(0, 0, 0);
+    const poolBall2: PoolBall = new PoolBall(5, 0, 1);
     const poolBalls: PoolBall[] = [poolBall1, poolBall2];
     testArea = new PoolGameAreaController({
       id,
