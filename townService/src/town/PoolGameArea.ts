@@ -78,8 +78,7 @@ export default class PoolGameArea extends InteractableArea {
   /**
    * Removes a player from this pool game area.
    *
-   * When the last player leaves, this method clears the video of this area and
-   * emits that update to all of the players
+   * When the last player leaves, should reset the game state to be able to start a new game
    *
    * @param player
    */
