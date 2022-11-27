@@ -2,13 +2,13 @@ import EventEmitter from 'events';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import TypedEmitter from 'typed-emitter';
-import { PoolBall, PoolGameArea as PoolGameAreaModel } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
-import { PoolGameArea as PoolGameAreaModel, PoolBallModel, Player } from '../types/CoveyTownSocket';
+import { PoolGameArea as PoolGameAreaModel, Player } from '../types/CoveyTownSocket';
 import TownController from './TownController';
 import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
-import { Vector } from '../components/Town/interactables/GameAreas/PoolGame/Vector';
+import { addVectors, magnitude, subtractVectors, Vector } from '../components/Town/interactables/GameAreas/PoolGame/Vector';
 import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
+import { ballBallCollision, ballSlateCollision, cueBallCollision, cushionBallCollision } from '../components/Town/interactables/GameAreas/PoolGame/Collisions';
 
 /**
  * Type representing the entirety of the pool game to be sent to the frontend.
@@ -20,16 +20,14 @@ export type PoolGameModel = {
   // id: string;
 
   // a list of pool ball objects, each of which contains information on their current position, orientation, etc.
-  id: number;
-  poolBalls: PoolBallModel[];
+  id: string;
+  poolBalls: PoolBall[];
   player1BallType: string | undefined;
   player2BallType: string | undefined;
-  player1ID: number;
-  player2ID: number;
+  player1ID: string;
+  player2ID: string;
   isPlayer1Turn: boolean;
   isBallBeingPlaced: boolean;
-
-  // POOL TODO: add more
 };
 
 /**
@@ -64,6 +62,11 @@ export type PoolGameAreaEvents = {
   playersChange: (newPlayers: PlayerController[]) => void;
 };
 
+const BALL_RADIUS = 0.028575; // m
+const TICK_RATE = 0.10; // s
+const POCKET_RADIUS = 0.05; // m
+const RAIL_WIDTH = 0.051; // m
+
 export default class PoolGameAreaController extends (EventEmitter as new () => TypedEmitter<PoolGameAreaEvents>) {
   // Players in bounds of the area
   private _occupants: PlayerController[] = [];
@@ -85,8 +88,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   private _8ballIndex = 1;
 
-  private _pockets: Pocket[] = [];
-
   // Number of Pool Balls each player has pocketed, for checking whether they should win/lose the game
   private _player1BallsPocketed = 0;
 
@@ -97,7 +98,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   private _player2BallType: string | undefined = undefined;
 
-  private _isPlayer1turn = false;
+  private _isPlayer1Turn = false;
 
   // Boolean that represents whether a player has to replace a ball or not
   public _isBallBeingPlaced = false;
@@ -112,6 +113,15 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // Boolean that represents whether the game has started or not.
   private _isGameStarted = false;
 
+  // list of all pockets, which hold their own location and radius
+  private _pockets: Pocket[] = [{ posnX: 0, posnY: 0, radius: POCKET_RADIUS },
+    { posnX: this._tableLength / 2, posnY: 0, radius: POCKET_RADIUS },
+    { posnX: this._tableLength, posnY: 0, radius: POCKET_RADIUS },
+    { posnX: 0, posnY: this._tableWidth, radius: POCKET_RADIUS },
+    { posnX: this._tableLength / 2, posnY: this._tableWidth, radius: POCKET_RADIUS },
+    { posnX: this._tableLength, posnY: this._tableWidth, radius: POCKET_RADIUS },
+  ];
+
   /**
    * Create a new PoolGameAreaController
    * @param poolGameModel model representation of this pool area
@@ -120,10 +130,13 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     super();
     this._id = poolGameModel.id;
     this.currentModel = {
+      id: this._id,
       poolBalls: this._poolBalls,
+      player1ID: this._players[0]?.id,
+      player2ID: this._players[1]?.id,
       player1BallType: this._player1BallType,
       player2BallType: this._player2BallType,
-      isPlayer1Turn: this._isPlayer1turn,
+      isPlayer1Turn: this._isPlayer1Turn,
       isBallBeingPlaced: this._isBallBeingPlaced,
     };
   }
@@ -143,7 +156,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    * The Current Turn of this pool area (read only)
    */
   get isPlayer1Turn() {
-    return this._isPlayer1turn;
+    return this._isPlayer1Turn;
   }
 
   /**
@@ -208,13 +221,26 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // POOL TODO
   startGame(): void {
     // randomly decide who is first
-    this._isPlayer1turn = Math.random() <= 0.5;
+    this._isPlayer1Turn = Math.random() <= 0.5;
 
+    
     // set pool balls into break position
   }
 
-  poolMove() {
-
+  /**
+   * A function that returns a string representing the type of the ball based on its number-- 'Stripes', 'Solids', '8ball', or 'CueBall'
+   * @param ballNumber the number of the given ball
+   */
+  getBallTypeByNumber(ballNumber: number): string {
+    if (ballNumber <= 7 && ballNumber >= 1) {
+      return 'Solids';
+    } else if (ballNumber === 8) {
+      return '8ball';
+    } else if (ballNumber >= 9 && ballNumber <= 15) {
+      return 'Stripes';
+    }
+    // Cue ball has a number of 0?
+    return 'CueBall';
   }
 
   /**
@@ -237,7 +263,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   isGameOver(): { isGameOver: boolean; didPlayer1Win: boolean } {
     // If a player has 8 balls pocketed (all 7 of theirs and the 8 ball)
     // the 8 ball is pocketed, the cue ball is NOT pocketed, and it is a certain player's turn, that player wins.
-    if (this._isPlayer1turn) {
+    if (this._isPlayer1Turn) {
       if (
         this._poolBalls[this._8ballIndex].isPocketed &&
         !this._poolBalls[this._cueBallIndex].isPocketed
@@ -251,7 +277,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         }
       }
     }
-    if (!this._isPlayer1turn) {
+    if (!this._isPlayer1Turn) {
       if (
         this._poolBalls[this._8ballIndex].isPocketed &&
         !this._poolBalls[this._cueBallIndex].isPocketed
@@ -281,99 +307,154 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   // whatever else needs to go here, maybe physics
-  poolPhysicsGoHere(): void {
-    // call physics update function with the currentMove information
-    // physics(this.currentMove?.cueHitLocationX, this.currentMove?.cueHitLocationY)
-    // we only want to update once, so we reset current move to undefined.
-
+  poolPhysicsGoHere(cue: PoolCue | undefined = undefined, cueBall: PoolBall | undefined = undefined): void {
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
     const movingBalls: PoolBall[] = this.poolBalls.filter(ball => ball.isMoving);
     // holds all of the pool balls we've already checked for collisions to prevent duplicate collisions
     const alreadyCheckedBalls: PoolBall[] = [];
 
+    if (cue && cueBall) {
+      cueBallCollision(cue, cueBall);
+    }
+
+    // we can only scratch once per turn, so this boolean represents whether that has happened yet
+    let canScratch = true;
+
     // loop through every pool ball, calling an update function on them and checking for collisions.
     // if any collisions, call the collide function on both balls, passing each other as parameters.
     movingBalls.forEach(ball => {
+      ball.tick(TICK_RATE);
       if (!alreadyCheckedBalls.includes(ball)) {
         // ball-table collisions
-        // if (ball.position.Z = 0 && ball.velocity.z < 0) {
-        //   // call ball/table collision
-        // }
+        if (ball.position.z = 0 && ball.velocity.z < 0) {
+          ballSlateCollision(ball);
+        }
 
         // ball-ball collisions
         this._poolBalls.forEach(otherBall => {
-          if (ball !== otherBall) {
-            if (ball.ballNumber === 0 || otherBall.ballNumber === 0) {
-              // call cue/ball collision
+          // check if the two current poolballs are different, and have not already been checked
+          if (ball !== otherBall && !alreadyCheckedBalls.includes(otherBall)) {
+            if (magnitude(subtractVectors(ball.position, otherBall.position)) <= (BALL_RADIUS * 2)) {
+              ballBallCollision(ball, otherBall);
+              alreadyCheckedBalls.push(ball);
+              alreadyCheckedBalls.push(otherBall);
 
-              // otherBall is the cue
-              if (
-                this.isPlayer1Turn &&
-                ball.ballNumber === 0 &&
-                otherBall.ballType !== this._player1BallType
-              ) {
-                // player 1 hit the wrong ball, scratch
-                this._isBallBeingPlaced = true;
+              // can only scratch on the first cue/ball collision 
+              if (canScratch && (this.getBallTypeByNumber(ball.ballNumber) === 'CueBall' || this.getBallTypeByNumber(otherBall.ballNumber) === 'CueBall')) {
+                // check for scratches 
+                if (this._player1BallType) {
+                  // ball is the cue ball
+                  if (
+                    this.isPlayer1Turn &&
+                    ball.ballNumber === 0 &&
+                    this.getBallTypeByNumber(otherBall.ballNumber) !== this._player1BallType
+                  ) {
+                    // player 1 hit the wrong ball, scratch
+                    this._isBallBeingPlaced = true;
+                    this._isPlayer1Turn = false;
+                    canScratch = false;
+                  }
+                  // otherBall is the cue ball
+                  if (
+                    this.isPlayer1Turn &&
+                    otherBall.ballNumber === 0 &&
+                    this.getBallTypeByNumber(ball.ballNumber) !== this._player1BallType
+                  ) {
+                    // player 1 hit the wrong ball, scratch
+                    this._isBallBeingPlaced = true;
+                    this._isPlayer1Turn = false;
+                    canScratch = false;
+                  }
+                }
+                if (this._player2BallType) {
+                  // ball is the cue ball
+                  if (
+                    !this.isPlayer1Turn &&
+                    ball.ballNumber === 0 &&
+                    this.getBallTypeByNumber(otherBall.ballNumber) !== this._player2BallType
+                  ) {
+                    // player 2 hit the wrong ball, scratch
+                    this._isBallBeingPlaced = true;
+                    this._isPlayer1Turn = true;
+                    canScratch = false;
+                  }
+                  // otherBall is the cue ball
+                  if (
+                    !this.isPlayer1Turn &&
+                    otherBall.ballNumber === 0 &&
+                    this.getBallTypeByNumber(ball.ballNumber) !== this._player2BallType
+                  ) {
+                    // player 2 hit the wrong ball, scratch
+                    this._isBallBeingPlaced = true;
+                    this._isPlayer1Turn = true;
+                    canScratch = false;
+                  }
+                }
               }
-              if (
-                !this.isPlayer1Turn &&
-                ball.ballNumber === 0 &&
-                otherBall.ballType !== this._player2BallType
-              ) {
-                // player 2 hit the wrong ball, scratch
-                this._isBallBeingPlaced = true;
-              }
-
-              // ball is the cue
-              if (
-                this.isPlayer1Turn &&
-                ball.ballNumber !== 0 &&
-                ball.ballType !== this._player1BallType
-              ) {
-                // player 1 hit the wrong ball, scratch
-                this._isBallBeingPlaced = true;
-              }
-              if (
-                !this.isPlayer1Turn &&
-                ball.ballNumber !== 0 &&
-                ball.ballType !== this._player2BallType
-              ) {
-                // player 2 hit the wrong ball, scratch
-                this._isBallBeingPlaced = true;
-              }
-            } else {
-              // call check collision between the two balls
             }
           }
         });
-        // call check if ball goes in pocket
-        // if (ball collides with pocket) {
-        //   ball.isMoving = false;
-        //   ball.isPocketed = true;
-        //   (this.isPlayer1Turn) ? this._player1BallsPocketed++ : this._player2BallsPocketed++;
-        // }
+        // at this point we've checked the current moving ball against every other ball, so do other checks
+
+        // check if ball goes in pocket
+        this._pockets.forEach(pocket => {
+          if (magnitude(subtractVectors(ball.position, {x: pocket.posnX, y: pocket.posnY, z: 0})) <= (BALL_RADIUS + pocket.radius)) {
+            ball.isPocketed = true;
+            const ballType = this.getBallTypeByNumber(ball.ballNumber);
+            if (ballType === this._player1BallType) {
+              this._player1BallsPocketed++;
+            } else if (ballType === this._player2BallType) {
+              this._player2BallsPocketed++;
+            } else if (ballType === 'CueBall') {
+              // cue ball went in pocket, scratch
+              this._isBallBeingPlaced = true;
+              this._isPlayer1Turn = !this._isPlayer1Turn;
+              canScratch = false;
+            }
+          }
+        });
+
+        // check if the ball has collided with the side rails
+        if (
+          ball.velocity.x > 0 &&
+          magnitude(subtractVectors(ball.position, {x: this._tableLength + RAIL_WIDTH, y: ball.position.y, z: this._cushionHeight})) <= (2 * BALL_RADIUS)) {
+          // collided with right rail
+          cushionBallCollision(ball, false);
+        } else if (
+          ball.velocity.x > 0 &&
+          magnitude(subtractVectors(ball.position, {x: RAIL_WIDTH, y: ball.position.y, z: this._cushionHeight})) <= (2 * BALL_RADIUS)) {
+          // collided with left rail
+          cushionBallCollision(ball, false);
+        } else if (
+          ball.velocity.y > 0 &&
+          magnitude(subtractVectors(ball.position, {x: ball.position.x, y: RAIL_WIDTH, z: this._cushionHeight})) <= (2 * BALL_RADIUS)) {
+          // collided with top rail
+          cushionBallCollision(ball, true);
+        } else if (
+          ball.velocity.y > 0 &&
+          magnitude(subtractVectors(ball.position, {x: ball.position.x, y: this._tableWidth + RAIL_WIDTH, z: this._cushionHeight})) <= (2 * BALL_RADIUS)) {
+          // collided with bottom rail
+          cushionBallCollision(ball, true);
+        }
 
         // check if the ball has gone off the board/ over the rails
-        // let haveWeScratched = false;
-        // if (ball.posnX > this._tableLength) {
-        // ball.posnX = this._tableLength - ballRadius;
-        //   haveWeScratched = ball.ballNumber === 0;
-        // }
-        // if (ball.posnX < 0) {
-        //   ball.posnX = 0 + ballRadius;
-        //   haveWeScratched = ball.ballNumber === 0;
-        // }
-        // if (ball.posnY > this._tableWidth) {
-        //   ball.posnY = this._tableWidth + ballRadius;
-        //   haveWeScratched = ball.ballNumber === 0;
-        // }
-        // if (ball.posnY < 0) {
-        //   ball.posnY = 0 - ballRadius;
-        //   haveWeScratched = ball.ballNumber === 0;
-        // }
-        // if (haveWeScratched) {
-        //   this._isBallBeingPlaced = true;
-        // }
+        let haveWeScratchedOverTable = false;
+        if (ball.position.x > this._tableLength) {
+          ball.position.x = this._tableLength - BALL_RADIUS;
+        } else if (ball.position.x < 0) {
+          ball.position.x = RAIL_WIDTH + BALL_RADIUS;
+        } else if (ball.position.y > this._tableWidth) {
+          ball.position.y = this._tableWidth - BALL_RADIUS;
+        } else if (ball.position.y < 0) {
+          ball.position.y = RAIL_WIDTH + BALL_RADIUS;
+        }
+        haveWeScratchedOverTable = ball.ballNumber === 0;
+        if (haveWeScratchedOverTable) {
+          // cue ball went over the table, scratch
+          this._isBallBeingPlaced = true;
+          this._isPlayer1Turn = !this._isPlayer1Turn;
+          canScratch = false;
+        }
       }
     });
 
@@ -389,7 +470,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       id: this._id,
       player1ID: this._players[0]?.id,
       player2ID: this._players[1]?.id,
-      isPlayer1Turn: this._isPlayer1turn,
+      isPlayer1Turn: this._isPlayer1Turn,
       poolBalls: this._poolBalls,
     };
   }
@@ -398,7 +479,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     updatedModel: PoolGameAreaModel,
     playerFinder: (playerIDs: string[]) => PlayerController[],
   ) {
-    this._isPlayer1turn = updatedModel.isPlayer1Turn;
+    this._isPlayer1Turn = updatedModel.isPlayer1Turn;
     this._player1BallType = updatedModel.player1BallType;
     this._player2BallType = updatedModel.player2BallType;
     this._poolBalls = updatedModel.poolBalls;
@@ -409,7 +490,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this._players[1] = playerFinder([
       updatedModel.player2ID !== undefined ? updatedModel.player2ID : '',
     ])[0];
-    this._isPlayer1turn = updatedModel.isPlayer1Turn;
+    this._isPlayer1Turn = updatedModel.isPlayer1Turn;
   }
 }
 
