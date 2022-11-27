@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PoolBallModel } from '../../../../classes/PoolGameAreaController';
+import { PoolBallModel, PoolGameModel } from '../../../../classes/PoolGameAreaController';
 import { usePoolGameAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
@@ -40,9 +40,9 @@ const TEST_POOL_BALLS: PoolBallModel[] = [
  * @returns HTML canvas containing pool game display
  */
 export default function PoolGameCanvas({
-  poolGameArea,
+  poolGameModel,
 }: {
-  poolGameArea: PoolGameArea | undefined;
+  poolGameModel: PoolGameModel | undefined;
 }): JSX.Element {
   // POOL TODO: add react hooks for game state so we can update this with the pool balls
   // const coveyTownController = useTownController(); // not sure if we need this

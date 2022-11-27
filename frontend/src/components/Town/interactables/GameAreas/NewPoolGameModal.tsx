@@ -30,32 +30,6 @@ export default function NewPoolGameModal(): JSX.Element {
 
   const isOpen = newPoolGame !== undefined;
 
-  // canvas for rendering the game
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  canvasRef.current?.getContext('2d');
-  const canvasCtxRef = React.useRef<CanvasRenderingContext2D | null>(null);
-
-  // POOL TODO: this useEffect could probably be removed, as drawing is handled in PoolGameCanvas now
-  useEffect(() => {
-    // Initialize
-    console.log('attempting to find canvasRef.current');
-    if (!canvasRef.current) {
-      console.log('could not find canvasRef.current');
-      return;
-    }
-    canvasCtxRef.current = canvasRef.current.getContext('2d');
-    if (!canvasCtxRef.current) {
-      console.log('could not find canvasCtxRef.current');
-      return;
-    }
-    const ctx = canvasCtxRef.current;
-    console.log('attempting to draw');
-
-    ctx.beginPath();
-    ctx.arc(95, 50, 40, 0, 2 * Math.PI);
-    ctx.stroke();
-  }, [canvasRef]);
-
   useEffect(() => {
     if (newPoolGame) {
       coveyTownController.pause();
@@ -95,7 +69,7 @@ export default function NewPoolGameModal(): JSX.Element {
       isPlayer1Turn: boolean;
     }
    */
-  /* const createPoolGame = useCallback(async () => {
+  const createPoolGame = useCallback(async () => {
     if (gameState && newPoolGame) {
       const poolGameToCreate: PoolGameModel = {
         // id: newPoolGame.id,
@@ -108,7 +82,8 @@ export default function NewPoolGameModal(): JSX.Element {
         poolBalls: [], //gameState.poolBalls.map(b => b), // POOL TODO: convert from frontend to backend balls
       };
       try {
-        await coveyTownController.createPoolGameArea(poolGameToCreate);
+        // await coveyTownController.createPoolGameArea(poolGameToCreate); // POOL TODO: fix this
+        // we could probably change this to take in a PoolGameModel
         toast({
           title: 'Pool Area Created!',
           status: 'success',
@@ -132,7 +107,7 @@ export default function NewPoolGameModal(): JSX.Element {
         }
       }
     }
-  }, [gameState, setGameState, coveyTownController, newPoolGame, closeModal, toast]); */
+  }, [gameState, setGameState, coveyTownController, newPoolGame, closeModal, toast]);
 
   return (
     <Modal
@@ -147,7 +122,7 @@ export default function NewPoolGameModal(): JSX.Element {
         <ModalHeader>Play Pool!!!</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <PoolGameCanvas poolGameArea={undefined} />
+          <PoolGameCanvas poolGameModel={gameState} />
           {/**
            * POOL TODO: update poolGameArea above to be not undefined
            * some references:
