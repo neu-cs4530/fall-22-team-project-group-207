@@ -79,33 +79,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // Players playing the game (as opposed to spectating). A subset of occupants.
   private _players: PlayerController[] = [];
 
-  // List of Pool Ball objects in the game. May contain the cue ball, TBD.
-  private _poolBalls: PoolBall[] = [
-    // cue ball at break position
-    new PoolBall(0.847, 0.634, 0),
-    // front of triangle
-    new PoolBall(1.905, 0.634, 1),
-    // second row
-    new PoolBall(1.905 + (2 * BALL_RADIUS), 0.634 + BALL_RADIUS, 9),
-    new PoolBall(1.905 + (2 * BALL_RADIUS), 0.634 - BALL_RADIUS, 2),
-    // third row
-    new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634 + (2 * BALL_RADIUS), 10),
-    new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634, 8),
-    new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634 - (2 * BALL_RADIUS), 3),
-    // fourth row
-    new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 + BALL_RADIUS, 7),
-    new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 + (3 * BALL_RADIUS), 11),
-    new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 - BALL_RADIUS, 14),
-    new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 - (3 * BALL_RADIUS), 4),
-    // fifth row
-    new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 + BALL_RADIUS, 7),
-    new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 + (2 * BALL_RADIUS), 11),
-    new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634, 15),
-    new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 - (2 * BALL_RADIUS), 4),
-    new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 - (2 * BALL_RADIUS), 4),
-  ];
-
-  private _cue: PoolCue = new PoolCue();
+  // List of Pool Ball objects in the game at their default break position. Includes cue and 8 ball.
+  private _poolBalls: PoolBall[] = this.resetPoolBalls();
 
   private _cueBallIndex = 0;
 
@@ -241,14 +216,54 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     }
   }
 
+  /**
+   * Function that returns an array of PoolBalls to the default break state.
+   */
+  resetPoolBalls(): PoolBall[] {
+    return [
+      // cue ball at break position
+      new PoolBall(0.847, 0.634, 0),
+      // front of triangle
+      new PoolBall(1.905, 0.634, 1),
+      // second row
+      new PoolBall(1.905 + (2 * BALL_RADIUS), 0.634 - BALL_RADIUS, 2),
+      new PoolBall(1.905 + (2 * BALL_RADIUS), 0.634 + BALL_RADIUS, 9),
+      // third row
+      new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634 - (2 * BALL_RADIUS), 3),
+      new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634, 8),
+      new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634 + (2 * BALL_RADIUS), 10),
+      // fourth row
+      new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 - (3 * BALL_RADIUS), 4),
+      new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 - BALL_RADIUS, 14),
+      new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 + BALL_RADIUS, 7),
+      new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 + (3 * BALL_RADIUS), 11),
+      // fifth row
+      new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 - (4 * BALL_RADIUS), 12),
+      new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 - (2 * BALL_RADIUS), 6),
+      new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634, 15),
+      new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 + (2 * BALL_RADIUS), 13),
+      new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 + (4 * BALL_RADIUS), 5),
+    ];
+  }
+
   // POOL TODO
   startGame(): void {
     // randomly decide who is first
     this._isPlayer1Turn = Math.random() <= 0.5;
 
-    // resets
+    // reset score and type for both players
+    this._player1BallType = undefined;
+    this._player2BallType = undefined;
+    this._player1BallsPocketed = 0;
+    this._player2BallsPocketed = 0;
 
-    // set pool balls into break position
+    this._isBallBeingPlaced = false;
+
+    // set pool balls into break position. Declaring new pool balls is to reset their fields. 
+    this._poolBalls = this.resetPoolBalls();
+
+    // start the game
+    this.isGameStarted = true;
   }
 
   /**
@@ -426,6 +441,18 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           if (magnitude(subtractVectors(ball.position, {x: pocket.posnX, y: pocket.posnY, z: 0})) <= (BALL_RADIUS + pocket.radius)) {
             ball.isPocketed = true;
             const ballType = this.getBallTypeByNumber(ball.ballNumber);
+
+            // if the players don't have a ball type yet, assign them
+            if (this._player1BallType === undefined && this._player2BallType == undefined) {
+              if (this._isPlayer1Turn) {
+                this._player1BallType = ballType;
+                (ballType === 'Stripes') ? this._player2BallType = 'Solids': this._player2BallType = 'Stripes';
+              } else {
+                this._player2BallType = ballType;
+                (ballType === 'Stripes') ? this._player1BallType = 'Solids': this._player1BallType = 'Stripes';
+              }
+            }
+
             if (ballType === this._player1BallType) {
               this._player1BallsPocketed++;
             } else if (ballType === this._player2BallType) {
