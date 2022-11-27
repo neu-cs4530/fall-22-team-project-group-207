@@ -80,13 +80,36 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _players: PlayerController[] = [];
 
   // List of Pool Ball objects in the game. May contain the cue ball, TBD.
-  private _poolBalls: PoolBall[] = [];
+  private _poolBalls: PoolBall[] = [
+    // cue ball at break position
+    new PoolBall(0.847, 0.634, 0),
+    // front of triangle
+    new PoolBall(1.905, 0.634, 1),
+    // second row
+    new PoolBall(1.905 + (2 * BALL_RADIUS), 0.634 + BALL_RADIUS, 9),
+    new PoolBall(1.905 + (2 * BALL_RADIUS), 0.634 - BALL_RADIUS, 2),
+    // third row
+    new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634 + (2 * BALL_RADIUS), 10),
+    new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634, 8),
+    new PoolBall(1.905 + (4 * BALL_RADIUS), 0.634 - (2 * BALL_RADIUS), 3),
+    // fourth row
+    new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 + BALL_RADIUS, 7),
+    new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 + (3 * BALL_RADIUS), 11),
+    new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 - BALL_RADIUS, 14),
+    new PoolBall(1.905 + (6 * BALL_RADIUS), 0.634 - (3 * BALL_RADIUS), 4),
+    // fifth row
+    new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 + BALL_RADIUS, 7),
+    new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 + (2 * BALL_RADIUS), 11),
+    new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634, 15),
+    new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 - (2 * BALL_RADIUS), 4),
+    new PoolBall(1.905 + (8 * BALL_RADIUS), 0.634 - (2 * BALL_RADIUS), 4),
+  ];
 
   private _cue: PoolCue = new PoolCue();
 
   private _cueBallIndex = 0;
 
-  private _8ballIndex = 1;
+  private _8ballIndex = 5;
 
   // Number of Pool Balls each player has pocketed, for checking whether they should win/lose the game
   private _player1BallsPocketed = 0;
@@ -223,7 +246,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // randomly decide who is first
     this._isPlayer1Turn = Math.random() <= 0.5;
 
-    
+    // resets
+
     // set pool balls into break position
   }
 
@@ -255,6 +279,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         this.endGame();
       }
     }
+    this.emit('onTick', this.currentModel);
   }
 
   /**
