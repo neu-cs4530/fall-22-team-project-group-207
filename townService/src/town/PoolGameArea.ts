@@ -47,10 +47,10 @@ export default class PoolGameArea extends InteractableArea {
   }
 
   /**
-   * Creates a new ViewingArea
+   * Creates a new PoolGameArea
    *
-   * @param viewingArea model containing this area's starting state
-   * @param coordinates the bounding box that defines this viewing area
+   * @param poolArea model containing this area's starting state
+   * @param coordinates the bounding box that defines this pool game area
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
@@ -76,7 +76,7 @@ export default class PoolGameArea extends InteractableArea {
   }
 
   /**
-   * Removes a player from this  area.
+   * Removes a player from this pool game area.
    *
    * When the last player leaves, this method clears the video of this area and
    * emits that update to all of the players
