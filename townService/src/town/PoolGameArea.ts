@@ -3,6 +3,7 @@ import Player from '../lib/Player';
 import {
   BoundingBox,
   TownEmitter,
+  PoolBall,
   PoolGameArea as PoolGameAreaModel,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
@@ -46,9 +47,10 @@ export default class PoolGameArea extends InteractableArea {
   }
 
   /**
-   * Constructs a new PoolGameArea
-   * @param poolArea model containing this area's starting state
-   * @param coordinates the bounding box that defines this pool game area
+   * Creates a new ViewingArea
+   *
+   * @param viewingArea model containing this area's starting state
+   * @param coordinates the bounding box that defines this viewing area
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
    */
   public constructor(
@@ -74,9 +76,10 @@ export default class PoolGameArea extends InteractableArea {
   }
 
   /**
-   * Removes a player from this pool game area.
+   * Removes a player from this  area.
    *
-   * When the last player leaves, should reset the game state to be able to start a new game
+   * When the last player leaves, this method clears the video of this area and
+   * emits that update to all of the players
    *
    * @param player
    */
