@@ -1,12 +1,5 @@
-import {
-  addVectors,
-  crossProduct,
-  magnitude,
-  scale,
-  subtractVectors,
-  unitVector,
-  Vector,
-} from '../Vector';
+import { Vector } from '../Vector';
+import { addVectors, crossProduct, magnitude, scale, subtractVectors, unitVector } from '../Vector';
 
 const BALL_CLOTH_ANGULAR_DECELERATION_RATE = 10; //rad/s^2
 const BALL_CLOTH_ROLLING_FRICTION = 0.01;
@@ -187,5 +180,19 @@ export default class PoolBall {
     );
     this._angularVelocity.x = xyPlaneAngularVelocity.x;
     this._angularVelocity.y = xyPlaneAngularVelocity.y;
+  }
+
+  // Convert to a PoolBallModel suitable for broadcasting
+  public toModel() {
+    return {
+      angularOrientation: this.angularOrientation,
+      angularVelocity: this.angularVelocity,
+      position: this.position,
+      velocity: this.velocity,
+      ballNumber: this.ballNumber,
+      isMoving: this.isMoving,
+      isAirborne: this.isAirborne,
+      isPocketed: this.isPocketed,
+    };
   }
 }

@@ -4,6 +4,7 @@ import { PlayerLocation, PoolBall } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
 import PoolGameAreaController, { PoolGameAreaEvents } from './PoolGameAreaController';
 //import TownController from './TownController';
+/*
 describe('PoolGameAreaController', () => {
   // A valid PoolGameAreaController to be reused within the tests
   let testArea: PoolGameAreaController;
@@ -92,3 +93,4 @@ describe('PoolGameAreaController', () => {
     });
   });
 });
+*/
