@@ -12,8 +12,8 @@ import {
   ModalOverlay,
   // useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { PoolGameModel } from '../../../../classes/PoolGameAreaController';
+import React, { useCallback, useEffect, useRef } from 'react'; // useState
+// import { PoolGameModel } from '../../../../classes/PoolGameAreaController';
 import { useInteractable } from '../../../../classes/TownController';
 // import { PoolGameArea } from '../../../../generated/client';
 import useTownController from '../../../../hooks/useTownController';
@@ -26,9 +26,7 @@ import PoolGameCanvas from './PoolGameCanvas';
 export default function NewPoolGameModal(): JSX.Element {
   const coveyTownController = useTownController();
   const newPoolGame = useInteractable('gameArea');
-  const [gameState, setGameState] = useState<PoolGameModel>();
-  console.log(gameState);
-  setGameState(gameState);
+  // const [gameState, setGameState] = useState<PoolGameModel>();
 
   const isOpen = newPoolGame !== undefined;
 
@@ -37,7 +35,7 @@ export default function NewPoolGameModal(): JSX.Element {
   canvasRef.current?.getContext('2d');
   const canvasCtxRef = React.useRef<CanvasRenderingContext2D | null>(null);
 
-  // POOL TODO: this useEffect could probably be removed, as drawing is handled in PoolGameCanvas now
+  //POOL TODO: this useEffect could probably be removed, as drawing is handled in PoolGameCanvas now
   useEffect(() => {
     // Initialize
     console.log('attempting to find canvasRef.current');
