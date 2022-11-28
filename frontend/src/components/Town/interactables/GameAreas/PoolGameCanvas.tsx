@@ -1,39 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PoolBallModel } from '../../../../classes/PoolGameAreaController';
-// import { usePoolGameAreaController } from '../../../../classes/TownController';
-// import useTownController from '../../../../hooks/useTownController';
-// import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
+import { PoolBall, PoolGameArea as PoolGameAreaModel } from '../../../../types/CoveyTownSocket';
+import { usePoolGameAreaController } from '../../../../classes/TownController';
+import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
 import PoolGameArea from './PoolGameArea';
-import { POOL_BALL_PATHS, POOL_TABLE_PATH } from './PoolGameAssets/assets';
-// POOL TODO: add the rest of the imports
+import { POOL_BALL_IMAGES, POOL_TABLE_IMAGE } from './PoolGameAssets/assets';
 
-// POOL TODO: remove test balls
-const TEST_POOL_BALLS: PoolBallModel[] = [
-  {
-    posnX: 380,
-    posnY: 260,
-    orientation: '',
-    ballNumber: 0,
-  },
-  {
-    posnX: 500,
-    posnY: 200,
-    orientation: '',
-    ballNumber: 1,
-  },
-  {
-    posnX: 100,
-    posnY: 140,
-    orientation: '',
-    ballNumber: 2,
-  },
-  {
-    posnX: 400,
-    posnY: 340,
-    orientation: '',
-    ballNumber: 3,
-  },
-];
+const BALL_RADIUS = 0.028575; // m
 
 /**
  * Returns a canvas that renders the pool game
@@ -42,39 +14,23 @@ const TEST_POOL_BALLS: PoolBallModel[] = [
 export default function PoolGameCanvas({
   poolGameArea,
 }: {
-  poolGameArea: PoolGameArea | undefined;
+  poolGameArea: PoolGameArea;
 }): JSX.Element {
   // POOL TODO: add react hooks for game state so we can update this with the pool balls
-  // const coveyTownController = useTownController(); // not sure if we need this
-  // const poolGameAreaController = usePoolGameAreaController(poolGameArea?.name);
-  // const [poolBalls, setPoolBalls] = useState<FrontEndPoolBall>(poolGameArea?.poolBalls);
+  const poolGameAreaController = usePoolGameAreaController(poolGameArea.id);
+  const [gameState, setGameState] = useState<PoolGameAreaModel>(
+    poolGameAreaController.currentModel,
+  );
+  console.log('POOL TODO: setGameState log to remove eslint error' + setGameState);
 
   // Coordinates of mouse
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  console.log(poolGameArea);
-
-  // canvas for rendering the game
+  // Canvas for rendering the game
   const boardCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const boardCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
-
-  const scratch = false; // POOL TODO: use pool controller for these
-  const isPlayersTurn = true;
-  const spectating = false;
-
-  /**
-   * Draws the board on the canvas
-   * @param ctx Canvas context
-   */
-  function drawBoard(ctx: CanvasRenderingContext2D) {
-    const img = new Image();
-    img.src = POOL_TABLE_PATH;
-    img.onload = function () {
-      ctx.drawImage(img, 0, 0, img.width * 1.5, img.height * 1.5);
-    };
-  }
 
   // Handle mouse events, namely movement and clicking
   useEffect(() => {
@@ -84,7 +40,6 @@ export default function PoolGameCanvas({
       return;
     }
     const canvasRect = canvas.getBoundingClientRect();
-    console.log('bounding rect ' + canvasRect.x + ' ' + canvasRect.y);
 
     // Get local mouse coordinates
     const handleMouseMove = (event: { screenX: number; screenY: number }) => {
@@ -97,33 +52,35 @@ export default function PoolGameCanvas({
     // Handle user input based on the state of the game
     const handleMouseClick = () => {
       console.log('player clicked at ' + mousePos.x + ' ' + mousePos.y);
-      if (scratch) {
+      if (gameState.isBallBeingPlaced) {
         // POOL TODO: update game controller with new cue ball position
       }
       // When the current player needs to input a hit
-      else if (isPlayersTurn) {
-        /*
+      else if (gameState.isPlayer1Turn) {
+        const cueBall = gameState.poolBalls.find(p => {
+          return p.ballNumber === 0;
+        });
+        if (!cueBall) {
+          console.log('could not find cue ball');
+          return;
+        }
         const velocityUnitVector: Vector = unitVector(
-          subtractVectors(cueBall.position, cueTip.position),
+          subtractVectors(cueBall.position, { x: mousePos.x, y: 0, z: mousePos.y }),
         );
         const velocity: Vector = scale(velocityUnitVector, 1); // POOL TODO: get scalar for velocity
 
         const collisionPoint: Vector = addVectors(
           cueBall.position,
-          scale(velocityUnitVector, -cueBall.radius),
+          scale(velocityUnitVector, -BALL_RADIUS),
         );
 
-        poolGameAreaController.poolPhysicsGoHere(); // POOL TODO: pass the vectors to the controller to handle physics
-        */
+        console.log(velocity, collisionPoint);
+        // poolGameAreaController.makeMove(velocity, collisionPoint); // POOL TODO: pass the vectors to the controller to handle physics
       }
       // When the current player is spectating or waiting on the other player's move
-      else if (spectating) {
+      else {
         // Clicking when it's not the player's turn should do nothing
         return;
-      }
-      // Catch unknown states
-      else {
-        console.log('no state found');
       }
     };
 
@@ -134,7 +91,7 @@ export default function PoolGameCanvas({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mousedown', handleMouseClick);
     };
-  }, [isPlayersTurn, mousePos, scratch, spectating]);
+  }, [gameState, mousePos]);
 
   /**
    * useEffect to render the board state and ball movements
@@ -143,12 +100,25 @@ export default function PoolGameCanvas({
     // Set up context for board
     const boardCanvas = boardCanvasRef.current;
     if (!boardCanvas) {
+      console.log('could not find boardCanvas');
       return;
     }
     boardCanvasCtxRef.current = boardCanvas.getContext('2d');
     const boardCanvasCtx = boardCanvasCtxRef.current;
     if (!boardCanvasCtx) {
+      console.log('could not find boardCanvasCtx');
       return;
+    }
+
+    /**
+     * Draws the board on the canvas
+     * @param ctx Canvas context
+     */
+    function drawBoard(ctx: CanvasRenderingContext2D) {
+      const img = POOL_TABLE_IMAGE[0];
+      const width = img.width * 1.5;
+      const height = img.height * 1.5;
+      ctx.drawImage(img, 0, 0, width, height);
     }
 
     /**
@@ -157,14 +127,11 @@ export default function PoolGameCanvas({
      * @param ctx Canvas context
      * @param ball Pool ball to be drawn
      */
-    function drawBall(ctx: CanvasRenderingContext2D, ball: PoolBallModel) {
-      const img = new Image();
-      img.src = POOL_BALL_PATHS[ball.ballNumber];
-      const width = img.width * 0.7;
-      const height = img.height * 0.7;
-      img.onload = function () {
-        ctx.drawImage(img, ball.posnX - width / 2, ball.posnY - height / 2, width, height);
-      };
+    function drawBall(ctx: CanvasRenderingContext2D, ball: PoolBall) {
+      const img = POOL_BALL_IMAGES[ball.ballNumber];
+      const width = img.width * 0.6;
+      const height = img.height * 0.6;
+      ctx.drawImage(img, ball.position.x - width / 2, ball.position.y - height / 2, width, height);
     }
 
     /**
@@ -172,15 +139,15 @@ export default function PoolGameCanvas({
      * @param ctx Canvas context
      * @param balls Pool balls to be drawn
      */
-    function drawAllBalls(ctx: CanvasRenderingContext2D, balls: PoolBallModel[]) {
+    function drawAllBalls(ctx: CanvasRenderingContext2D, balls: PoolBall[]) {
       balls.map(ball => drawBall(ctx, ball));
     }
 
     // Actually draw stuff
     boardCanvasCtx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
     drawBoard(boardCanvasCtx);
-    drawAllBalls(boardCanvasCtx, TEST_POOL_BALLS);
-  }, []);
+    drawAllBalls(boardCanvasCtx, gameState.poolBalls);
+  }, [gameState.poolBalls]);
 
   /**
    * useEffect to render the player's inputs to the game
@@ -189,11 +156,13 @@ export default function PoolGameCanvas({
     // Set up context for player input
     const inputCanvas = inputCanvasRef.current;
     if (!inputCanvas) {
+      console.log('could not find inputCanvas');
       return;
     }
     inputCanvasCtxRef.current = inputCanvas.getContext('2d');
     const inputCanvasCtx = inputCanvasCtxRef.current;
     if (!inputCanvasCtx) {
+      console.log('could not find inputCanvasCtx');
       return;
     }
 
@@ -202,17 +171,16 @@ export default function PoolGameCanvas({
      * @param ctx Canvas context
      */
     function drawCueStick(ctx: CanvasRenderingContext2D) {
-      const ballX = TEST_POOL_BALLS[0].posnX; // POOL TODO: fix this to actually use the cue ball
-      const ballY = TEST_POOL_BALLS[0].posnY;
-      /*
-      // This code draws a line from the mouse to the cue ball
-      ctx.beginPath();
-      ctx.moveTo(coords.x, coords.y);
-      ctx.lineTo(ballX, ballY);
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      */
+      const ball = poolGameAreaController.poolBalls.find(p => {
+        return p.ballNumber === 0;
+      });
+      if (!ball) {
+        console.log('could not find ball');
+        return;
+      }
+
+      const ballX = ball.position.x;
+      const ballY = ball.position.y;
 
       const r = Math.atan2(mousePos.y - ballY, mousePos.x - ballX);
       const ballOffset = 35;
@@ -225,35 +193,28 @@ export default function PoolGameCanvas({
       ctx.stroke();
     }
 
-    // Draw the player placing down the cue ball
-    function drawPlaceCueBall(ctx: CanvasRenderingContext2D) {
-      TEST_POOL_BALLS[0].posnX = mousePos.x;
-      TEST_POOL_BALLS[0].posnY = mousePos.y;
-
-      console.log(ctx);
-      // drawBall(ctx, TEST_POOL_BALLS[0]);
-    }
-
     // Draw the player's inputs based on the current state of the game
     // If the the previous player scratched, the current player gets to place the cue ball
-    if (scratch) {
+    if (poolGameAreaController.isBallBeingPlaced) {
+      //scratch) {
       inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
-      drawPlaceCueBall(inputCanvasCtx);
+      // drawPlaceCueBall(inputCanvasCtx);
     }
     // When the current player needs to input a hit
-    else if (isPlayersTurn) {
+    else if (poolGameAreaController.isPlayer1Turn) {
       inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
       drawCueStick(inputCanvasCtx);
     }
     // When the current player is spectating or waiting on the other player's move
-    else if (spectating) {
+    else {
       inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
     }
-    // Catch unknown states
-    else {
-      console.log('no state found');
-    }
-  }, [isPlayersTurn, mousePos, scratch, spectating]);
+  }, [
+    mousePos,
+    poolGameAreaController.isBallBeingPlaced,
+    poolGameAreaController.isPlayer1Turn,
+    poolGameAreaController.poolBalls,
+  ]);
 
   return (
     <div id='pool-canvas-container'>
@@ -263,14 +224,14 @@ export default function PoolGameCanvas({
         ref={boardCanvasRef}
         width='800'
         height='500'
-        style={{ backgroundImage: POOL_TABLE_PATH, position: 'absolute' }}></canvas>
+        style={{ position: 'absolute' }}></canvas>
       <canvas
         id='input canvas'
         className='pool-canvas'
         ref={inputCanvasRef}
         width='800'
         height='500'
-        style={{ backgroundImage: POOL_TABLE_PATH, position: 'absolute' }}></canvas>
+        style={{ position: 'absolute' }}></canvas>
       <div style={{ height: '500px' }}>{/* div to hold space for canvas */}</div>
       <div>
         {/* POOL TODO: delete this div*/}

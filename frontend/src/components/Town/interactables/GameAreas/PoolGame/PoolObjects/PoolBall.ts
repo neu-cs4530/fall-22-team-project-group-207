@@ -188,4 +188,18 @@ export default class PoolBall {
     this._angularVelocity.x = xyPlaneAngularVelocity.x;
     this._angularVelocity.y = xyPlaneAngularVelocity.y;
   }
+
+  // Convert to a PoolBallModel suitable for broadcasting
+  public toModel() {
+    return {
+      angularOrientation: this.angularOrientation,
+      angularVelocity: this.angularVelocity,
+      position: this.position,
+      velocity: this.velocity,
+      ballNumber: this.ballNumber,
+      isMoving: this.isMoving,
+      isAirborne: this.isAirborne,
+      isPocketed: this.isPocketed,
+    };
+  }
 }

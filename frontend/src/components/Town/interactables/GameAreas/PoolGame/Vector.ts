@@ -1,8 +1,6 @@
-export type Vector = {
-  x: number;
-  y: number;
-  z: number;
-};
+import { Vector as SharedVector } from '../../../../../types/CoveyTownSocket';
+
+export type Vector = SharedVector;
 
 // return a vector scaled by a constant
 export function scale(v: Vector, scalar: number): Vector {
