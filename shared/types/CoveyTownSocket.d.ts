@@ -67,7 +67,7 @@ export interface ViewingArea {
   video?: string;
   isPlaying: boolean;
   elapsedTimeSec: number;
-}
+};
 
 export type Vector = {
   x: number;

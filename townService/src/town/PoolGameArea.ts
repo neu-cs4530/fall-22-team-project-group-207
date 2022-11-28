@@ -53,7 +53,8 @@ export default class PoolGameArea extends InteractableArea {
   }
 
   /**
-   * Constructs a new PoolGameArea
+   * Creates a new PoolGameArea
+   *
    * @param poolArea model containing this area's starting state
    * @param coordinates the bounding box that defines this pool game area
    * @param townEmitter a broadcast emitter that can be used to emit updates to players
