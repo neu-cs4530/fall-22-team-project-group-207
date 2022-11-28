@@ -13,6 +13,7 @@ import {
   ChatMessage,
   CoveyTownSocket,
   PlayerLocation,
+  PoolGameArea as PoolGameAreaModel,
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
@@ -528,15 +529,7 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
    *
    * @param newArea
    */
-  async createPoolGameArea(newArea: {
-    id: string;
-    player1ID?: string;
-    player2ID?: string;
-    player1BallType?: string;
-    player2BallType?: string;
-    isPlayer1Turn: boolean;
-    poolBalls: PoolBall[];
-  }) {
+  async createPoolGameArea(newArea: PoolGameAreaModel) {
     await this._townsService.createPoolGameArea(this.townID, this.sessionToken, newArea);
   }
 

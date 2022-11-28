@@ -2,6 +2,10 @@ import EventEmitter from 'events';
 import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import TypedEmitter from 'typed-emitter';
+import {
+  PoolBall as PoolBallModel,
+  PoolGameArea as PoolGameAreaModel,
+} from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
 import { PoolGameArea as PoolGameAreaModel } from '../types/CoveyTownSocket';
 import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
@@ -57,7 +61,7 @@ export type Pocket = {
  */
 export type PoolGameAreaEvents = {
   // To animate the game playing
-  onTick: (newModel: PoolGameModel) => void;
+  onTick: (newModel: PoolGameAreaModel) => void;
 
   // To tell other clients that a player has made a move
   onPlayerMove: () => void;
@@ -86,8 +90,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // Players playing the game (as opposed to spectating). A subset of occupants.
   private _players: PlayerController[] = [];
 
+  private _player1ID: string | undefined; // POOL TODO: fix these
+
+  private _player2ID: string | undefined;
+
   // List of Pool Ball objects in the game at their default break position. Includes cue and 8 ball.
-  private _poolBalls: PoolBall[] = this.resetPoolBalls();
+  private _poolBalls: PoolBallModel[] = this.resetPoolBalls();
 
   private _cueBallIndex = 0;
 
@@ -105,8 +113,18 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   private _isPlayer1Turn = false;
 
+  private _playerIDToMove: string | undefined = undefined;
+
+  private _playerIDToMove: string | undefined = undefined;
+
   // Boolean that represents whether a player has to replace a ball or not
   public _isBallBeingPlaced = false;
+
+  // Boolean that represents whether the balls are currently moving
+  private _isBallMoving = false;
+
+  // Boolean that represents whether the balls are currently moving
+  private _isBallMoving = false;
 
   // Constants representing the length and width of a 7-foot pool table. (0, 0) is the top-left corner of the playable area.
   private _tableLength = 2.54; //m
@@ -137,6 +155,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this._id = poolGameModel.id;
     this.currentModel = {
       id: this._id,
+      player1ID: this._player1ID,
+      player2ID: this._player2ID,
       poolBalls: this._poolBalls,
       player1ID: this._players[0]?.id,
       player2ID: this._players[1]?.id,
@@ -144,6 +164,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       player2BallType: this._player2BallType,
       isPlayer1Turn: this._isPlayer1Turn,
       isBallBeingPlaced: this._isBallBeingPlaced,
+      isBallMoving: this._isBallMoving,
+      playerIDToMove: this._playerIDToMove,
     };
   }
 
@@ -177,6 +199,14 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    */
   set isGameStarted(hasGameStarted: boolean) {
     this._isGameStarted = hasGameStarted;
+  }
+
+  get isBallBeingPlaced() {
+    return this._isBallBeingPlaced;
+  }
+
+  set isBallBeingPlaced(value) {
+    this._isBallBeingPlaced = value;
   }
 
   /**
@@ -215,7 +245,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   /**
    * The list of pool balls in this pool area.
    */
-  set poolBalls(newPoolBalls: PoolBall[]) {
+  set poolBalls(newPoolBalls: PoolBallModel[]) {
     if (
       newPoolBalls.length !== this._poolBalls.length ||
       _.xor(newPoolBalls, this._poolBalls).length > 0
@@ -360,9 +390,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     cueBall: PoolBall | undefined = undefined,
   ): void {
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
-    const movingBalls: PoolBall[] = this.poolBalls.filter(ball => ball.isMoving);
+    const movingBalls: PoolBallModel[] = this.poolBalls.filter(ball => ball.isMoving);
     // holds all of the pool balls we've already checked for collisions to prevent duplicate collisions
-    const alreadyCheckedBalls: PoolBall[] = [];
+    const alreadyCheckedBalls: PoolBallModel[] = [];
 
     if (cue && cueBall) {
       cueBallCollision(cue, cueBall);
@@ -580,7 +610,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       id: this._id,
       player1ID: this._players[0]?.id,
       player2ID: this._players[1]?.id,
-      isPlayer1Turn: this._isPlayer1Turn,
+      isPlayer1Turn: this._isPlayer1turn,
+      isBallBeingPlaced: this._isBallBeingPlaced,
+      isBallMoving: this._isBallMoving,
       poolBalls: this._poolBalls,
     };
   }
@@ -625,7 +657,7 @@ export function usePoolGameAreaOccupants(area: PoolGameAreaController): PlayerCo
  *
  * This hook will re-render any components that use it when the current PoolGameModel changes.
  */
-export function usePoolGameModel(area: PoolGameAreaController): PoolGameModel {
+export function usePoolGameModel(area: PoolGameAreaController): PoolGameAreaModel {
   const [gameModel, setGameModel] = useState(area.currentModel);
   useEffect(() => {
     area.addListener('onTick', setGameModel);

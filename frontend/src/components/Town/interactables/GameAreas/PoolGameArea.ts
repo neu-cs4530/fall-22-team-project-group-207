@@ -69,7 +69,6 @@ export default class PoolGameArea extends GameArea {
   }
 
   interact(): void {
-    console.log('hello');
     this._labelText?.setVisible(false);
     this._isInteracting = true;
   }

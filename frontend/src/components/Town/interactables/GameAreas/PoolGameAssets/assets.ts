@@ -40,3 +40,20 @@ export const POOL_BALL_PATHS = [
 ];
 
 export const POOL_TABLE_PATH = pool_table;
+
+/**
+ * Preload the images so they display on first render
+ */
+export const POOL_TABLE_IMAGE = [POOL_TABLE_PATH].map(p => {
+  console.log('loading pool board');
+  const img = new Image();
+  img.src = p;
+  return img;
+});
+
+export const POOL_BALL_IMAGES = POOL_BALL_PATHS.map(p => {
+  console.log('loading pool ball');
+  const img = new Image();
+  img.src = p;
+  return img;
+});
