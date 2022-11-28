@@ -223,33 +223,33 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     return this._player1ID;
   }
 
-  set player1ID(newPlayer1ID: string | undefined) {
-    if (newPlayer1ID !== this.player1ID) {
-      this._player1ID = newPlayer1ID;
-      if (newPlayer1ID) {
-        const newPlayerController = this.occupants.find(occ => occ.id === newPlayer1ID);
-        if (newPlayerController) {
-          this.emit('playersChange', [newPlayerController]);
-        }
-      }
-    }
-  }
+  // set player1ID(newPlayer1ID: string | undefined) {
+  //   if (newPlayer1ID !== this.player1ID) {
+  //     this._player1ID = newPlayer1ID;
+  //     if (newPlayer1ID) {
+  //       const newPlayerController = this.occupants.find(occ => occ.id === newPlayer1ID);
+  //       if (newPlayerController) {
+  //         this.emit('playersChange', [newPlayerController]);
+  //       }
+  //     }
+  //   }
+  // }
 
   get player2ID() {
     return this._player1ID;
   }
 
-  set player2ID(newPlayer2ID: string | undefined) {
-    if (newPlayer2ID !== this.player2ID) {
-      this._player1ID = newPlayer2ID;
-      if (newPlayer2ID) {
-        const newPlayerController = this.occupants.find(occ => occ.id === newPlayer2ID);
-        if (newPlayerController) {
-          this.emit('playersChange', [newPlayerController]);
-        }
-      }
-    }
-  }
+  // set player2ID(newPlayer2ID: string | undefined) {
+  //   if (newPlayer2ID !== this.player2ID) {
+  //     this._player1ID = newPlayer2ID;
+  //     if (newPlayer2ID) {
+  //       const newPlayerController = this.occupants.find(occ => occ.id === newPlayer2ID);
+  //       if (newPlayerController) {
+  //         this.emit('playersChange', [newPlayerController]);
+  //       }
+  //     }
+  //   }
+  // }
 
   get poolBalls() {
     return this._poolBalls;
