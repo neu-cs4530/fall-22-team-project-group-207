@@ -605,8 +605,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // TODO: this is placeholder, and this._players[0]/[1] is hardcoded, should definitely find a better way to do that.
     return {
       id: this._id,
-      player1ID: this._players[0]?.id,
-      player2ID: this._players[1]?.id,
+      player1ID: this._player1ID,
+      player2ID: this._player2ID,
+      player1BallType: this._player1BallType,
+      player2BallType: this._player2BallType,
+      playerIDToMove: this._playerIDToMove,
       isPlayer1Turn: this._isPlayer1Turn,
       isBallBeingPlaced: this._isBallBeingPlaced,
       isBallMoving: this._isBallMoving,
