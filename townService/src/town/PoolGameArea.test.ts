@@ -1,4 +1,4 @@
-export {}
+export {};
 /*
 import { mock, mockClear } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
