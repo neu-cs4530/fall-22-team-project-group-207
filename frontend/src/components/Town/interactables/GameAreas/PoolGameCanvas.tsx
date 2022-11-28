@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PoolBallModel } from '../../../../classes/PoolGameAreaController';
-import { usePoolGameAreaController } from '../../../../classes/TownController';
-import useTownController from '../../../../hooks/useTownController';
-import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
+// import { usePoolGameAreaController } from '../../../../classes/TownController';
+// import useTownController from '../../../../hooks/useTownController';
+// import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
 import PoolGameArea from './PoolGameArea';
 import { POOL_BALL_PATHS, POOL_TABLE_PATH } from './PoolGameAssets/assets';
 // POOL TODO: add the rest of the imports
@@ -51,6 +51,8 @@ export default function PoolGameCanvas({
 
   // Coordinates of mouse
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  console.log(poolGameArea);
 
   // canvas for rendering the game
   const boardCanvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -227,6 +229,8 @@ export default function PoolGameCanvas({
     function drawPlaceCueBall(ctx: CanvasRenderingContext2D) {
       TEST_POOL_BALLS[0].posnX = mousePos.x;
       TEST_POOL_BALLS[0].posnY = mousePos.y;
+
+      console.log(ctx);
       // drawBall(ctx, TEST_POOL_BALLS[0]);
     }
 
