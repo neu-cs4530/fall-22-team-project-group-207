@@ -10,7 +10,7 @@ import PoolGameArea from './PoolGameArea';
 
 export {};
 describe('Sample Test', () => {
-  describe('sample test 2', () => {
+  it('sample test 2', () => {
     expect(123).toBe(123);
   });
 });

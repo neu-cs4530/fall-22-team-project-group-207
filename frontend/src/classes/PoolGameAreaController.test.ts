@@ -8,7 +8,9 @@ import TownController from './TownController';*/
 
 export {};
 describe('sample test', () => {
-  expect(123).toBe(123);
+  it('sample test 2', () => {
+    expect(123).toBe(123);
+  });
 });
 
 /*
