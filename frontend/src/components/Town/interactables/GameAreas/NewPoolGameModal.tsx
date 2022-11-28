@@ -1,5 +1,5 @@
 import {
-  // Button,
+  Button,
   // FormControl,
   // FormLabel,
   // Input,
@@ -12,12 +12,13 @@ import {
   ModalOverlay,
   // useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useRef } from 'react'; // useState
+import React, { useCallback, useEffect, useRef, useState } from 'react'; // useState
 // import { PoolGameModel } from '../../../../classes/PoolGameAreaController';
 import { useInteractable } from '../../../../classes/TownController';
 // import { PoolGameArea } from '../../../../generated/client';
 import useTownController from '../../../../hooks/useTownController';
 import PoolGameCanvas from './PoolGameCanvas';
+import PoolLeaderboard from './PoolLeaderboardModal';
 
 /**
  * Returns a modal that contains a display for the pool game
@@ -27,6 +28,7 @@ export default function NewPoolGameModal(): JSX.Element {
   const coveyTownController = useTownController();
   const newPoolGame = useInteractable('gameArea');
   // const [gameState, setGameState] = useState<PoolGameModel>();
+  const [viewLeaderboard, setViewLeaderboard] = useState(false);
 
   const isOpen = newPoolGame !== undefined;
 
@@ -147,7 +149,14 @@ export default function NewPoolGameModal(): JSX.Element {
         <ModalHeader>Play Pool!!!</ModalHeader>
         <ModalCloseButton />
         <ModalBody pb={6}>
-          <PoolGameCanvas poolGameArea={undefined} />
+          <Button onClick={() => setViewLeaderboard(true)} hidden={viewLeaderboard}>
+            View Leaderboard
+          </Button>
+          <Button onClick={() => setViewLeaderboard(false)} hidden={!viewLeaderboard}>
+            Back
+          </Button>
+          {viewLeaderboard && <PoolLeaderboard />}
+          {!viewLeaderboard && <PoolGameCanvas poolGameArea={undefined} />}
           {/**
            * POOL TODO: update poolGameArea above to be not undefined
            * some references:
