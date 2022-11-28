@@ -118,7 +118,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _playerIDToMove: string | undefined = undefined;
 
   // Boolean that represents whether a player has to replace a ball or not
-  public _isBallBeingPlaced = false;
+  private _isBallBeingPlaced = false;
 
   // Boolean that represents whether the balls are currently moving
   private _isBallMoving = false;
@@ -294,6 +294,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
     // set pool balls into break position. Declaring new pool balls is to reset their fields.
     this._physicsPoolBalls = this.resetPoolBalls();
+    this._poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
 
     // start the game
     this.isGameStarted = true;
