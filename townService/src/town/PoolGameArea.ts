@@ -24,6 +24,10 @@ export default class PoolGameArea extends InteractableArea {
 
   private _poolBalls: PoolBall[];
 
+  private _isBallMoving: boolean;
+
+  private _playerIDToMove: string | undefined;
+
   public get player1ID() {
     return this._player1ID;
   }
@@ -64,6 +68,8 @@ export default class PoolGameArea extends InteractableArea {
       isPlayer1Turn,
       isBallBeingPlaced,
       poolBalls,
+      isBallMoving,
+      playerIDToMove,
     }: PoolGameAreaModel,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
@@ -76,6 +82,8 @@ export default class PoolGameArea extends InteractableArea {
     this._isPlayer1Turn = isPlayer1Turn;
     this._isBallBeingPlaced = isBallBeingPlaced;
     this._poolBalls = poolBalls;
+    this._isBallMoving = isBallMoving;
+    this._playerIDToMove = playerIDToMove;
   }
 
   /**
@@ -127,6 +135,8 @@ export default class PoolGameArea extends InteractableArea {
       isPlayer1Turn: this._isPlayer1Turn,
       isBallBeingPlaced: this._isBallBeingPlaced,
       poolBalls: this._poolBalls,
+      isBallMoving: this._isBallMoving,
+      playerIDToMove: this._playerIDToMove,
     };
   }
 
@@ -152,6 +162,8 @@ export default class PoolGameArea extends InteractableArea {
         isPlayer1Turn: true,
         isBallBeingPlaced: false,
         poolBalls: [],
+        isBallMoving: false,
+        playerIDToMove: undefined,
       },
       rect,
       townEmitter,
