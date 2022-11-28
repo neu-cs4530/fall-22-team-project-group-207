@@ -381,17 +381,14 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   // whatever else needs to go here, maybe physics
-  poolPhysicsGoHere(
-    cue: PoolCue | undefined = undefined,
-    cueBall: PoolBall | undefined = undefined,
-  ): void {
+  poolPhysicsGoHere(cue: PoolCue | undefined = undefined): void {
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
     const movingBalls: PoolBall[] = this._physicsPoolBalls.filter(ball => ball.isMoving);
     // holds all of the pool balls we've already checked for collisions to prevent duplicate collisions
     const alreadyCheckedBalls: PoolBall[] = [];
 
-    if (cue && cueBall) {
-      cueBallCollision(cue, cueBall);
+    if (cue) {
+      cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
     }
 
     // we can only scratch once per turn, so this boolean represents whether that has happened yet
