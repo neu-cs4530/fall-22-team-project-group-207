@@ -95,7 +95,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   // a private, controller-only list of pool balls to be used to calculate physics. Includes cue and 8 ball.
   private _physicsPoolBalls: PoolBall[] = this.resetPoolBalls();
-  
+
   // List of Pool Ball objects in the game at their default break position. Updated by calling toModel on the physicsPoolBall list
   private _poolBalls: PoolBallModel[] = this._physicsPoolBalls.map(ball => ball.toModel());
 

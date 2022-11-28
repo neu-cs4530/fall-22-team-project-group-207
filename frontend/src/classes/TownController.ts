@@ -17,7 +17,6 @@ import {
   TownSettingsUpdate,
   ViewingArea as ViewingAreaModel,
 } from '../types/CoveyTownSocket';
-import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
 import { isConversationArea, isPoolGameArea, isViewingArea } from '../types/TypeUtils';
 import ConversationAreaController from './ConversationAreaController';
 import PlayerController from './PlayerController';
