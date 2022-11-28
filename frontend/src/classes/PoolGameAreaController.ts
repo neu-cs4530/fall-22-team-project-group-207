@@ -226,12 +226,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   set player1ID(newPlayer1ID: string | undefined) {
     if (newPlayer1ID !== this.player1ID) {
       this._player1ID = newPlayer1ID;
-      if (newPlayer1ID) {
-        const newPlayerController = this.occupants.find(occ => occ.id === newPlayer1ID);
-        if (newPlayerController) {
-          this.emit('playersChange', [newPlayerController]);
-        }
-      }
+      // if (newPlayer1ID) {
+      //   const newPlayerController = this.occupants.find(occ => occ.id === newPlayer1ID);
+      //   if (newPlayerController) {
+      //     this.emit('playersChange', [newPlayerController]);
+      //   }
+      // }
     }
   }
 
@@ -242,12 +242,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   set player2ID(newPlayer2ID: string | undefined) {
     if (newPlayer2ID !== this.player2ID) {
       this._player1ID = newPlayer2ID;
-      if (newPlayer2ID) {
-        const newPlayerController = this.occupants.find(occ => occ.id === newPlayer2ID);
-        if (newPlayerController) {
-          this.emit('playersChange', [newPlayerController]);
-        }
-      }
+      // if (newPlayer2ID) {
+      //   const newPlayerController = this.occupants.find(occ => occ.id === newPlayer2ID);
+      //   if (newPlayerController) {
+      //     this.emit('playersChange', [newPlayerController]);
+      //   }
+      // }
     }
   }
 
@@ -642,10 +642,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     };
   }
 
-  public updateFrom(
-    updatedModel: PoolGameAreaModel,
-    playerFinder: (playerIDs: string[]) => PlayerController[],
-  ) {
+  public updateFrom(updatedModel: PoolGameAreaModel) {
     this._isPlayer1Turn = updatedModel.isPlayer1Turn;
     this._player1BallType = updatedModel.player1BallType;
     this._player2BallType = updatedModel.player2BallType;
