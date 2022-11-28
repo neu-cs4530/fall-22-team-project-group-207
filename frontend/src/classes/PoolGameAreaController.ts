@@ -69,7 +69,7 @@ export type PoolGameAreaEvents = {
   occupantsChange: (newOccupants: PlayerController[]) => void;
 
   // Player joins or leaves game (interacts with area or presses exit)
-  playersChange: (newPlayers: PlayerController[]) => void;
+  playersChange: (newPlayerID: string | undefined) => void;
 };
 
 const BALL_RADIUS = 0.028575; // m
@@ -85,9 +85,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   // Current state of the game that we send to the front end for rendering
   public currentModel: PoolGameAreaModel;
-
-  // Players playing the game (as opposed to spectating). A subset of occupants.
-  private _players: PlayerController[] = [];
 
   private _player1ID: string | undefined; // POOL TODO: fix these
 
@@ -172,7 +169,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   get isPlaying() {
-    return this._players.length >= 2 && !this.isGameOver;
+    return this.player1ID && this.player2ID && !this.isGameOver;
   }
 
   /**
@@ -222,14 +219,25 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     return this._occupants;
   }
 
-  /**
-   * The list of players in this pool area. Changing the set of players
-   * will emit an playersChange event.
-   */
-  set players(newPlayers: PlayerController[]) {
-    if (newPlayers.length !== this._players.length || _.xor(newPlayers, this._players).length > 0) {
-      this.emit('playersChange', newPlayers);
-      this._players = newPlayers;
+  get player1ID() {
+    return this._player1ID;
+  }
+
+  set player1ID(newPlayer1ID: string | undefined) {
+    if (newPlayer1ID !== this.player1ID) {
+      this._player1ID = newPlayer1ID;
+      this.emit('playersChange', newPlayer1ID);
+    }
+  }
+
+  get player2ID() {
+    return this._player1ID;
+  }
+
+  set player2ID(newPlayer2ID: string | undefined) {
+    if (newPlayer2ID !== this.player2ID) {
+      this._player1ID = newPlayer2ID;
+      this.emit('playersChange', newPlayer2ID);
     }
   }
 
