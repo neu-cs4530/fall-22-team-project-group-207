@@ -197,9 +197,26 @@ export default class PoolBall {
       position: this.position,
       velocity: this.velocity,
       ballNumber: this.ballNumber,
+      ballType: this.getBallTypeByNumber(this.ballNumber),
       isMoving: this.isMoving,
       isAirborne: this.isAirborne,
       isPocketed: this.isPocketed,
     };
   }
+
+    /**
+   * A function that returns a string representing the type of the ball based on its number-- 'Stripes', 'Solids', '8ball', or 'CueBall'
+   * @param ballNumber the number of the given ball
+   */
+     getBallTypeByNumber(ballNumber: number): string {
+      if (ballNumber <= 7 && ballNumber >= 1) {
+        return 'Solids';
+      } else if (ballNumber === 8) {
+        return '8ball';
+      } else if (ballNumber >= 9 && ballNumber <= 15) {
+        return 'Stripes';
+      }
+      // Cue ball has a number of 0?
+      return 'CueBall';
+    }
 }
