@@ -70,9 +70,9 @@ export interface ViewingArea {
 };
 
 export type Vector = {
-  x: number,
-  y: number,
-  z: number,
+  x: number;
+  y: number;
+  z: number;
 };
 
 export type PoolBall = {
