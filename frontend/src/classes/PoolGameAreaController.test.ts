@@ -1,11 +1,17 @@
-export {};
 //import { mock, mockClear /*, MockProxy*/ } from 'jest-mock-extended';
 /*
 import { nanoid } from 'nanoid';
 import { PlayerLocation, PoolBall } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
 import PoolGameAreaController, { PoolGameAreaEvents } from './PoolGameAreaController';
-import TownController from './TownController';
+import TownController from './TownController';*/
+
+export {};
+describe('sample test', () => {
+  expect(123).toBe(123);
+});
+
+/*
 describe('PoolGameAreaController', () => {
   // A valid PoolGameAreaController to be reused within the tests
   let testArea: PoolGameAreaController;
