@@ -608,7 +608,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   toPoolGameAreaModel(): PoolGameAreaModel {
-    // TODO: this is placeholder, and this._players[0]/[1] is hardcoded, should definitely find a better way to do that.
     return {
       id: this._id,
       player1ID: this._player1ID,
@@ -632,12 +631,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this._player2BallType = updatedModel.player2BallType;
     this._poolBalls = updatedModel.poolBalls;
     this._id = updatedModel.id;
-    this._players[0] = playerFinder([
-      updatedModel.player1ID !== undefined ? updatedModel.player1ID : '',
-    ])[0];
-    this._players[1] = playerFinder([
-      updatedModel.player2ID !== undefined ? updatedModel.player2ID : '',
-    ])[0];
+    this._player1ID = updatedModel.player1ID;
+    this._player2ID = updatedModel.player2ID;
     this._isPlayer1Turn = updatedModel.isPlayer1Turn;
   }
 }
