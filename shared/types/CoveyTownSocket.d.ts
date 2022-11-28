@@ -69,6 +69,12 @@ export interface ViewingArea {
   elapsedTimeSec: number;
 };
 
+export type Vector = {
+  x: number,
+  y: number,
+  z: number,
+};
+
 export type PoolBall = {
   // Position, rotation, and velocity of the ball
   angularOrientation: Vector;
