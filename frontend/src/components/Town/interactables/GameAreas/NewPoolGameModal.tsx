@@ -6,7 +6,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  useToast,
+  // useToast,
 } from '@chakra-ui/react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useInteractable } from '../../../../classes/TownController';
@@ -43,7 +43,7 @@ export default function NewPoolGameModal(): JSX.Element {
     }
   }, [townController, poolGameArea]);
 
-  const toast = useToast();
+  // const toast = useToast();
 
   /**
    * The datatypes we are working with
