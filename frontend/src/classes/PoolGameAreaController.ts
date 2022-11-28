@@ -69,7 +69,7 @@ export type PoolGameAreaEvents = {
   occupantsChange: (newOccupants: PlayerController[]) => void;
 
   // Player joins or leaves game (interacts with area or presses exit)
-  playersChange: (newPlayerID: string | undefined) => void;
+  playersChange: (newPlayers: PlayerController[]) => void;
 };
 
 const BALL_RADIUS = 0.028575; // m
@@ -86,7 +86,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // Current state of the game that we send to the front end for rendering
   public currentModel: PoolGameAreaModel;
 
-  private _player1ID: string | undefined; // POOL TODO: fix these
+  private _player1ID: string | undefined;
 
   private _player2ID: string | undefined;
 
@@ -226,7 +226,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   set player1ID(newPlayer1ID: string | undefined) {
     if (newPlayer1ID !== this.player1ID) {
       this._player1ID = newPlayer1ID;
-      this.emit('playersChange', newPlayer1ID);
+      if (newPlayer1ID) {
+        const newPlayerController = this.occupants.find(occ => occ.id === newPlayer1ID);
+        if (newPlayerController) {
+          this.emit('playersChange', [newPlayerController]);
+        }
+      }
     }
   }
 
@@ -237,7 +242,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   set player2ID(newPlayer2ID: string | undefined) {
     if (newPlayer2ID !== this.player2ID) {
       this._player1ID = newPlayer2ID;
-      this.emit('playersChange', newPlayer2ID);
+      if (newPlayer2ID) {
+        const newPlayerController = this.occupants.find(occ => occ.id === newPlayer2ID);
+        if (newPlayerController) {
+          this.emit('playersChange', [newPlayerController]);
+        }
+      }
     }
   }
 
