@@ -15,23 +15,23 @@ export type TownJoinResponse = {
   isPubliclyListed: boolean;
   /** Current state of interactables in this town */
   interactables: Interactable[];
-}
+};
 
 export type Interactable = ViewingArea | ConversationArea | PoolGameArea;
 
 export type TownSettingsUpdate = {
   friendlyName?: string;
   isPubliclyListed?: boolean;
-}
+};
 
-export type Direction = 'front' | 'back' | 'left' | 'right';
+export type Direction = "front" | "back" | "left" | "right";
 export interface Player {
   id: string;
   userName: string;
   location: PlayerLocation;
-};
+}
 
-export type XY = { x: number, y: number };
+export type XY = { x: number; y: number };
 
 export interface PlayerLocation {
   /* The CENTER x coordinate of this player's location */
@@ -42,7 +42,7 @@ export interface PlayerLocation {
   rotation: Direction;
   moving: boolean;
   interactableID?: string;
-};
+}
 export type ChatMessage = {
   author: string;
   sid: string;
@@ -54,13 +54,13 @@ export interface ConversationArea {
   id: string;
   topic?: string;
   occupantsByID: string[];
-};
+}
 export interface BoundingBox {
   x: number;
   y: number;
   width: number;
   height: number;
-};
+}
 
 export interface ViewingArea {
   id: string;
@@ -69,30 +69,44 @@ export interface ViewingArea {
   elapsedTimeSec: number;
 };
 
+export type Vector = {
+  x: number;
+  y: number;
+  z: number;
+};
+
 export type PoolBall = {
-  // Position on the board
-  posnX: number;
-  posnY: number;
+  // Position, rotation, and velocity of the ball
+  angularOrientation: Vector;
+  angularVelocity: Vector;
+  position: Vector;
+  velocity: Vector;
   // Number on the ball 1 - 15 (0 for cue ball)
   ballNumber: number;
-  // Stripes or solids or 8ball or cue ball
   ballType: string;
-  // Rotation for display purposes 
-  orientation: string;
-  isPocketed: boolean;
+  // Other useful information
   isMoving: boolean;
+  isAirborne: boolean;
+  isPocketed: boolean;
 };
 
 export interface PoolGameArea {
   id: string;
   player1ID?: string;
   player2ID?: string;
-  // Stripes or solids, or undeclared if no balls have been pocketed yet
+
+  // a list of pool ball objects, each of which contains information on their current position, orientation, etc.
+  poolBalls: PoolBall[];
+
+  // Stripes or solids, or undefined if no balls have been pocketed yet
   player1BallType?: string;
   player2BallType?: string;
-  isPlayer1Turn: boolean;
-  poolBalls: PoolBall[];
-};
+  isPlayer1Turn: boolean; // POOL TODO: potentially we could remove this
+  isBallBeingPlaced: boolean;
+  isBallMoving: boolean;
+  // Player ID of the next player to move, or undefined if no player is up next
+  playerIDToMove?: string;
+}
 
 export interface ServerToClientEvents {
   playerMoved: (movedPlayer: Player) => void;

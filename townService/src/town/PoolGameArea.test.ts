@@ -2,8 +2,15 @@ import { mock, mockClear } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import Player from '../lib/Player';
 import { getLastEmittedEvent } from '../TestUtils';
-import { TownEmitter, PoolBall } from '../types/CoveyTownSocket';
+import { TownEmitter, PoolBall as PoolBallModel } from '../types/CoveyTownSocket';
 import PoolGameArea from './PoolGameArea';
+
+export {};
+describe('Sample Test', () => {
+  it('sample test 2', () => {
+    expect(123).toBe(123);
+  });
+});
 
 describe('PoolGameArea', () => {
   const testAreaBox = {
@@ -22,25 +29,31 @@ describe('PoolGameArea', () => {
   const player1BallType = 'Stripes';
   const player2BallType = 'Solids';
   const isPlayer1Turn = true;
-  const poolBall1: PoolBall = {
-    posnX: 0,
-    posnY: 0,
+  const isBallBeingPlaced = false;
+  const isBallMoving = false;
+  const poolBall1: PoolBallModel = {
+    angularOrientation: { x: 0, y: 0, z: 0 },
+    angularVelocity: { x: 0, y: 0, z: 0 },
+    position: { x: 0, y: 0, z: 0 },
+    velocity: { x: 0, y: 0, z: 0 },
     ballNumber: 0,
-    ballType: 'Cue',
-    orientation: '',
-    isPocketed: false,
+    ballType: 'CueBall',
     isMoving: false,
+    isAirborne: false,
+    isPocketed: false,
   };
-  const poolBall2: PoolBall = {
-    posnX: 5,
-    posnY: 0,
+  const poolBall2: PoolBallModel = {
+    angularOrientation: { x: 0, y: 0, z: 0 },
+    angularVelocity: { x: 0, y: 0, z: 0 },
+    position: { x: 5, y: 0, z: 0 },
+    velocity: { x: 0, y: 0, z: 0 },
     ballNumber: 1,
-    ballType: 'Solid',
-    orientation: '',
-    isPocketed: false,
+    ballType: 'Solids',
     isMoving: false,
+    isAirborne: false,
+    isPocketed: false,
   };
-  const poolBalls: PoolBall[] = [poolBall1, poolBall2];
+  const poolBalls: PoolBallModel[] = [poolBall1, poolBall2];
 
   beforeEach(() => {
     mockClear(townEmitter);
@@ -52,6 +65,8 @@ describe('PoolGameArea', () => {
         player1BallType,
         player2BallType,
         isPlayer1Turn,
+        isBallBeingPlaced,
+        isBallMoving,
         poolBalls,
       },
       testAreaBox,
@@ -76,6 +91,8 @@ describe('PoolGameArea', () => {
         player1BallType,
         player2BallType,
         isPlayer1Turn,
+        isBallBeingPlaced,
+        isBallMoving,
         poolBalls,
       });
     });
@@ -96,6 +113,8 @@ describe('PoolGameArea', () => {
         player1BallType,
         player2BallType,
         isPlayer1Turn,
+        isBallBeingPlaced,
+        isBallMoving,
         poolBalls,
       });
     });
@@ -120,6 +139,8 @@ describe('PoolGameArea', () => {
       player1BallType,
       player2BallType,
       isPlayer1Turn,
+      isBallBeingPlaced,
+      isBallMoving,
       poolBalls,
     });
   });
@@ -131,6 +152,8 @@ describe('PoolGameArea', () => {
       player1BallType: 'Stripes',
       player2BallType: 'Solids',
       isPlayer1Turn: true,
+      isBallBeingPlaced: false,
+      isBallMoving: false,
       poolBalls,
     });
     expect(testArea.player1ID).toBe('123');
