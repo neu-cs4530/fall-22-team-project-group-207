@@ -5,14 +5,12 @@ import { getLastEmittedEvent } from '../TestUtils';
 import { TownEmitter, PoolBall as PoolBallModel } from '../types/CoveyTownSocket';
 import PoolGameArea from './PoolGameArea';
 
-
 export {};
 describe('Sample Test', () => {
   it('sample test 2', () => {
     expect(123).toBe(123);
   });
 });
-
 
 describe('PoolGameArea', () => {
   const testAreaBox = {
