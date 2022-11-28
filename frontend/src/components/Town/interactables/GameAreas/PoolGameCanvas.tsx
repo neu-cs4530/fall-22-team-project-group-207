@@ -4,6 +4,8 @@ import { usePoolGameAreaController } from '../../../../classes/TownController';
 import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
 import PoolGameArea from './PoolGameArea';
 import { POOL_BALL_IMAGES, POOL_TABLE_IMAGE } from './PoolGameAssets/assets';
+import useTownController from '../../../../hooks/useTownController';
+import PoolCue from './PoolGame/PoolObjects/PoolCue';
 
 const BALL_RADIUS = 0.028575; // m
 
@@ -17,6 +19,7 @@ export default function PoolGameCanvas({
   poolGameArea: PoolGameArea;
 }): JSX.Element {
   // POOL TODO: add react hooks for game state so we can update this with the pool balls
+  const townController = useTownController();
   const poolGameAreaController = usePoolGameAreaController(poolGameArea.id);
   const [gameState, setGameState] = useState<PoolGameAreaModel>(
     poolGameAreaController.currentModel,
@@ -52,46 +55,66 @@ export default function PoolGameCanvas({
     // Handle user input based on the state of the game
     const handleMouseClick = () => {
       console.log('player clicked at ' + mousePos.x + ' ' + mousePos.y);
-      if (gameState.isBallBeingPlaced) {
-        // POOL TODO: update game controller with new cue ball position
-      }
-      // When the current player needs to input a hit
-      else if (gameState.isPlayer1Turn) {
-        const cueBall = gameState.poolBalls.find(p => {
-          return p.ballNumber === 0;
-        });
-        if (!cueBall) {
-          console.log('could not find cue ball');
-          return;
+      const handlePlayerInput = () => {
+        // Handle player's move
+        // Place down a ball
+        if (poolGameAreaController.isBallBeingPlaced) {
+          // POOL TODO: update game controller with new cue ball position
         }
-        const velocityUnitVector: Vector = unitVector(
-          subtractVectors(cueBall.position, { x: mousePos.x, y: 0, z: mousePos.y }),
-        );
-        const velocity: Vector = scale(velocityUnitVector, 1); // POOL TODO: get scalar for velocity
+        // When the current player needs to input a hit
+        else {
+          const cueBall = gameState.poolBalls.find(p => {
+            return p.ballNumber === 0;
+          });
+          if (!cueBall) {
+            console.log('could not find cue ball');
+            return;
+          }
+          const velocityUnitVector: Vector = unitVector(
+            subtractVectors(cueBall.position, { x: mousePos.x, y: 0, z: mousePos.y }),
+          );
+          const velocity: Vector = scale(velocityUnitVector, 1); // POOL TODO: get scalar for velocity
 
-        const collisionPoint: Vector = addVectors(
-          cueBall.position,
-          scale(velocityUnitVector, -BALL_RADIUS),
-        );
+          const collisionPoint: Vector = addVectors(
+            cueBall.position,
+            scale(velocityUnitVector, -BALL_RADIUS),
+          );
 
-        console.log(velocity, collisionPoint);
-        // poolGameAreaController.makeMove(velocity, collisionPoint); // POOL TODO: pass the vectors to the controller to handle physics
+          console.log(velocity, collisionPoint);
+          const cue: PoolCue = new PoolCue(velocity, collisionPoint);
+          poolGameAreaController.poolPhysicsGoHere(cue);
+        }
+      };
+
+      // Draw the player's inputs based on the current state of the game
+      // If the the previous player scratched, the current player gets to place the cue ball
+      if (
+        // Player 1's turn, Player 1 is this player
+        poolGameAreaController.isPlayer1Turn &&
+        townController.userID === poolGameAreaController.players[0].id
+      ) {
+        // Player 1 gets to move
+        handlePlayerInput();
+      } else if (
+        // Player 2's turn, Player 2 is this player
+        !poolGameAreaController.isPlayer1Turn &&
+        townController.userID === poolGameAreaController.players[1].id
+      ) {
+        // Player 2 gets to move
+        handlePlayerInput();
+      } else {
+        // Do nothing
       }
-      // When the current player is spectating or waiting on the other player's move
-      else {
-        // Clicking when it's not the player's turn should do nothing
-        return;
-      }
-    };
 
-    // Listeners
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mousedown', handleMouseClick);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mousedown', handleMouseClick);
+      // Listeners
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mousedown', handleMouseClick);
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mousedown', handleMouseClick);
+      };
     };
-  }, [gameState, mousePos]);
+  }, [gameState.poolBalls, mousePos.x, mousePos.y, poolGameAreaController, townController.userID]);
 
   /**
    * useEffect to render the board state and ball movements
@@ -193,27 +216,51 @@ export default function PoolGameCanvas({
       ctx.stroke();
     }
 
+    const drawPlayerInput = () => {
+      // Draw player's move
+      if (poolGameAreaController.isBallBeingPlaced) {
+        inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
+        // drawPlaceCueBall(inputCanvasCtx);
+      }
+      // When the current player needs to input a hit
+      else {
+        inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
+        drawCueStick(inputCanvasCtx);
+      }
+    };
+
+    console.log(
+      'right before checking poolgameareacontroller' + poolGameAreaController.toString() + 'end',
+    );
+
     // Draw the player's inputs based on the current state of the game
     // If the the previous player scratched, the current player gets to place the cue ball
-    if (poolGameAreaController.isBallBeingPlaced) {
-      //scratch) {
-      inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
-      // drawPlaceCueBall(inputCanvasCtx);
-    }
-    // When the current player needs to input a hit
-    else if (poolGameAreaController.isPlayer1Turn) {
-      inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
-      drawCueStick(inputCanvasCtx);
-    }
-    // When the current player is spectating or waiting on the other player's move
-    else {
+    if (
+      // Player 1's turn, Player 1 is this player
+      poolGameAreaController.isPlayer1Turn &&
+      townController.userID === poolGameAreaController.players[0].id
+    ) {
+      // Player 1 gets to move
+      drawPlayerInput();
+    } else if (
+      // Player 2's turn, Player 2 is this player
+      !poolGameAreaController.isPlayer1Turn &&
+      townController.userID === poolGameAreaController.players[1].id
+    ) {
+      // Player 2 gets to move
+      drawPlayerInput();
+    } else {
+      // When the current player is spectating or waiting on the other player's move
       inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
     }
   }, [
     mousePos,
+    poolGameAreaController,
     poolGameAreaController.isBallBeingPlaced,
     poolGameAreaController.isPlayer1Turn,
+    poolGameAreaController.players,
     poolGameAreaController.poolBalls,
+    townController.userID,
   ]);
 
   return (
