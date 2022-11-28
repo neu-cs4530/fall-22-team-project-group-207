@@ -190,7 +190,8 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
     { x: xVelocityAdjusted, y: yVelocityAdjusted, z: 0 },
   );
   const ballRailFriction: number = 0.471 - 0.241 * theta;
-  const ballRailRestitution: number = 0.39 + (0.257 * xVelocityAdjusted) - (0.044 * (xVelocityAdjusted ** 2));
+  const ballRailRestitution: number =
+    0.39 + 0.257 * xVelocityAdjusted - 0.044 * xVelocityAdjusted ** 2;
   const sx: number =
     xVelocityAdjusted * Math.sin(theta) -
     yVelocityAdjusted * Math.cos(theta) +
@@ -203,15 +204,21 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
   const pzE: number = BALL_MASS * c * (1 + ballRailRestitution);
   const pzS: number = ((2 * BALL_MASS) / 7) * Math.sqrt(sx ** 2 + sy ** 2);
   if (pzS <= pzE) {
-    xVelocityAdjusted = (-2 / 7) * sx * Math.sin(theta) - (1 + ballRailRestitution) * c * Math.cos(theta);
+    xVelocityAdjusted =
+      (-2 / 7) * sx * Math.sin(theta) - (1 + ballRailRestitution) * c * Math.cos(theta);
     yVelocityAdjusted = (2 / 7) * sy;
-    ball.velocity.z = (2 / 7) * sx * Math.cos(theta) - (1 + ballRailRestitution) * c * Math.sin(theta);
+    ball.velocity.z =
+      (2 / 7) * sx * Math.cos(theta) - (1 + ballRailRestitution) * c * Math.sin(theta);
   } else {
     xVelocityAdjusted =
-      -c * (1 + ballRailRestitution) * (ballRailFriction * Math.cos(phi) * Math.sin(theta) + Math.cos(theta));
+      -c *
+      (1 + ballRailRestitution) *
+      (ballRailFriction * Math.cos(phi) * Math.sin(theta) + Math.cos(theta));
     yVelocityAdjusted = c * (1 + ballRailRestitution) * ballRailFriction * Math.sin(phi);
     ball.velocity.z =
-      c * (1 + ballRailRestitution) * (ballRailFriction * Math.cos(phi) * Math.cos(theta) - Math.sin(theta));
+      c *
+      (1 + ballRailRestitution) *
+      (ballRailFriction * Math.cos(phi) * Math.cos(theta) - Math.sin(theta));
   }
   c = (BALL_MASS * BALL_RADIUS) / BALL_MOMENT_OF_INERTIA;
   xAngularVelocityAdjusted = -c * yVelocityAdjusted * Math.sin(theta);
