@@ -1,5 +1,12 @@
-import { Vector } from '../Vector';
-import { addVectors, crossProduct, magnitude, scale, subtractVectors, unitVector } from '../Vector';
+import {
+  addVectors,
+  crossProduct,
+  magnitude,
+  scale,
+  subtractVectors,
+  unitVector,
+  Vector,
+} from '../Vector';
 
 const BALL_CLOTH_ANGULAR_DECELERATION_RATE = 10; //rad/s^2
 const BALL_CLOTH_ROLLING_FRICTION = 0.01;
