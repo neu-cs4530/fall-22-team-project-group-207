@@ -7,7 +7,6 @@ import {
   PoolGameArea as PoolGameAreaModel,
 } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
-import { PoolGameArea as PoolGameAreaModel } from '../types/CoveyTownSocket';
 import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
 import {
   magnitude,
@@ -32,7 +31,7 @@ export type PoolGameModel = {
 
   // a list of pool ball objects, each of which contains information on their current position, orientation, etc.
   id: string;
-  poolBalls: PoolBall[];
+  poolBalls: PoolBallModel[];
   player1BallType: string | undefined;
   player2BallType: string | undefined;
   player1ID: string;
@@ -85,7 +84,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _id: string;
 
   // Current state of the game that we send to the front end for rendering
-  public currentModel: PoolGameModel;
+  public currentModel: PoolGameAreaModel;
 
   // Players playing the game (as opposed to spectating). A subset of occupants.
   private _players: PlayerController[] = [];
@@ -94,8 +93,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   private _player2ID: string | undefined;
 
-  // List of Pool Ball objects in the game at their default break position. Includes cue and 8 ball.
-  private _poolBalls: PoolBallModel[] = this.resetPoolBalls();
+  // a private, controller-only list of pool balls to be used to calculate physics. Includes cue and 8 ball.
+  private _physicsPoolBalls: PoolBall[] = this.resetPoolBalls();
+  
+  // List of Pool Ball objects in the game at their default break position. Updated by calling toModel on the physicsPoolBall list
+  private _poolBalls: PoolBallModel[] = this._physicsPoolBalls.map(ball => ball.toModel());
 
   private _cueBallIndex = 0;
 
@@ -115,13 +117,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   private _playerIDToMove: string | undefined = undefined;
 
-  private _playerIDToMove: string | undefined = undefined;
-
   // Boolean that represents whether a player has to replace a ball or not
   public _isBallBeingPlaced = false;
-
-  // Boolean that represents whether the balls are currently moving
-  private _isBallMoving = false;
 
   // Boolean that represents whether the balls are currently moving
   private _isBallMoving = false;
@@ -158,8 +155,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       player1ID: this._player1ID,
       player2ID: this._player2ID,
       poolBalls: this._poolBalls,
-      player1ID: this._players[0]?.id,
-      player2ID: this._players[1]?.id,
       player1BallType: this._player1BallType,
       player2BallType: this._player2BallType,
       isPlayer1Turn: this._isPlayer1Turn,
@@ -298,7 +293,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this._isBallBeingPlaced = false;
 
     // set pool balls into break position. Declaring new pool balls is to reset their fields.
-    this._poolBalls = this.resetPoolBalls();
+    this._physicsPoolBalls = this.resetPoolBalls();
 
     // start the game
     this.isGameStarted = true;
@@ -390,9 +385,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     cueBall: PoolBall | undefined = undefined,
   ): void {
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
-    const movingBalls: PoolBallModel[] = this.poolBalls.filter(ball => ball.isMoving);
+    const movingBalls: PoolBall[] = this._physicsPoolBalls.filter(ball => ball.isMoving);
     // holds all of the pool balls we've already checked for collisions to prevent duplicate collisions
-    const alreadyCheckedBalls: PoolBallModel[] = [];
+    const alreadyCheckedBalls: PoolBall[] = [];
 
     if (cue && cueBall) {
       cueBallCollision(cue, cueBall);
@@ -412,7 +407,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         }
 
         // ball-ball collisions
-        this._poolBalls.forEach(otherBall => {
+        this._physicsPoolBalls.forEach(otherBall => {
           // check if the two current poolballs are different, and have not already been checked
           if (ball !== otherBall && !alreadyCheckedBalls.includes(otherBall)) {
             if (magnitude(subtractVectors(ball.position, otherBall.position)) <= BALL_RADIUS * 2) {
@@ -597,6 +592,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         }
       }
     });
+    // update the poolballmodels
+    this.poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
 
     // update the current PoolGameModel variable (currentModel). Might be worth moving this into its own function? so we can emit a onTick?
     this.currentModel.isBallBeingPlaced = this._isBallBeingPlaced;
@@ -610,7 +607,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       id: this._id,
       player1ID: this._players[0]?.id,
       player2ID: this._players[1]?.id,
-      isPlayer1Turn: this._isPlayer1turn,
+      isPlayer1Turn: this._isPlayer1Turn,
       isBallBeingPlaced: this._isBallBeingPlaced,
       isBallMoving: this._isBallMoving,
       poolBalls: this._poolBalls,
