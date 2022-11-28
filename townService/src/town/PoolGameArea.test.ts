@@ -91,6 +91,8 @@ describe('PoolGameArea', () => {
         player1BallType,
         player2BallType,
         isPlayer1Turn,
+        isBallBeingPlaced,
+        isBallMoving,
         poolBalls,
       });
     });
@@ -111,6 +113,8 @@ describe('PoolGameArea', () => {
         player1BallType,
         player2BallType,
         isPlayer1Turn,
+        isBallBeingPlaced,
+        isBallMoving,
         poolBalls,
       });
     });
@@ -135,6 +139,8 @@ describe('PoolGameArea', () => {
       player1BallType,
       player2BallType,
       isPlayer1Turn,
+      isBallBeingPlaced,
+      isBallMoving,
       poolBalls,
     });
   });
