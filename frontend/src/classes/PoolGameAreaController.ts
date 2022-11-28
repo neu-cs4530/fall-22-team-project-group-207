@@ -86,10 +86,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // Current state of the game that we send to the front end for rendering
   public currentModel: PoolGameAreaModel;
 
-  // Players playing the game (as opposed to spectating). A subset of occupants.
-  private _players: PlayerController[] = [];
-
-  private _player1ID: string | undefined; // POOL TODO: fix these
+  private _player1ID: string | undefined;
 
   private _player2ID: string | undefined;
 
@@ -172,7 +169,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   get isPlaying() {
-    return this._players.length >= 2 && !this.isGameOver;
+    return this.player1ID && this.player2ID && !this.isGameOver;
   }
 
   /**
@@ -222,14 +219,45 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     return this._occupants;
   }
 
-  /**
-   * The list of players in this pool area. Changing the set of players
-   * will emit an playersChange event.
-   */
+  get player1ID() {
+    return this._player1ID;
+  }
+
+  set player1ID(newPlayer1ID: string | undefined) {
+    if (newPlayer1ID !== this.player1ID) {
+      this._player1ID = newPlayer1ID;
+      // if (newPlayer1ID) {
+      //   const newPlayerController = this.occupants.find(occ => occ.id === newPlayer1ID);
+      //   if (newPlayerController) {
+      //     this.emit('playersChange', [newPlayerController]);
+      //   }
+      // }
+    }
+  }
+
+  get player2ID() {
+    return this._player1ID;
+  }
+
+  set player2ID(newPlayer2ID: string | undefined) {
+    if (newPlayer2ID !== this.player2ID) {
+      this._player1ID = newPlayer2ID;
+      // if (newPlayer2ID) {
+      //   const newPlayerController = this.occupants.find(occ => occ.id === newPlayer2ID);
+      //   if (newPlayerController) {
+      //     this.emit('playersChange', [newPlayerController]);
+      //   }
+      // }
+    }
+  }
+
   set players(newPlayers: PlayerController[]) {
-    if (newPlayers.length !== this._players.length || _.xor(newPlayers, this._players).length > 0) {
+    if (newPlayers.length > 0) {
+      this.player1ID = newPlayers[0].id;
+      if (newPlayers.length > 1) {
+        this.player2ID = newPlayers[1].id;
+      }
       this.emit('playersChange', newPlayers);
-      this._players = newPlayers;
     }
   }
 
@@ -600,7 +628,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   toPoolGameAreaModel(): PoolGameAreaModel {
-    // TODO: this is placeholder, and this._players[0]/[1] is hardcoded, should definitely find a better way to do that.
     return {
       id: this._id,
       player1ID: this._player1ID,
@@ -615,21 +642,14 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     };
   }
 
-  public updateFrom(
-    updatedModel: PoolGameAreaModel,
-    playerFinder: (playerIDs: string[]) => PlayerController[],
-  ) {
+  public updateFrom(updatedModel: PoolGameAreaModel) {
     this._isPlayer1Turn = updatedModel.isPlayer1Turn;
     this._player1BallType = updatedModel.player1BallType;
     this._player2BallType = updatedModel.player2BallType;
     this._poolBalls = updatedModel.poolBalls;
     this._id = updatedModel.id;
-    this._players[0] = playerFinder([
-      updatedModel.player1ID !== undefined ? updatedModel.player1ID : '',
-    ])[0];
-    this._players[1] = playerFinder([
-      updatedModel.player2ID !== undefined ? updatedModel.player2ID : '',
-    ])[0];
+    this._player1ID = updatedModel.player1ID;
+    this._player2ID = updatedModel.player2ID;
     this._isPlayer1Turn = updatedModel.isPlayer1Turn;
   }
 }
