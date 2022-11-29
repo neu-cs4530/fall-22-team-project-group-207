@@ -70,7 +70,7 @@ describe('PoolGameAreaController', () => {
       new PlayerController(nanoid(), nanoid(), playerLocation),
     ];
     mockClear(mockListeners.occupantsChange);
-    mockClear(mockListeners.onPlayerMove);
+    mockClear(mockListeners.turnChange);
     mockClear(mockListeners.onTick);
     mockClear(mockListeners.playersChange);
     testArea.addListener('occupantsChange', mockListeners.occupantsChange);

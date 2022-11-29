@@ -43,9 +43,6 @@ export type PoolGameAreaEvents = {
   // To animate the game playing
   onTick: (newModel: PoolGameAreaModel) => void;
 
-  // To tell other clients that a player has made a move
-  onPlayerMove: () => void;
-
   // Player enters or leaves area
   occupantsChange: (newOccupants: PlayerController[]) => void;
 
@@ -54,6 +51,12 @@ export type PoolGameAreaEvents = {
 
   // To tell other clients that a player is placing the ball
   onBallPlacement: (playerPlacingID: string) => void;
+
+  // Send the history of models to clients for rendering.
+  onHistoryUpdate: (newModelHistory: PoolGameAreaModel[]) => void;
+
+  // Sends an update out to signify a turn has been made for a player
+  turnChange: (newTurn: boolean) => void;
 };
 
 const BALL_RADIUS = 0.028575; // m
@@ -71,10 +74,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   public currentModel: PoolGameAreaModel;
 
   // A history of the game models at every tick-- index 0 is the model at tick 0, index 1 is the model at tick 1, etc.
-  // public modelHistory: PoolGameAreaModel[] = [];
+  public modelHistory: PoolGameAreaModel[] = [];
 
   // The tick the game is currently on, for use indexing the modelHistory
-  // public currentTick: number = 0;
+  public currentTick: number = 0;
 
   private _player1ID: string | undefined;
 
@@ -168,10 +171,20 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   /**
-   * The Current Turn of this pool area (read only)
+   * The Current Turn of this pool area
    */
   get isPlayer1Turn() {
     return this._isPlayer1Turn;
+  }
+
+  /**
+   * The current Turn of this pool area. Changing the turn will emit a turnChange event.
+   */
+  set isPlayer1Turn(newPlayerTurn: boolean) {
+    if (newPlayerTurn !== this.isPlayer1Turn) {
+      this.isPlayer1Turn = newPlayerTurn;
+      this.emit('turnChange', true);
+    }
   }
 
   /**
@@ -354,6 +367,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   // resets the pool balls to their starting position and scores to 0.
   resetGame(): void {
+    // reset the model history.
+    this.currentTick = 0;
+    this.modelHistory = [this.currentModel];
+
     // set pool balls into break position. Declaring new pool balls is to reset their fields.
     this._physicsPoolBalls = this.resetPoolBalls();
     this._poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
@@ -370,14 +387,50 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this.emit('onTick', this.toPoolGameAreaModel());
   }
 
+  /**
+   * A player makes a move. Runs the onTick function repeatedly until every ball stops moving.
+   * @param cue information stored in the cue, which is passed to the physics engine 
+   */
+  poolMove(cue: PoolCue) {
+    // Player hits the cue ball
+    if (cue) {
+      cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
+    }
+    // Tick until every ball stops moving
+    while (this.areAnyPoolBallsMoving()) {
+      this.gameTick();
+    }
+    // swap the turns
+    if (this.isPlayer1Turn) {
+      this._playerIDToMove = this.player2ID;
+    } else {
+      this._playerIDToMove = this.player1ID;
+    }
+    this.isPlayer1Turn = !this.isPlayer1Turn;
+  }
+
+  /**
+   * Helper function
+   * @returns a boolean that stores whether any of the pool balls are moving
+   */
+  private areAnyPoolBallsMoving(): boolean {
+    this._physicsPoolBalls.forEach(ball => {
+      if (ball.isMoving) {
+        return true;
+      }
+    });
+
+    return false;
+  }
+
   // POOL TODO
   startGame(): void {
     // if players aren't valid, we dont start the game
     // if (!this.player1ID || !this.player2ID) {
     //   return;
     // }
-    // this.currentTick = 0;
-    // this.modelHistory = [this.currentModel];
+    this.currentTick = 0;
+    this.modelHistory = [this.currentModel];
     // randomly decide who is first
     this._isPlayer1Turn = Math.random() <= 0.5;
 
@@ -420,14 +473,15 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // only tick the game if we've actually started it. Assuming we'll start via an input in covey.town.
     if (this.isGameStarted) {
       this.poolPhysicsGoHere();
+      this.currentModel = this.toPoolGameAreaModel();
 
       if (this.isGameOver().isGameOver) {
         this.endGame();
       }
+      this.emit('onTick', this.toPoolGameAreaModel());
+      this.modelHistory.push(this.currentModel);
+      this.currentTick++;
     }
-    this.emit('onTick', this.currentModel);
-    // this.modelHistory.push(this.currentModel);
-    // this.currentTick++;
   }
 
   /**
@@ -480,12 +534,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   // whatever else needs to go here, maybe physics
-  poolPhysicsGoHere(cue: PoolCue | undefined = undefined): void {
-    if (cue) {
-      cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
-      this.emit('onPlayerMove');
-    }
-
+  poolPhysicsGoHere(): void {
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
     const movingBalls: PoolBall[] = this._physicsPoolBalls.filter(
       ball => ball.isMoving && !ball.isPocketed,
@@ -720,13 +769,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     });
     // update the poolballmodels
     this.poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
-
-    // update the current PoolGameModel variable (currentModel). Might be worth moving this into its own function? so we can emit a onTick?
-    this.currentModel.isBallBeingPlaced = this._isBallBeingPlaced;
-    this.currentModel.isPlayer1Turn = this.isPlayer1Turn;
-    this.currentModel.poolBalls = this._poolBalls;
-
-    this.emit('onTick', this.currentModel);
   }
 
   toPoolGameAreaModel(): PoolGameAreaModel {
