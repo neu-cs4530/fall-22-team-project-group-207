@@ -114,7 +114,7 @@ export default function PoolGameCanvas({
 
           console.log(velocity, collisionPoint);
           const cue: PoolCue = new PoolCue(velocity, collisionPoint);
-          poolGameAreaController.poolPhysicsGoHere(cue);
+          poolGameAreaController.poolMove(cue);
         }
       };
 
