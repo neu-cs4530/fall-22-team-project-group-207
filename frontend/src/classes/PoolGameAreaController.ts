@@ -13,6 +13,7 @@ import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObj
 import {
   magnitude,
   subtractVectors,
+  Vector,
 } from '../components/Town/interactables/GameAreas/PoolGame/Vector';
 import {
   PoolBall as PoolBallModel,
@@ -50,6 +51,9 @@ export type PoolGameAreaEvents = {
 
   // Player joins or leaves game (interacts with area or presses exit)
   playersChange: (newPlayers: PlayerController[]) => void;
+
+  // To tell other clients that a player is placing the ball
+  onBallPlacement: (playerPlacingID: string) => void;
 };
 
 const BALL_RADIUS = 0.028575; // m
@@ -173,12 +177,18 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this._isGameStarted = hasGameStarted;
   }
 
+  /**
+   * Whether a player is currently placing the cue ball anywhere on the board following a scratch.
+   */
   get isBallBeingPlaced() {
     return this._isBallBeingPlaced;
   }
 
   set isBallBeingPlaced(value) {
-    this._isBallBeingPlaced = value;
+    if (value !== this.isBallBeingPlaced) {
+      this._isBallBeingPlaced = value;
+      this.emit('onBallPlacement', )
+    }
   }
 
   /**
@@ -209,12 +219,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         this._player2ID = undefined;
       }
       this._player1ID = newPlayer1ID;
-      // if (newPlayer1ID) {
-      //   const newPlayerController = this.occupants.find(occ => occ.id === newPlayer1ID);
-      //   if (newPlayerController) {
-      //     this.emit('playersChange', [newPlayerController]);
-      //   }
-      // }
+      if (newPlayer1ID) {
+        const newPlayerController = this.occupants.find(occ => occ.id === newPlayer1ID);
+        if (newPlayerController) {
+          this.emit('playersChange', [newPlayerController]);
+        }
+      }
     }
   }
 
@@ -228,12 +238,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         this._player1ID = undefined;
       }
       this._player2ID = newPlayer2ID;
-      // if (newPlayer2ID) {
-      //   const newPlayerController = this.occupants.find(occ => occ.id === newPlayer2ID);
-      //   if (newPlayerController) {
-      //     this.emit('playersChange', [newPlayerController]);
-      //   }
-      // }
+      if (newPlayer2ID) {
+        const newPlayerController = this.occupants.find(occ => occ.id === newPlayer2ID);
+        if (newPlayerController) {
+          this.emit('playersChange', [newPlayerController]);
+        }
+      }
     }
   }
 
@@ -412,6 +422,22 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     }
   }
 
+  placeCueBall(newPosition: Vector) {
+    // update the cue ball's position
+    this._physicsPoolBalls[this._cueBallIndex].position.x = newPosition.x;
+    this._physicsPoolBalls[this._cueBallIndex].position.y = newPosition.y;
+    this._physicsPoolBalls[this._cueBallIndex].position.z = newPosition.z;
+
+    // unset the flag
+    this._isBallBeingPlaced = false;
+
+    // update the model list
+    this.poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
+    if (this._playerIDToMove) {
+      this.emit('onBallPlacement', this._playerIDToMove);
+    }
+  }
+
   // whatever else needs to go here, maybe physics
   poolPhysicsGoHere(cue: PoolCue | undefined = undefined): void {
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
@@ -421,6 +447,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
     if (cue) {
       cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
+      this.emit('onPlayerMove');
     }
 
     // we can only scratch once per turn, so this boolean represents whether that has happened yet
@@ -462,6 +489,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
                     // player 1 hit the wrong ball, scratch
                     this._isBallBeingPlaced = true;
                     this._isPlayer1Turn = false;
+                    this._playerIDToMove = this.player2ID;
                     canScratch = false;
                   }
                   // otherBall is the cue ball
@@ -473,6 +501,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
                     // player 1 hit the wrong ball, scratch
                     this._isBallBeingPlaced = true;
                     this._isPlayer1Turn = false;
+                    this._playerIDToMove = this.player2ID;
                     canScratch = false;
                   }
                 }
@@ -486,6 +515,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
                     // player 2 hit the wrong ball, scratch
                     this._isBallBeingPlaced = true;
                     this._isPlayer1Turn = true;
+                    this._playerIDToMove = this.player1ID;
                     canScratch = false;
                   }
                   // otherBall is the cue ball
@@ -497,6 +527,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
                     // player 2 hit the wrong ball, scratch
                     this._isBallBeingPlaced = true;
                     this._isPlayer1Turn = true;
+                    this._playerIDToMove = this.player1ID;
                     canScratch = false;
                   }
                 }
@@ -541,6 +572,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             } else if (ballType === 'CueBall') {
               // cue ball went in pocket, scratch
               this._isBallBeingPlaced = true;
+              if (this.isPlayer1Turn) {
+                this._playerIDToMove = this.player2ID;
+              } else {
+                this._playerIDToMove = this.player1ID;
+              }
               this._isPlayer1Turn = !this._isPlayer1Turn;
               canScratch = false;
             }
@@ -617,6 +653,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         if (haveWeScratchedOverTable) {
           // cue ball went over the table, scratch
           this._isBallBeingPlaced = true;
+          if (this.isPlayer1Turn) {
+            this._playerIDToMove = this.player2ID;
+          } else {
+            this._playerIDToMove = this.player1ID;
+          }
           this._isPlayer1Turn = !this._isPlayer1Turn;
           canScratch = false;
         }
@@ -629,6 +670,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this.currentModel.isBallBeingPlaced = this._isBallBeingPlaced;
     this.currentModel.isPlayer1Turn = this.isPlayer1Turn;
     this.currentModel.poolBalls = this._poolBalls;
+
+    this.emit('onTick', this.currentModel);
   }
 
   toPoolGameAreaModel(): PoolGameAreaModel {
