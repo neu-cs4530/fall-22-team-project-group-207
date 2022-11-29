@@ -77,7 +77,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   public modelHistory: PoolGameAreaModel[] = [];
 
   // The tick the game is currently on, for use indexing the modelHistory
-  public currentTick: number = 0;
+  public currentTick = 0;
 
   private _player1ID: string | undefined;
 
@@ -389,7 +389,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   /**
    * A player makes a move. Runs the onTick function repeatedly until every ball stops moving.
-   * @param cue information stored in the cue, which is passed to the physics engine 
+   * @param cue information stored in the cue, which is passed to the physics engine
    */
   poolMove(cue: PoolCue) {
     // Player hits the cue ball
@@ -397,7 +397,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
     }
     // Tick until every ball stops moving
-    while (this.areAnyPoolBallsMoving()) {
+    while (this._areAnyPoolBallsMoving()) {
       this.gameTick();
     }
     // swap the turns
@@ -413,7 +413,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    * Helper function
    * @returns a boolean that stores whether any of the pool balls are moving
    */
-  private areAnyPoolBallsMoving(): boolean {
+  private _areAnyPoolBallsMoving(): boolean {
     this._physicsPoolBalls.forEach(ball => {
       if (ball.isMoving) {
         return true;
@@ -478,7 +478,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       if (this.isGameOver().isGameOver) {
         this.endGame();
       }
-      this.emit('onTick', this.toPoolGameAreaModel());
+      this.emit('onTick', this.currentModel);
       this.modelHistory.push(this.currentModel);
       this.currentTick++;
     }
