@@ -100,6 +100,10 @@ export default function PoolGameCanvas({
 
     // Handle user input based on the state of the game
     const handleMouseClick = () => {
+      // If click out of bounds, don't process it
+      if (mousePos.x < 0 || mousePos.x > 1170 || mousePos.y < 0 || mousePos.y > 1170) {
+        return;
+      }
       const qwe: Vector = pixelsToPosition({ x: mousePos.x, y: mousePos.y, z: 0 });
       console.log('player clicked at ' + mousePos.x + ' ' + mousePos.y);
       console.log('player clicked at ' + qwe.x + ' ' + qwe.y);
@@ -431,7 +435,7 @@ export default function PoolGameCanvas({
         className='pool-canvas'
         ref={inputCanvasRef}
         width='1170'
-        height='6750'
+        height='670'
         style={{ position: 'absolute' }}></canvas>
       <div style={{ height: '1000px' }}>{/* div to hold space for canvas */}</div>
       <div>
