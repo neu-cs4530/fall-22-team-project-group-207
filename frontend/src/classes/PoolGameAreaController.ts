@@ -14,6 +14,7 @@ import {
   magnitude,
   subtractVectors,
 } from '../components/Town/interactables/GameAreas/PoolGame/Vector';
+import { PoolLeaderboardServiceClient } from '../poolLeaderboardServices/PoolLeaderboardServiceClient';
 import {
   PoolBall as PoolBallModel,
   PoolGameArea as PoolGameAreaModel,
@@ -120,6 +121,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     { posnX: this._tableLength / 2, posnY: this._tableWidth, radius: POCKET_RADIUS },
     { posnX: this._tableLength, posnY: this._tableWidth, radius: POCKET_RADIUS },
   ];
+
+  private _leaderboardService = new PoolLeaderboardServiceClient();
 
   /**
    * Create a new PoolGameAreaController
@@ -428,9 +431,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   endGame(): void {
     const gameOverStruct: { isGameOver: boolean; didPlayer1Win: boolean } = this.isGameOver();
 
-    if (gameOverStruct.didPlayer1Win) {
+    if (gameOverStruct.didPlayer1Win && this.player1ID) {
+      this._leaderboardService.leaderboard.playerWon(this.player1ID);
       // send update to frontend saying that player 1 won.
-    } else if (!gameOverStruct.didPlayer1Win) {
+    } else if (!gameOverStruct.didPlayer1Win && this.player2ID) {
+      this._leaderboardService.leaderboard.playerWon(this.player2ID);
       // send update to frontend saying that player 2 won.
     }
   }

@@ -61,4 +61,23 @@ export class PoolLeaderboardService {
         });
     }
 
+    /**
+     * Updates an existing leaderboard entry's wins by ID
+     * @param user_id user to update
+     * @returns void
+     * @throws ApiError
+     */
+     public playerWon(
+        user_id: string,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/leaderboard/win/{userid}',
+            path: {
+                'userid': user_id,
+            },
+            mediaType: 'application/json'
+        });
+    }
+
 }
