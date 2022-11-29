@@ -125,7 +125,7 @@ export default function NewPoolGameModal(): JSX.Element {
           townController.unPause();
         }}>
         <ModalOverlay />
-        <ModalContent maxW='1000px' height='800px'>
+        <ModalContent maxW='1800px' height='800px'>
           <ModalHeader>Play Pool!!!</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>

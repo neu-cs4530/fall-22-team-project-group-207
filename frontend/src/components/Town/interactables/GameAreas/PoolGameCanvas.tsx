@@ -6,8 +6,27 @@ import PoolGameArea from './PoolGameArea';
 import { POOL_BALL_IMAGES, POOL_TABLE_IMAGE } from './PoolGameAssets/assets';
 import useTownController from '../../../../hooks/useTownController';
 import PoolCue from './PoolGame/PoolObjects/PoolCue';
+import { Button } from '@chakra-ui/react';
 
 const BALL_RADIUS = 0.028575; // m
+const OUTSIDE_BORDER_WIDTH = 0.18; // m
+const POOL_TABLE_WIDTH = 2.9; // m
+const POOL_TABLE_HEIGHT = 1.63; // m
+const METER_TO_PIXEL_SCALAR = 400; // scalar
+
+/**
+ * function to convert position of a ball in meters to the pixel value
+ * @param position position of the ball in m
+ * @returns new position of the ball to draw in pixels
+ */
+const positionToPixels = (position: Vector) => {
+  const newPos: Vector = {
+    x: position.x + OUTSIDE_BORDER_WIDTH,
+    y: position.y + OUTSIDE_BORDER_WIDTH,
+    z: position.z,
+  };
+  return scale(newPos, METER_TO_PIXEL_SCALAR);
+};
 
 /**
  * Returns a canvas that renders the pool game
@@ -34,6 +53,20 @@ export default function PoolGameCanvas({
   const boardCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+
+  // States for joining the game
+  const [player1IDEnabled, setPlayer1IDEnabled] = useState<boolean>(
+    poolGameAreaController.player1ID === undefined,
+  );
+  const [player2IDEnabled, setPlayer2IDEnabled] = useState<boolean>(
+    poolGameAreaController.player2ID === undefined,
+  );
+
+  // Handle clicking the join game buttons
+  useEffect(() => {
+    setPlayer1IDEnabled(poolGameAreaController.player1ID === undefined);
+    setPlayer2IDEnabled(poolGameAreaController.player2ID === undefined);
+  }, [poolGameAreaController.player1ID, poolGameAreaController.player2ID]);
 
   // Handle mouse events, namely movement and clicking
   useEffect(() => {
@@ -91,28 +124,27 @@ export default function PoolGameCanvas({
       if (
         // Player 1's turn, Player 1 is this player
         poolGameAreaController.isPlayer1Turn &&
-        townController.userID === poolGameAreaController.players[0].id
+        townController.userID === poolGameAreaController.player1ID
       ) {
         // Player 1 gets to move
         handlePlayerInput();
       } else if (
         // Player 2's turn, Player 2 is this player
         !poolGameAreaController.isPlayer1Turn &&
-        townController.userID === poolGameAreaController.players[1].id
+        townController.userID === poolGameAreaController.player2ID
       ) {
         // Player 2 gets to move
         handlePlayerInput();
       } else {
         // Do nothing
       }
-
-      // Listeners
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mousedown', handleMouseClick);
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mousedown', handleMouseClick);
-      };
+    };
+    // Listeners
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousedown', handleMouseClick);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousedown', handleMouseClick);
     };
   }, [gameState.poolBalls, mousePos.x, mousePos.y, poolGameAreaController, townController.userID]);
 
@@ -139,9 +171,13 @@ export default function PoolGameCanvas({
      */
     function drawBoard(ctx: CanvasRenderingContext2D) {
       const img = POOL_TABLE_IMAGE[0];
-      const width = img.width * 1.5;
-      const height = img.height * 1.5;
-      ctx.drawImage(img, 0, 0, width, height);
+      ctx.drawImage(
+        img,
+        0,
+        0,
+        POOL_TABLE_WIDTH * METER_TO_PIXEL_SCALAR,
+        POOL_TABLE_HEIGHT * METER_TO_PIXEL_SCALAR,
+      );
     }
 
     /**
@@ -151,10 +187,12 @@ export default function PoolGameCanvas({
      * @param ball Pool ball to be drawn
      */
     function drawBall(ctx: CanvasRenderingContext2D, ball: PoolBall) {
+      const displayPos = positionToPixels(ball.position);
+
       const img = POOL_BALL_IMAGES[ball.ballNumber];
-      const width = img.width * 0.6;
-      const height = img.height * 0.6;
-      ctx.drawImage(img, ball.position.x - width / 2, ball.position.y - height / 2, width, height);
+      const radius = BALL_RADIUS * METER_TO_PIXEL_SCALAR;
+      const diameter = radius * 2;
+      ctx.drawImage(img, displayPos.x - radius, displayPos.y - radius, diameter, diameter);
     }
 
     /**
@@ -202,15 +240,14 @@ export default function PoolGameCanvas({
         return;
       }
 
-      const ballX = ball.position.x;
-      const ballY = ball.position.y;
+      const ballPos = positionToPixels(ball.position);
 
-      const r = Math.atan2(mousePos.y - ballY, mousePos.x - ballX);
+      const r = Math.atan2(mousePos.y - ballPos.y, mousePos.x - ballPos.y);
       const ballOffset = 35;
       const handleOffset = 300;
       ctx.beginPath();
-      ctx.moveTo(ballOffset * Math.cos(r) + ballX, ballOffset * Math.sin(r) + ballY);
-      ctx.lineTo(handleOffset * Math.cos(r) + ballX, handleOffset * Math.sin(r) + ballY);
+      ctx.moveTo(ballOffset * Math.cos(r) + ballPos.x, ballOffset * Math.sin(r) + ballPos.y);
+      ctx.lineTo(handleOffset * Math.cos(r) + ballPos.x, handleOffset * Math.sin(r) + ballPos.y);
       ctx.strokeStyle = 'brown';
       ctx.lineWidth = 6;
       ctx.stroke();
@@ -229,23 +266,24 @@ export default function PoolGameCanvas({
       }
     };
 
-    console.log(
-      'right before checking poolgameareacontroller' + poolGameAreaController.toString() + 'end',
-    );
+    console.log('isplayer1turn ' + !poolGameAreaController.isPlayer1Turn + ' end');
+    console.log('player1id ' + poolGameAreaController.player1ID + ' end');
+    console.log('player2id ' + poolGameAreaController.player2ID + ' end');
+    console.log('myid ' + townController.userID + ' end');
 
     // Draw the player's inputs based on the current state of the game
     // If the the previous player scratched, the current player gets to place the cue ball
     if (
       // Player 1's turn, Player 1 is this player
       poolGameAreaController.isPlayer1Turn &&
-      townController.userID === poolGameAreaController.players[0].id
+      townController.userID === poolGameAreaController.player1ID
     ) {
       // Player 1 gets to move
       drawPlayerInput();
     } else if (
       // Player 2's turn, Player 2 is this player
       !poolGameAreaController.isPlayer1Turn &&
-      townController.userID === poolGameAreaController.players[1].id
+      townController.userID === poolGameAreaController.player2ID
     ) {
       // Player 2 gets to move
       drawPlayerInput();
@@ -265,21 +303,32 @@ export default function PoolGameCanvas({
 
   return (
     <div id='pool-canvas-container'>
+      <Button onClick={() => poolGameAreaController.startGame()}>Play Pool!</Button>
+      <Button
+        onClick={() => (poolGameAreaController.player1ID = townController.userID)}
+        disabled={!player1IDEnabled}>
+        Join as player 1
+      </Button>
+      <Button
+        onClick={() => (poolGameAreaController.player2ID = townController.userID)}
+        disabled={!player2IDEnabled}>
+        Join as player 2
+      </Button>
       <canvas
         id='board canvas'
         className='pool-canvas'
         ref={boardCanvasRef}
-        width='800'
-        height='500'
+        width='1600'
+        height='800'
         style={{ position: 'absolute' }}></canvas>
       <canvas
         id='input canvas'
         className='pool-canvas'
         ref={inputCanvasRef}
-        width='800'
-        height='500'
+        width='1600'
+        height='800'
         style={{ position: 'absolute' }}></canvas>
-      <div style={{ height: '500px' }}>{/* div to hold space for canvas */}</div>
+      <div style={{ height: '1000px' }}>{/* div to hold space for canvas */}</div>
       <div>
         {/* POOL TODO: delete this div*/}
         {/* Get mouse coordinates relative to element */}

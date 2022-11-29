@@ -21,26 +21,6 @@ import {
 } from '../components/Town/interactables/GameAreas/PoolGame/Collisions';
 
 /**
- * Type representing the entirety of the pool game to be sent to the frontend.
- *
- * POOL TODO: further documentation about state
- */
-export type PoolGameModel = {
-  // POOL TODO: add in id, player1ID, player2ID for telling whose move it is
-  // id: string;
-
-  // a list of pool ball objects, each of which contains information on their current position, orientation, etc.
-  id: string;
-  poolBalls: PoolBallModel[];
-  player1BallType: string | undefined;
-  player2BallType: string | undefined;
-  player1ID: string;
-  player2ID: string;
-  isPlayer1Turn: boolean;
-  isBallBeingPlaced: boolean;
-};
-
-/**
  * Type representing the two types of pool balls and the 8 ball.
  */
 export type BallType = 'Stripes' | 'Solids' | '8 ball';
@@ -290,8 +270,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 - BALL_RADIUS, 2),
       new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 + BALL_RADIUS, 9),
       // third row
-      new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 3),
-      new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634, 8),
+      new PoolBall(0, 0, 3),
+      new PoolBall(2.54, 1.27, 8),
       new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 10),
       // fourth row
       new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - 3 * BALL_RADIUS, 4),
@@ -323,6 +303,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // set pool balls into break position. Declaring new pool balls is to reset their fields.
     this._physicsPoolBalls = this.resetPoolBalls();
     this._poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
+
+    // POOL TODO: this is extremely scuffed, please fix
+    this._player1ID = this.occupants[0].id;
+    this._player2ID = this.players[1].id;
 
     // start the game
     this.isGameStarted = true;
