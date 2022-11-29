@@ -63,6 +63,7 @@ export default function PoolGameCanvas({
   const [gameState, setGameState] = useState<PoolGameAreaModel>(
     poolGameAreaController.currentModel,
   );
+  // POOL TODO: remove this
   console.log('POOL TODO: setGameState log to remove eslint error' + setGameState);
 
   // Player move variables for shooting
