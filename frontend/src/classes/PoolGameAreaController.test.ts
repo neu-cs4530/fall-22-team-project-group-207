@@ -64,7 +64,6 @@ describe('PoolGameAreaController', () => {
       isBallBeingPlaced: false,
       isBallMoving: false,
     });
-    // testArea = new PoolGameAreaController(nanoid());
     testArea.occupants = [
       new PlayerController(nanoid(), nanoid(), playerLocation),
       new PlayerController(nanoid(), nanoid(), playerLocation),
@@ -96,18 +95,6 @@ describe('PoolGameAreaController', () => {
       testArea.occupants = newOccupants;
       expect(testArea.occupants).toEqual(newOccupants);
       expect(mockListeners.occupantsChange).toBeCalledWith(newOccupants);
-      // expect(testArea.toPoolGameAreaModel()).toEqual({
-      //   id: testArea.id,
-      //   player1ID: undefined,
-      //   player2ID: undefined,
-      //   player1BallType: undefined,
-      //   player2BallType: undefined,
-      //   playerIDToMove: undefined,
-      //   isPlayer1Turn: false,
-      //   isBallBeingPlaced: false,
-      //   isBallMoving: false
-      //   poolBalls: [],
-      // });
     });
   });
 });
