@@ -567,12 +567,12 @@
                 }, 
                 {
                  "type":"PoolGameArea",
-                 "height":91.5,
+                 "height":115.295926210607,
                  "id":39,
                  "name":"Pool",
                  "rotation":0,
                  "visible":true,
-                 "width":170,
+                 "width":178.983199736467,
                  "x":3017.45909739761,
                  "y":872.954869880312
                 }],
