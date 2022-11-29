@@ -107,6 +107,10 @@ export default class PoolBall {
     return this._isMoving;
   }
 
+  set isMoving(isMoving: boolean) {
+    this._isMoving = isMoving;
+  }
+
   public tick(elapsedTime: number) {
     if (this._isMoving) {
       this._updatePosition(elapsedTime);

@@ -397,13 +397,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     if (cue) {
       cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
     }
-    // Tick until every ball stops moving
-    for (let i = 0; i < 100; i++) {
+    // Tick until every ball stops moving, whether they roll to a stop or get pocketed.
+    while (this._areAnyPoolBallsMoving()) {
       this.gameTick();
     }
-    // while (this._areAnyPoolBallsMoving() || !this.isGameOver().isGameOver) {
-    //   this.gameTick();
-    // }
 
     // emits a history update to listeners, passing the new model history.
     this.emit('onHistoryUpdate', this.modelHistory);
@@ -647,7 +644,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             magnitude(subtractVectors(ball.position, { x: pocket.posnX, y: pocket.posnY, z: 0 })) <=
             BALL_RADIUS + pocket.radius
           ) {
+            // ball goes in pocket, so stop it from moving !!
             ball.isPocketed = true;
+            ball.isMoving = false;
             const ballType = this.getBallTypeByNumber(ball.ballNumber);
 
             // if the players don't have a ball type yet, assign them
