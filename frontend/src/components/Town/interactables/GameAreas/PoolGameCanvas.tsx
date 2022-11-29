@@ -13,6 +13,8 @@ const OUTSIDE_BORDER_WIDTH = 0.18; // m
 const POOL_TABLE_WIDTH = 2.9; // m
 const POOL_TABLE_HEIGHT = 1.63; // m
 const METER_TO_PIXEL_SCALAR = 400.0; // scalar
+const MOUSE_LEFT_OFFSET = 0;
+const MOUSE_TOP_OFFSET = 70;
 
 /**
  * function to convert position of a ball in meters to the pixel value
@@ -29,6 +31,24 @@ const positionToPixels = (position: Vector) => {
 };
 
 /**
+ * function to convert pixel value to position of a ball in meters
+ * @param position position of the ball in pixels
+ * @returns new position of the ball in meters
+ */
+const pixelsToPosition = (position: Vector) => {
+  const newPos: Vector = {
+    x: position.x,
+    y: position.y,
+    z: position.z,
+  };
+  return subtractVectors(scale(newPos, 1 / METER_TO_PIXEL_SCALAR), {
+    x: OUTSIDE_BORDER_WIDTH,
+    y: OUTSIDE_BORDER_WIDTH,
+    z: 0,
+  });
+};
+
+/**
  * Returns a canvas that renders the pool game
  * @returns HTML canvas containing pool game display
  */
@@ -37,13 +57,18 @@ export default function PoolGameCanvas({
 }: {
   poolGameArea: PoolGameArea;
 }): JSX.Element {
-  // POOL TODO: add react hooks for game state so we can update this with the pool balls
+  // Controllers
   const townController = useTownController();
   const poolGameAreaController = usePoolGameAreaController(poolGameArea.id);
   const [gameState, setGameState] = useState<PoolGameAreaModel>(
     poolGameAreaController.currentModel,
   );
   console.log('POOL TODO: setGameState log to remove eslint error' + setGameState);
+
+  // Player move variables for shooting
+  const [mouseClick1Pos, setMouseClick1Pos] = useState<{ x: number; y: number } | undefined>(
+    undefined,
+  );
 
   // Coordinates of mouse
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -66,8 +91,8 @@ export default function PoolGameCanvas({
     // Get local mouse coordinates
     const handleMouseMove = (event: { screenX: number; screenY: number }) => {
       setMousePos({
-        x: event.screenX - canvasRect.x,
-        y: event.screenY - canvasRect.y,
+        x: event.screenX - canvasRect.x - MOUSE_LEFT_OFFSET,
+        y: event.screenY - canvasRect.y - MOUSE_TOP_OFFSET,
       });
     };
 
@@ -75,7 +100,12 @@ export default function PoolGameCanvas({
 
     // Handle user input based on the state of the game
     const handleMouseClick = () => {
+      const qwe: Vector = pixelsToPosition({ x: mousePos.x, y: mousePos.y, z: 0 });
       console.log('player clicked at ' + mousePos.x + ' ' + mousePos.y);
+      console.log('player clicked at ' + qwe.x + ' ' + qwe.y);
+      if (mouseClick1Pos) {
+        console.log('saved mouse click ' + mouseClick1Pos.x + ' ' + mouseClick1Pos.y);
+      }
       console.log('isplayer1turn ' + poolGameAreaController.isPlayer1Turn + ' end');
       console.log('place ball ' + poolGameAreaController.isBallBeingPlaced + ' end');
       console.log('player1id ' + poolGameAreaController.player1ID + ' end');
@@ -87,34 +117,61 @@ export default function PoolGameCanvas({
         // Handle player's move
         // Place down a ball
         if (poolGameAreaController.isBallBeingPlaced) {
-          poolGameAreaController.placeCueBall({ x: mousePos.x, y: mousePos.y, z: BALL_RADIUS });
+          const pos: Vector = {
+            x: mousePos.x,
+            y: mousePos.y,
+            z: BALL_RADIUS,
+          };
+          poolGameAreaController.placeCueBall(pixelsToPosition(pos));
         }
         // When the current player needs to input a hit
         else {
-          const cueBall = gameState.poolBalls.find(p => {
-            return p.ballNumber === 0;
-          });
-          if (!cueBall) {
-            console.log('could not find cue ball');
-            return;
+          // When the player needs to input angle
+          if (mouseClick1Pos === undefined) {
+            setMouseClick1Pos(mousePos);
           }
-          const velocityUnitVector: Vector = unitVector(
-            subtractVectors(cueBall.position, {
-              x: mousePos.x / METER_TO_PIXEL_SCALAR,
-              y: mousePos.y / METER_TO_PIXEL_SCALAR,
-              z: 0,
-            }),
-          );
-          const velocity: Vector = scale(velocityUnitVector, 0.5); // POOL TODO: get scalar for velocity
+          // When the player needs to input velocity
+          else {
+            const cueBall = gameState.poolBalls.find(p => {
+              return p.ballNumber === 0;
+            });
+            if (!cueBall) {
+              console.log('could not find cue ball');
+              return;
+            }
 
-          const collisionPoint: Vector = addVectors(
-            cueBall.position,
-            scale(velocityUnitVector, -BALL_RADIUS),
-          );
+            const velocityUnitVector: Vector = unitVector(
+              subtractVectors(cueBall.position, {
+                x: mousePos.x / METER_TO_PIXEL_SCALAR,
+                y: mousePos.y / METER_TO_PIXEL_SCALAR,
+                z: 0,
+              }),
+            );
 
-          console.log(velocity, collisionPoint);
-          const cue: PoolCue = new PoolCue(velocity, collisionPoint);
-          poolGameAreaController.poolPhysicsGoHere(cue);
+            const ballPos = positionToPixels(cueBall.position);
+            const velocityScalar =
+              Math.max(
+                Math.min(
+                  Math.sqrt(
+                    Math.pow(mousePos.y - ballPos.y, 2) + Math.pow(mousePos.x - ballPos.x, 2),
+                  ),
+                  200,
+                ),
+                15,
+              ) / 10;
+
+            const velocity: Vector = scale(velocityUnitVector, velocityScalar); // POOL TODO: get scalar for velocity
+
+            const collisionPoint: Vector = addVectors(
+              cueBall.position,
+              scale(velocityUnitVector, -BALL_RADIUS),
+            );
+
+            console.log(velocity, collisionPoint);
+            const cue: PoolCue = new PoolCue(velocity, collisionPoint);
+            poolGameAreaController.poolPhysicsGoHere(cue);
+            setMouseClick1Pos(undefined);
+          }
         }
       };
 
@@ -147,7 +204,13 @@ export default function PoolGameCanvas({
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mousedown', handleMouseClick);
     };
-  }, [gameState.poolBalls, mousePos.x, mousePos.y, poolGameAreaController, townController.userID]);
+  }, [
+    gameState.poolBalls,
+    mouseClick1Pos,
+    mousePos,
+    poolGameAreaController,
+    townController.userID,
+  ]);
 
   /**
    * useEffect to render the board state and ball movements
@@ -255,11 +318,30 @@ export default function PoolGameCanvas({
         return;
       }
 
+      let r: number;
+      let ballOffset: number;
+      let handleOffset: number;
       const ballPos = positionToPixels(ball.position);
 
-      const r = Math.atan2(mousePos.y - ballPos.y, mousePos.x - ballPos.y);
-      const ballOffset = 35;
-      const handleOffset = 300;
+      if (mouseClick1Pos === undefined) {
+        r = Math.atan2(mousePos.y - ballPos.y, mousePos.x - ballPos.x);
+        ballOffset = 30;
+        handleOffset = 300;
+      } else {
+        r = Math.atan2(mouseClick1Pos.y - ballPos.y, mouseClick1Pos.x - ballPos.x);
+        ballOffset = Math.max(
+          Math.min(
+            Math.sqrt(Math.pow(mousePos.y - ballPos.y, 2) + Math.pow(mousePos.x - ballPos.x, 2)),
+            200,
+          ),
+          15,
+        );
+        handleOffset = ballOffset + 270;
+        console.log('mousePos ' + mousePos.x + ' ' + mousePos.y);
+        console.log('ball pos' + ballPos.x + ' ' + ballPos.y);
+        console.log('ballOffset ' + ballOffset);
+        console.log('handleOffset ' + handleOffset);
+      }
       ctx.beginPath();
       ctx.moveTo(ballOffset * Math.cos(r) + ballPos.x, ballOffset * Math.sin(r) + ballPos.y);
       ctx.lineTo(handleOffset * Math.cos(r) + ballPos.x, handleOffset * Math.sin(r) + ballPos.y);
@@ -304,6 +386,7 @@ export default function PoolGameCanvas({
     }
     //}
   }, [
+    mouseClick1Pos,
     mousePos,
     poolGameAreaController,
     poolGameAreaController.isBallBeingPlaced,
@@ -340,15 +423,15 @@ export default function PoolGameCanvas({
         id='board canvas'
         className='pool-canvas'
         ref={boardCanvasRef}
-        width='1600'
-        height='800'
+        width='1170'
+        height='670'
         style={{ position: 'absolute' }}></canvas>
       <canvas
         id='input canvas'
         className='pool-canvas'
         ref={inputCanvasRef}
-        width='1600'
-        height='800'
+        width='1170'
+        height='6750'
         style={{ position: 'absolute' }}></canvas>
       <div style={{ height: '1000px' }}>{/* div to hold space for canvas */}</div>
       <div>
