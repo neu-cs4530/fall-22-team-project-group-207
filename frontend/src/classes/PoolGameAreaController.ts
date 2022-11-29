@@ -76,7 +76,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   /**
    * A history of the game models at every tick-- index 0 is the model at tick 0, index 1 is the model at tick 1, etc.
    * This will store this history of the entire game with multiple moves.
-   */ 
+   */
   public modelHistory: PoolGameAreaModel[] = [];
 
   // The tick the game is currently on, for use indexing the modelHistory
