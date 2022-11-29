@@ -400,6 +400,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     while (this._areAnyPoolBallsMoving()) {
       this.gameTick();
     }
+
+    // emits a history update to listeners, passing the new model history.
+    this.emit('onHistoryUpdate', this.modelHistory);
+
     // swap the turns
     if (this.isPlayer1Turn) {
       this._playerIDToMove = this.player2ID;
