@@ -87,7 +87,7 @@ export default function PoolGameCanvas({
         // Handle player's move
         // Place down a ball
         if (poolGameAreaController.isBallBeingPlaced) {
-          poolGameAreaController.placeCueBall({ x: mousePos.x, y: mousePos.y, z: BALL_RADIUS });
+          poolGameAreaController.placeCueBall({ x: mousePos.x, y: mousePos.y, z: 0 });
         }
         // When the current player needs to input a hit
         else {
