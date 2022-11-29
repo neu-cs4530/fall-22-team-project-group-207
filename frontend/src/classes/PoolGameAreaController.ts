@@ -183,7 +183,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    */
   set isPlayer1Turn(newPlayerTurn: boolean) {
     if (newPlayerTurn !== this.isPlayer1Turn) {
-      this.isPlayer1Turn = newPlayerTurn;
+      this._isPlayer1Turn = newPlayerTurn;
       this.emit('turnChange', true);
     }
   }
