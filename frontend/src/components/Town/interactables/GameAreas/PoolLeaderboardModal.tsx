@@ -13,6 +13,7 @@ export default function PoolLeaderboard(): JSX.Element {
     leaderboardService.leaderboard
       .listLeaderboard()
       .then(l => setLeaderboard(l.sort((a: Leader, b: Leader) => b.wins - a.wins)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <div id='pool-leaderboard'>
