@@ -52,11 +52,27 @@ export class PoolLeaderboardService {
     ): CancelablePromise<void> {
         return this.httpRequest.request({
             method: 'PATCH',
-            url: '/leaderboard/{userid}',
-            path: {
+            url: '/leaderboard/update/',
+            body: requestBody,
+            mediaType: 'application/json'
+        });
+    }
+
+    /**
+     * Updates an existing leaderboard entry's wins by ID
+     * @param user_id user to update
+     * @returns void
+     * @throws ApiError
+     */
+     public playerWon(
+        user_id: string,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'PATCH',
+            url: '/leaderboard/win/',
+            body: {
                 'userid': user_id,
             },
-            body: requestBody,
             mediaType: 'application/json'
         });
     }
