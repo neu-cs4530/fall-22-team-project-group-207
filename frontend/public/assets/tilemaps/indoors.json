@@ -352,7 +352,7 @@
          "name":"Objects",
          "objects":[
                 {
-                 "class":"",
+                 "type":"",
                  "height":0,
                  "id":1,
                  "name":"Spawn Point",
@@ -364,7 +364,7 @@
                  "y":1019.64299470573
                 }, 
                 {
-                 "class":"Transporter",
+                 "type":"Transporter",
                  "height":180.333333333333,
                  "id":6,
                  "name":"Stairs to basement",
@@ -381,7 +381,7 @@
                  "y":1101.16666666667
                 }, 
                 {
-                 "class":"",
+                 "type":"",
                  "height":0,
                  "id":9,
                  "name":"upstairs_target",
@@ -393,7 +393,7 @@
                  "y":1237.0995845061
                 }, 
                 {
-                 "class":"Transporter",
+                 "type":"Transporter",
                  "height":182.994839833802,
                  "id":11,
                  "name":"Stairs Up",
@@ -410,7 +410,7 @@
                  "y":1111.01534646831
                 }, 
                 {
-                 "class":"",
+                 "type":"",
                  "height":0,
                  "id":12,
                  "name":"upstairs_target",
@@ -422,7 +422,7 @@
                  "y":1231.73837287227
                 }, 
                 {
-                 "class":"ConversationArea",
+                 "type":"ConversationArea",
                  "height":125.333333333333,
                  "id":22,
                  "name":"Foyer Table 6",
@@ -433,7 +433,7 @@
                  "y":1105.33333333333
                 }, 
                 {
-                 "class":"ConversationArea",
+                 "type":"ConversationArea",
                  "height":125.333,
                  "id":23,
                  "name":"Foyer Table 7",
@@ -444,7 +444,7 @@
                  "y":1104.00016666667
                 }, 
                 {
-                 "class":"ConversationArea",
+                 "type":"ConversationArea",
                  "height":125.333,
                  "id":24,
                  "name":"Foyer Table 4",
@@ -455,7 +455,7 @@
                  "y":1105.3335
                 }, 
                 {
-                 "class":"ConversationArea",
+                 "type":"ConversationArea",
                  "height":125.333,
                  "id":25,
                  "name":"Foyer Table 5",
@@ -466,7 +466,7 @@
                  "y":1104.00016666667
                 }, 
                 {
-                 "class":"ConversationArea",
+                 "type":"ConversationArea",
                  "height":125.333,
                  "id":26,
                  "name":"Foyer Table 2",
@@ -477,7 +477,7 @@
                  "y":1104.00016666667
                 }, 
                 {
-                 "class":"ConversationArea",
+                 "type":"ConversationArea",
                  "height":125.333,
                  "id":27,
                  "name":"Foyer Table 3",
@@ -488,7 +488,7 @@
                  "y":1105.3335
                 }, 
                 {
-                 "class":"ConversationArea",
+                 "type":"ConversationArea",
                  "height":125.333,
                  "id":28,
                  "name":"Foyer Table 1",
@@ -499,7 +499,7 @@
                  "y":1104.66683333333
                 }, 
                 {
-                 "class":"ConversationArea",
+                 "type":"ConversationArea",
                  "height":125.333,
                  "id":29,
                  "name":"Basement Lounge",
@@ -510,7 +510,7 @@
                  "y":1028.66683333333
                 }, 
                 {
-                 "class":"ConversationArea",
+                 "type":"ConversationArea",
                  "height":223.999666666667,
                  "id":30,
                  "name":"Basement Dining Table 1",
@@ -521,7 +521,7 @@
                  "y":1056.00016666667
                 }, 
                 {
-                 "class":"ConversationArea",
+                 "type":"ConversationArea",
                  "height":224,
                  "id":31,
                  "name":"Basement Dining Table 2",
@@ -532,7 +532,7 @@
                  "y":1058.66666666667
                 }, 
                 {
-                 "class":"ViewingArea",
+                 "type":"ViewingArea",
                  "height":123.333333333333,
                  "id":35,
                  "name":"Fish tank",
@@ -549,7 +549,7 @@
                  "y":868.333333333333
                 }, 
                 {
-                 "class":"ViewingArea",
+                 "type":"ViewingArea",
                  "height":150.833333333333,
                  "id":37,
                  "name":"Basement TV",
@@ -566,7 +566,7 @@
                  "y":826.666666666667
                 }, 
                 {
-                 "class":"PoolGameArea",
+                 "type":"PoolGameArea",
                  "height":115.295926210607,
                  "id":39,
                  "name":"Pool",
@@ -15810,7 +15810,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":28,
                              "id":6,
                              "name":"",
@@ -32710,7 +32710,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":25.995583882738,
                              "id":1,
                              "name":"",
@@ -32741,7 +32741,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":25.4474842225598,
                              "id":1,
                              "name":"",
@@ -32772,7 +32772,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":26.1521837856461,
                              "id":2,
                              "name":"",
@@ -32809,7 +32809,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":32.3378799505144,
                              "id":1,
                              "name":"",
@@ -32849,7 +32849,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"collision",
+                             "type":"collision",
                              "height":31.319980581612,
                              "id":1,
                              "name":"",
@@ -32886,7 +32886,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":31.5548804359741,
                              "id":1,
                              "name":"",
@@ -32926,7 +32926,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":31.7897802903362,
                              "id":1,
                              "name":"",
@@ -33331,7 +33331,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":32.3378799505144,
                              "id":1,
                              "name":"",
@@ -33362,7 +33362,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":31.8680802417902,
                              "id":1,
                              "name":"",
@@ -33393,7 +33393,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":18.7136883975132,
                              "id":1,
                              "name":"",
@@ -33424,7 +33424,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":15.659990290806,
                              "id":1,
                              "name":"",
@@ -33455,7 +33455,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":15.581690339352,
                              "id":1,
                              "name":"",
@@ -33486,7 +33486,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":16.1297899995302,
                              "id":1,
                              "name":"",
@@ -33517,7 +33517,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":22.4720860673066,
                              "id":1,
                              "name":"",
@@ -33548,7 +33548,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "class":"",
+                             "type":"",
                              "height":9.23939427157555,
                              "id":1,
                              "name":"",

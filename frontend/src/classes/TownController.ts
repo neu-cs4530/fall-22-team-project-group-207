@@ -730,7 +730,7 @@ export function usePoolGameAreaController(poolGameAreaID: string): PoolGameAreaC
 
   const poolGameArea = townController.poolGameAreas.find(eachArea => eachArea.id == poolGameAreaID);
   if (!poolGameArea) {
-    throw new Error(`Requested viewing area ${poolGameAreaID} does not exist`);
+    throw new Error(`Requested pool area ${poolGameAreaID} does not exist`);
   }
   return poolGameArea;
 }
