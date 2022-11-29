@@ -171,40 +171,71 @@ export function cueBallCollision(cue: PoolCue, ball: PoolBall) {
   ball.velocity = ballFinalVelocity;
 }
 
-export function cushionBallCollision(ball: PoolBall, flipAxes: boolean) {
-  let vx: number = flipAxes ? ball.velocity.y : ball.velocity.x;
-  let vy: number = flipAxes ? ball.velocity.x : ball.velocity.y;
-  let vz: number = ball.velocity.z;
-  let wx: number = flipAxes ? ball.angularVelocity.y : ball.angularVelocity.x;
-  let wy: number = flipAxes ? ball.angularVelocity.x : ball.angularVelocity.y;
-  let wz: number = ball.angularVelocity.z;
+export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
+  // Rotate the table frame of reference so it's as if the rail is always perpendicular to the x direction unit vector
+  const rotationAngle: number = (cushionNumber * Math.PI) / 2;
+  let xVelocityAdjusted: number =
+    ball.velocity.x * Math.cos(rotationAngle) + ball.velocity.y * Math.sin(rotationAngle);
+  let yVelocityAdjusted: number =
+    -ball.velocity.x * Math.sin(rotationAngle) + ball.velocity.y * Math.cos(rotationAngle);
+  let xAngularVelocityAdjusted: number =
+    ball.angularVelocity.x * Math.cos(rotationAngle) +
+    ball.angularVelocity.y * Math.sin(rotationAngle);
+  let yAngularVelocityAdjusted: number =
+    -ball.angularVelocity.x * Math.sin(rotationAngle) +
+    ball.angularVelocity.y * Math.cos(rotationAngle);
   const theta: number = Math.asin((CUSHION_HEIGHT - BALL_RADIUS) / BALL_RADIUS);
-  const phi: number = angleBetween({ x: 1, y: 0, z: 0 }, { x: vx, y: vy, z: 0 });
-  const ballRailFriction = 0.471 - 0.241 * theta;
-  const sx: number = vx * Math.sin(theta) - vy * Math.cos(theta) + BALL_RADIUS * wy;
-  const sy: number = -vy - BALL_RADIUS * wz * Math.cos(theta) + BALL_RADIUS * wx * Math.sin(theta);
-  let c: number = vx * Math.cos(theta);
-  const pzE: number = BALL_MASS * c * (1 + Math.E);
+  const phi: number = angleBetween(
+    { x: 1, y: 0, z: 0 },
+    { x: xVelocityAdjusted, y: yVelocityAdjusted, z: 0 },
+  );
+  const ballRailFriction: number = 0.471 - 0.241 * theta;
+  const ballRailRestitution: number =
+    0.39 + 0.257 * xVelocityAdjusted - 0.044 * xVelocityAdjusted ** 2;
+  const sx: number =
+    xVelocityAdjusted * Math.sin(theta) -
+    yVelocityAdjusted * Math.cos(theta) +
+    BALL_RADIUS * yAngularVelocityAdjusted;
+  const sy: number =
+    -yVelocityAdjusted -
+    BALL_RADIUS * ball.velocity.z * Math.cos(theta) +
+    BALL_RADIUS * xAngularVelocityAdjusted * Math.sin(theta);
+  let c: number = xVelocityAdjusted * Math.cos(theta);
+  const pzE: number = BALL_MASS * c * (1 + ballRailRestitution);
   const pzS: number = ((2 * BALL_MASS) / 7) * Math.sqrt(sx ** 2 + sy ** 2);
   if (pzS <= pzE) {
-    vx = (-2 / 7) * sx * Math.sin(theta) - (1 + Math.E) * c * Math.cos(theta);
-    vy = (2 / 7) * sy;
-    vz = (2 / 7) * sx * Math.cos(theta) - (1 + Math.E) * c * Math.sin(theta);
+    xVelocityAdjusted =
+      (-2 / 7) * sx * Math.sin(theta) - (1 + ballRailRestitution) * c * Math.cos(theta);
+    yVelocityAdjusted = (2 / 7) * sy;
+    ball.velocity.z =
+      (2 / 7) * sx * Math.cos(theta) - (1 + ballRailRestitution) * c * Math.sin(theta);
   } else {
-    vx = -c * (1 + Math.E) * (ballRailFriction * Math.cos(phi) * Math.sin(theta) + Math.cos(theta));
-    vy = c * (1 + Math.E) * ballRailFriction * Math.sin(phi);
-    vz = c * (1 + Math.E) * (ballRailFriction * Math.cos(phi) * Math.cos(theta) - Math.sin(theta));
+    xVelocityAdjusted =
+      -c *
+      (1 + ballRailRestitution) *
+      (ballRailFriction * Math.cos(phi) * Math.sin(theta) + Math.cos(theta));
+    yVelocityAdjusted = c * (1 + ballRailRestitution) * ballRailFriction * Math.sin(phi);
+    ball.velocity.z =
+      c *
+      (1 + ballRailRestitution) *
+      (ballRailFriction * Math.cos(phi) * Math.cos(theta) - Math.sin(theta));
   }
   c = (BALL_MASS * BALL_RADIUS) / BALL_MOMENT_OF_INERTIA;
-  wx = -c * vy * Math.sin(theta);
-  wy = c * (vx * Math.sin(theta) - vz * Math.cos(theta));
-  wz = c * vy * Math.cos(theta);
-  ball.velocity.x = flipAxes ? vy : vx;
-  ball.velocity.y = flipAxes ? vx : vy;
-  ball.velocity.z = vz;
-  ball.angularVelocity.x = flipAxes ? wy : wx;
-  ball.angularVelocity.y = flipAxes ? wx : wy;
-  ball.angularVelocity.z = wz;
+  xAngularVelocityAdjusted = -c * yVelocityAdjusted * Math.sin(theta);
+  yAngularVelocityAdjusted =
+    c * (xVelocityAdjusted * Math.sin(theta) - ball.velocity.z * Math.cos(theta));
+  // Restore frame of reference
+  ball.angularVelocity.z = c * yVelocityAdjusted * Math.cos(theta);
+  ball.velocity.x =
+    xVelocityAdjusted * Math.cos(-rotationAngle) + yVelocityAdjusted * Math.sin(-rotationAngle);
+  ball.velocity.y =
+    -xVelocityAdjusted * Math.sin(-rotationAngle) + yVelocityAdjusted * Math.cos(-rotationAngle);
+  ball.angularVelocity.x =
+    xAngularVelocityAdjusted * Math.cos(-rotationAngle) +
+    yAngularVelocityAdjusted * Math.sin(-rotationAngle);
+  ball.angularVelocity.y =
+    -xAngularVelocityAdjusted * Math.sin(-rotationAngle) +
+    yAngularVelocityAdjusted * Math.cos(-rotationAngle);
 }
 
 export function ballSlateCollision(ball: PoolBall) {

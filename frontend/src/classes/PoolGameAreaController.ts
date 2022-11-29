@@ -584,7 +584,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with right rail
-          cushionBallCollision(ball, false);
+          cushionBallCollision(ball, 0);
         } else if (
           ball.velocity.x > 0 &&
           magnitude(
@@ -597,7 +597,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with left rail
-          cushionBallCollision(ball, false);
+          cushionBallCollision(ball, 2);
         } else if (
           ball.velocity.y > 0 &&
           magnitude(
@@ -610,7 +610,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with top rail
-          cushionBallCollision(ball, true);
+          cushionBallCollision(ball, 1);
         } else if (
           ball.velocity.y > 0 &&
           magnitude(
@@ -623,7 +623,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with bottom rail
-          cushionBallCollision(ball, true);
+          cushionBallCollision(ball, 3);
         }
 
         // check if the ball has gone off the board/ over the rails
