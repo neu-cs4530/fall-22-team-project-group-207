@@ -609,6 +609,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         ) {
           // collided with right rail
           cushionBallCollision(ball, false);
+          alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.x > 0 &&
           magnitude(
@@ -622,6 +623,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         ) {
           // collided with left rail
           cushionBallCollision(ball, false);
+          alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.y > 0 &&
           magnitude(
@@ -635,6 +637,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         ) {
           // collided with top rail
           cushionBallCollision(ball, true);
+          alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.y > 0 &&
           magnitude(
@@ -648,18 +651,23 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         ) {
           // collided with bottom rail
           cushionBallCollision(ball, true);
+          alreadyCheckedBalls.push(ball);
         }
 
         // check if the ball has gone off the board/ over the rails
         let haveWeScratchedOverTable = false;
         if (ball.position.x > this._tableLength) {
           ball.position.x = this._tableLength - BALL_RADIUS;
+          alreadyCheckedBalls.push(ball);
         } else if (ball.position.x < 0) {
           ball.position.x = RAIL_WIDTH + BALL_RADIUS;
+          alreadyCheckedBalls.push(ball);
         } else if (ball.position.y > this._tableWidth) {
           ball.position.y = this._tableWidth - BALL_RADIUS;
+          alreadyCheckedBalls.push(ball);
         } else if (ball.position.y < 0) {
           ball.position.y = RAIL_WIDTH + BALL_RADIUS;
+          alreadyCheckedBalls.push(ball);
         }
         haveWeScratchedOverTable = ball.ballNumber === 0;
         if (haveWeScratchedOverTable) {
