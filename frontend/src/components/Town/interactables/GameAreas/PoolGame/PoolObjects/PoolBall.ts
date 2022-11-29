@@ -37,7 +37,7 @@ export default class PoolBall {
     this._ballNumber = ballNumber;
     this._angularOrientation = { x: 0, y: 0, z: 0 };
     this._angularVelocity = { x: 0, y: 0, z: 0 };
-    this._position = { x: xPosition, y: yPosition, z: BALL_RADIUS };
+    this._position = { x: xPosition, y: yPosition, z: 0 };
     this._velocity = { x: 0, y: 0, z: 0 };
     this._isMoving = false;
     this._isAirborne = false;
@@ -65,13 +65,6 @@ export default class PoolBall {
       this._isMoving = true;
       this._isAirborne = true;
     }
-    console.log(
-      'Set ball %d velocity to %d, %d, %d',
-      this._ballNumber,
-      this._velocity.x,
-      this._velocity.y,
-      this._velocity.z,
-    );
   }
 
   get position(): Vector {
