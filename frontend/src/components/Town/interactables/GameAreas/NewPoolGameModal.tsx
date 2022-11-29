@@ -1,8 +1,8 @@
 import {
   Button,
-  FormControl,
-  FormLabel,
-  Input,
+  // FormControl,
+  // FormLabel,
+  // Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -12,39 +12,50 @@ import {
   ModalOverlay,
   useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
-import { PoolGameState } from '../../../../classes/PoolGameAreaController';
+import React, { useCallback, useEffect, useState } from 'react'; // useState
+// import { PoolGameModel } from '../../../../classes/PoolGameAreaController';
 import { useInteractable } from '../../../../classes/TownController';
-import { PoolGameArea } from '../../../../generated/client';
 import useTownController from '../../../../hooks/useTownController';
+import PoolGameCanvas from './PoolGameCanvas';
+import { PoolGameArea as PoolGameAreaModel } from '../../../../types/CoveyTownSocket';
+import PoolGameArea from './PoolGameArea';
+import PoolLeaderboard from './PoolLeaderboardModal';
 
+/**
+ * Returns a modal that contains a display for the pool game
+ * @returns HTML modal containing pool game display
+ */
 export default function NewPoolGameModal(): JSX.Element {
-  const coveyTownController = useTownController();
-  const newPoolGame = useInteractable('gameArea');
-  const [gameState, setGameState] = useState<PoolGameState>();
+  const townController = useTownController();
+  const poolGameArea = useInteractable<PoolGameArea>('gameArea');
+  const [viewLeaderboard, setViewLeaderboard] = useState(false);
 
-  const isOpen = newPoolGame !== undefined;
+  const [gameState, setGameState] = useState<PoolGameAreaModel>();
+
+  const isOpen = poolGameArea !== undefined;
 
   useEffect(() => {
-    console.log('interacted with pool area');
-    if (newPoolGame) {
-      coveyTownController.pause();
+    if (poolGameArea) {
+      townController.pause();
       console.log('started game and paused coveytown');
     } else {
-      coveyTownController.unPause();
+      townController.unPause();
       console.log('ended game and unpaused coveytown');
     }
-  }, [coveyTownController, newPoolGame]);
+  }, [townController, poolGameArea]);
 
   const closeModal = useCallback(() => {
-    if (newPoolGame) {
-      coveyTownController.interactEnd(newPoolGame);
+    if (poolGameArea) {
+      townController.interactEnd(poolGameArea);
     }
-  }, [coveyTownController, newPoolGame]);
+  }, [townController, poolGameArea]);
 
   const toast = useToast();
 
   /**
+   * The datatypes we are working with
+   * POOL TODO: finalize these and update once datatype for frontend-backend communication is finalized
+   * 
     export type PoolGameArea = {
       id: string;
       player1ID?: string;
@@ -55,7 +66,7 @@ export default function NewPoolGameModal(): JSX.Element {
       poolBalls: Array<PoolBall>;
     };
 
-    type PoolGameState = {
+    type PoolGameModel = {
       poolBalls: FrontEndPoolBall[];
       player1BallType: BallType;
       player2BallType: BallType;
@@ -63,24 +74,27 @@ export default function NewPoolGameModal(): JSX.Element {
     }
    */
   const createPoolGame = useCallback(async () => {
-    if (gameState && newPoolGame) {
-      const poolGameToCreate: PoolGameArea = {
-        id: newPoolGame.id,
+    if (gameState && poolGameArea) {
+      const poolGameToCreate: PoolGameAreaModel = {
+        id: poolGameArea.id,
         // player1ID: ,
         // player2ID: ,
         isPlayer1Turn: gameState.isPlayer1Turn,
         player1BallType: gameState.player1BallType,
         player2BallType: gameState.player2BallType,
-        poolBalls: [], //gameState.poolBalls.map(b => b), // POOL TODO: convert from frontend to backend balls
+        isBallBeingPlaced: gameState.isBallBeingPlaced,
+        isBallMoving: gameState.isBallMoving,
+        poolBalls: gameState.poolBalls,
       };
       try {
-        await coveyTownController.createPoolGameArea(poolGameToCreate);
+        await townController.createPoolGameArea(poolGameToCreate); // POOL TODO: fix this
+        // we could probably change this to take in a PoolGameModel
         toast({
           title: 'Pool Area Created!',
           status: 'success',
         });
         setGameState(gameState);
-        coveyTownController.unPause();
+        townController.unPause();
         closeModal();
       } catch (err) {
         if (err instanceof Error) {
@@ -98,75 +112,42 @@ export default function NewPoolGameModal(): JSX.Element {
         }
       }
     }
-  }, [gameState, setGameState, coveyTownController, newPoolGame, closeModal, toast]);
+  }, [gameState, setGameState, townController, poolGameArea, closeModal, toast]);
+  console.log('POOL TODO create pool game log to remove eslint error' + createPoolGame);
 
-  const drawRect = (
-    info = { x: 0, y: 0, width: 1, height: 1 },
-    style = { borderColor: 'black', borderWidth: 1 },
-  ) => {
-    const { x, y, width, height } = info;
-    const { borderColor, borderWidth } = style;
-
-    // ctx.beginPath();
-    // ctx.strokeStyle = borderColor;
-    // ctx.lineWidth = borderWidth;
-    // ctx.rect(x, y, w, h);
-    // ctx.stroke();
-  };
-
-  const drawSphere = (
-    info = { x: 0, y: 0, radius: 1 },
-    style = { borderColor: 'black', borderWidth: 1 },
-  ) => {
-    const { x, y, radius } = info;
-    const { borderColor, borderWidth } = style;
-  };
-
-  const drawTable = (table = { x: 10, y: 10, width: 100, height: 100 }) => {
-    return;
-  };
-
-  const drawBall = (
-    ball = { x: 1, y: 2, z: 3, rotation: '123' },
-    table = { x: 10, y: 10, width: 100, height: 100 },
-  ) => {
-    return;
-  };
-
-  return (
-    <Modal
-      closeOnOverlayClick={false}
-      isOpen={isOpen}
-      onClose={() => {
-        closeModal();
-        coveyTownController.unPause();
-      }}>
-      <ModalOverlay />
-      <ModalContent maxW='1000px'>
-        <ModalHeader>Play Pool!!!</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody pb={6}>
-          <canvas id='canvas' width='800' height='490'></canvas>
-          <p>
-            there is a canvas above this... it&apos;s just invisible for now xD trust me its there
-            :)
-          </p>
-          <p>
-            the code for this is visible in NewPoolGameModal.tsx in interactables/GameAreas folder
-          </p>
-          <p>
-            Stuff todo: make the pool thingy actually draw in the canvas... need to figure out how
-            to find the canvas through the code to update it through react...
-          </p>
-          {/**
-           * some references:
-           * https://kernhanda.github.io/tutorial-typescript-canvas-drawing/
-           * https://www.cluemediator.com/draw-a-line-on-canvas-using-react/
-           */}
-          <p>also maybe figure out how to make the modal bigger lol</p>
-        </ModalBody>
-        <ModalFooter>footer here</ModalFooter>
-      </ModalContent>
-    </Modal>
-  );
+  if (poolGameArea) {
+    return (
+      <Modal
+        closeOnOverlayClick={false}
+        isOpen={isOpen}
+        onClose={() => {
+          closeModal();
+          townController.unPause();
+        }}>
+        <ModalOverlay />
+        <ModalContent maxW='1800px' height='800px'>
+          <ModalHeader>Play Pool!!!</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <Button onClick={() => setViewLeaderboard(true)} hidden={viewLeaderboard}>
+              View Leaderboard
+            </Button>
+            <Button onClick={() => setViewLeaderboard(false)} hidden={!viewLeaderboard}>
+              Back
+            </Button>
+            {viewLeaderboard && <PoolLeaderboard />}
+            {!viewLeaderboard && <PoolGameCanvas poolGameArea={poolGameArea} />}
+            {/**
+             * POOL TODO: update poolGameArea above to be not undefined
+             * some references:
+             * https://kernhanda.github.io/tutorial-typescript-canvas-drawing/
+             * https://www.cluemediator.com/draw-a-line-on-canvas-using-react/
+             */}
+          </ModalBody>
+          <ModalFooter>exit</ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  }
+  return <></>;
 }
