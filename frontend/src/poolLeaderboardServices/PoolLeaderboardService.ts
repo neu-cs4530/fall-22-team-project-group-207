@@ -52,7 +52,7 @@ export class PoolLeaderboardService {
     ): CancelablePromise<void> {
         return this.httpRequest.request({
             method: 'PATCH',
-            url: '/leaderboard/{userid}',
+            url: '/leaderboard/update/{userid}',
             path: {
                 'userid': user_id,
             },
