@@ -92,6 +92,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // List of Pool Ball objects in the game at their default break position. Updated by calling toModel on the physicsPoolBall list
   private _poolBalls: PoolBallModel[] = this._physicsPoolBalls.map(ball => ball.toModel());
 
+  // These indexes are dynamically set in the constructor-- these are assuming that all 16 pool balls exist in the list.
   private _cueBallIndex = 0;
 
   private _8ballIndex = 5;
@@ -143,18 +144,16 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   constructor(poolGameModel: PoolGameAreaModel) {
     super();
     this._id = poolGameModel.id;
-    this.currentModel = {
-      id: this._id,
-      player1ID: this._player1ID,
-      player2ID: this._player2ID,
-      poolBalls: this._poolBalls,
-      player1BallType: this._player1BallType,
-      player2BallType: this._player2BallType,
-      isPlayer1Turn: this._isPlayer1Turn,
-      isBallBeingPlaced: this._isBallBeingPlaced,
-      isBallMoving: this._isBallMoving,
-      playerIDToMove: this._playerIDToMove,
-    };
+    this.currentModel = this.toPoolGameAreaModel();
+    // Avoid hard-coding index values
+    for (let i = 0; i < this._physicsPoolBalls.length; i++) {
+      if (this._physicsPoolBalls[i].ballNumber === 0) {
+        this._cueBallIndex = i;
+      }
+      if (this._physicsPoolBalls[i].ballNumber === 8) {
+        this._8ballIndex = i;
+      }
+    }
   }
 
   /**
@@ -166,8 +165,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   get isPlaying() {
     return (
-      this.player1ID !== undefined &&
-      this.player2ID !== undefined &&
+      (this.player1ID !== undefined || this.player2ID !== undefined) &&
       this.isGameStarted &&
       !this.isGameOver
     );
@@ -399,8 +397,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     if (cue) {
       cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
     }
-    // Tick until every ball stops moving
-    while (this._areAnyPoolBallsMoving() || !this.isGameOver().isGameOver) {
+    // Tick until every ball stops moving, whether they roll to a stop or get pocketed.
+    while (this._areAnyPoolBallsMoving()) {
       this.gameTick();
     }
 
@@ -417,7 +415,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   /**
-   * Helper function
+   * Helper function that returns whether any pool ball is moving.
    * @returns a boolean that stores whether any of the pool balls are moving
    */
   private _areAnyPoolBallsMoving(): boolean {
@@ -646,7 +644,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             magnitude(subtractVectors(ball.position, { x: pocket.posnX, y: pocket.posnY, z: 0 })) <=
             BALL_RADIUS + pocket.radius
           ) {
+            // ball goes in pocket, so stop it from moving !!
             ball.isPocketed = true;
+            ball.isMoving = false;
             const ballType = this.getBallTypeByNumber(ball.ballNumber);
 
             // if the players don't have a ball type yet, assign them
