@@ -365,7 +365,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this._player2BallsPocketed = 0;
 
     this._isBallBeingPlaced = false;
-    
+
     // tell listeners to reset the game
     this.emit('onTick', this.toPoolGameAreaModel());
   }
@@ -489,7 +489,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
     const movingBalls: PoolBall[] = this._physicsPoolBalls.filter(
       ball => ball.isMoving && !ball.isPocketed,
-      );
+    );
     // holds all of the pool balls we've already checked for collisions to prevent duplicate collisions
     const alreadyCheckedBalls: PoolBall[] = [];
 
@@ -513,7 +513,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             !otherBall.isPocketed &&
             ball !== otherBall &&
             !alreadyCheckedBalls.includes(otherBall)
-            ) {
+          ) {
             if (magnitude(subtractVectors(ball.position, otherBall.position)) <= BALL_RADIUS * 2) {
               ballBallCollision(ball, otherBall);
               alreadyCheckedBalls.push(ball);
