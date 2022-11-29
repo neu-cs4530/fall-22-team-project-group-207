@@ -306,6 +306,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
     // update the model list
     this.poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
+
+    // emit an update
+    if (this._playerIDToMove) {
+      this.emit('onBallPlacement', this._playerIDToMove);
+    }
   }
 
   /**
@@ -442,22 +447,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       // send update to frontend saying that player 1 won.
     } else if (!gameOverStruct.didPlayer1Win) {
       // send update to frontend saying that player 2 won.
-    }
-  }
-
-  placeCueBall(newPosition: Vector) {
-    // update the cue ball's position
-    this._physicsPoolBalls[this._cueBallIndex].position.x = newPosition.x;
-    this._physicsPoolBalls[this._cueBallIndex].position.y = newPosition.y;
-    this._physicsPoolBalls[this._cueBallIndex].position.z = newPosition.z;
-
-    // unset the flag
-    this._isBallBeingPlaced = false;
-
-    // update the model list
-    this.poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
-    if (this._playerIDToMove) {
-      this.emit('onBallPlacement', this._playerIDToMove);
     }
   }
 
