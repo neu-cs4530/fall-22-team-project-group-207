@@ -124,7 +124,7 @@ export default function PoolGameCanvas({
           const pos: Vector = {
             x: mousePos.x,
             y: mousePos.y,
-            z: BALL_RADIUS,
+            z: 0,
           };
           poolGameAreaController.placeCueBall(pixelsToPosition(pos));
         }
@@ -421,7 +421,7 @@ export default function PoolGameCanvas({
         }>
         Leave Game
       </Button>
-      <Button onClick={() => poolGameAreaController.resetPoolBalls()}>Reset game</Button>
+      <Button onClick={() => poolGameAreaController.resetGame()}>Reset game</Button>
       <Button onClick={() => poolGameAreaController.gameTick()}>Tick game</Button>
       <canvas
         id='board canvas'
