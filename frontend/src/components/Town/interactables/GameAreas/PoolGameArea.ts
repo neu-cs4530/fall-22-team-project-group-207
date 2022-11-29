@@ -97,7 +97,7 @@ export default class PoolGameArea extends GameArea {
               }
               this._infoTextBox.text = 'Player 1 Turn';
             } else {
-              this._infoTextBox.text = 'Player 2 Turn';
+              this._infoTextBox.text = 'Play Pool!';
             }
           }
         };
