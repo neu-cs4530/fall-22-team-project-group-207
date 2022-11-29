@@ -3,22 +3,22 @@ import _ from 'lodash';
 import { useEffect, useState } from 'react';
 import TypedEmitter from 'typed-emitter';
 import {
-  PoolBall as PoolBallModel,
-  PoolGameArea as PoolGameAreaModel,
-} from '../types/CoveyTownSocket';
-import PlayerController from './PlayerController';
-import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
-import {
-  magnitude,
-  subtractVectors,
-} from '../components/Town/interactables/GameAreas/PoolGame/Vector';
-import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
-import {
   ballBallCollision,
   ballSlateCollision,
   cueBallCollision,
   cushionBallCollision,
 } from '../components/Town/interactables/GameAreas/PoolGame/Collisions';
+import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
+import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
+import {
+  magnitude,
+  subtractVectors,
+} from '../components/Town/interactables/GameAreas/PoolGame/Vector';
+import {
+  PoolBall as PoolBallModel,
+  PoolGameArea as PoolGameAreaModel,
+} from '../types/CoveyTownSocket';
+import PlayerController from './PlayerController';
 
 /**
  * Type representing the two types of pool balls and the 8 ball.
@@ -149,7 +149,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   get isPlaying() {
-    return this.player1ID && this.player2ID && !this.isGameOver;
+    return this.player1ID && this.player2ID && this.isGameStarted && !this.isGameOver;
   }
 
   /**
@@ -205,6 +205,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   set player1ID(newPlayer1ID: string | undefined) {
     if (newPlayer1ID !== this.player1ID) {
+      if (newPlayer1ID === this.player2ID) {
+        this._player2ID = undefined;
+      }
       this._player1ID = newPlayer1ID;
       // if (newPlayer1ID) {
       //   const newPlayerController = this.occupants.find(occ => occ.id === newPlayer1ID);
@@ -216,12 +219,15 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   get player2ID() {
-    return this._player1ID;
+    return this._player2ID;
   }
 
   set player2ID(newPlayer2ID: string | undefined) {
     if (newPlayer2ID !== this.player2ID) {
-      this._player1ID = newPlayer2ID;
+      if (newPlayer2ID === this.player1ID) {
+        this._player1ID = undefined;
+      }
+      this._player2ID = newPlayer2ID;
       // if (newPlayer2ID) {
       //   const newPlayerController = this.occupants.find(occ => occ.id === newPlayer2ID);
       //   if (newPlayerController) {
@@ -258,6 +264,18 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   /**
+   * Remove a player from playing the game
+   * @param playerID Player ID to remove
+   */
+  removePlayer(playerID: string): void {
+    if (this.player1ID === playerID) {
+      this._player1ID = undefined;
+    } else if (this.player2ID === playerID) {
+      this._player2ID = undefined;
+    }
+  }
+
+  /**
    * Function that returns an array of PoolBalls to the default break state.
    */
   resetPoolBalls(): PoolBall[] {
@@ -272,6 +290,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       // third row
       new PoolBall(0, 0, 3),
       new PoolBall(2.54, 1.27, 8),
+      // new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 3),
+      // new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634, 8),
       new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 10),
       // fourth row
       new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - 3 * BALL_RADIUS, 4),
@@ -289,6 +309,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   // POOL TODO
   startGame(): void {
+    // if players aren't valid, we dont start the game
+    if (!this.player1ID || !this.player2ID) {
+      return;
+    }
     // randomly decide who is first
     this._isPlayer1Turn = Math.random() <= 0.5;
 
@@ -303,10 +327,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // set pool balls into break position. Declaring new pool balls is to reset their fields.
     this._physicsPoolBalls = this.resetPoolBalls();
     this._poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
-
-    // POOL TODO: this is extremely scuffed, please fix
-    this._player1ID = this.occupants[0].id;
-    this._player2ID = this.players[1].id;
 
     // start the game
     this.isGameStarted = true;

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import TypedEmitter from 'typed-emitter';
 import Interactable from '../components/Town/Interactable';
+import PoolGameArea from '../components/Town/interactables/GameAreas/PoolGameArea';
 import ViewingArea from '../components/Town/interactables/ViewingArea';
 import { LoginController } from '../contexts/LoginControllerContext';
 import { TownsService, TownsServiceClient } from '../generated/client';
@@ -635,6 +636,40 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
   }
 
   /**
+   * Retrieve the pool game area controller that corresponds to a poolGameAreaModel, creating one if necessary
+   *
+   * @param poolGameArea
+   * @returns
+   */
+  public getPoolGameAreaController(poolGameArea: PoolGameArea): PoolGameAreaController {
+    const existingController = this._poolGameAreas.find(
+      eachExistingArea => eachExistingArea.id === poolGameArea.name,
+    );
+    if (existingController) {
+      return existingController;
+    } else {
+      const newController = new PoolGameAreaController({
+        id: poolGameArea.name,
+        poolBalls: [],
+        isPlayer1Turn: true,
+        isBallBeingPlaced: false,
+        isBallMoving: false,
+      });
+      this._poolGameAreas.push(newController);
+      return newController;
+    }
+  }
+
+  /**
+   * Emit a pool game area update to the townService
+   * @param poolGameArea The Pool Game Area Controller that is updated and should be emitted
+   *    with the event
+   */
+  public emitPoolGameAreaUpdate(poolGameArea: PoolGameAreaController) {
+    this._socket.emit('interactableUpdate', poolGameArea.toPoolGameAreaModel());
+  }
+
+  /**
    * Determine which players are "nearby" -- that they should be included in our video call
    */
   public nearbyPlayers(): PlayerController[] {
@@ -714,7 +749,7 @@ export function useViewingAreaController(viewingAreaID: string): ViewingAreaCont
 }
 
 /**
- * TODO FIX
+ * POOL TODO FIX
  * A react hook to retrieve a pool game area controller.
  *
  * This function will throw an error if the pool game area controller does not exist.
@@ -730,7 +765,7 @@ export function usePoolGameAreaController(poolGameAreaID: string): PoolGameAreaC
 
   const poolGameArea = townController.poolGameAreas.find(eachArea => eachArea.id == poolGameAreaID);
   if (!poolGameArea) {
-    throw new Error(`Requested viewing area ${poolGameAreaID} does not exist`);
+    throw new Error(`Requested pool area ${poolGameAreaID} does not exist`);
   }
   return poolGameArea;
 }

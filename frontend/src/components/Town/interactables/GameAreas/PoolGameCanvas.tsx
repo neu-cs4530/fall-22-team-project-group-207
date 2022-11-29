@@ -54,20 +54,6 @@ export default function PoolGameCanvas({
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
 
-  // States for joining the game
-  const [player1IDEnabled, setPlayer1IDEnabled] = useState<boolean>(
-    poolGameAreaController.player1ID === undefined,
-  );
-  const [player2IDEnabled, setPlayer2IDEnabled] = useState<boolean>(
-    poolGameAreaController.player2ID === undefined,
-  );
-
-  // Handle clicking the join game buttons
-  useEffect(() => {
-    setPlayer1IDEnabled(poolGameAreaController.player1ID === undefined);
-    setPlayer2IDEnabled(poolGameAreaController.player2ID === undefined);
-  }, [poolGameAreaController.player1ID, poolGameAreaController.player2ID]);
-
   // Handle mouse events, namely movement and clicking
   useEffect(() => {
     const canvas = boardCanvasRef.current;
@@ -310,13 +296,21 @@ export default function PoolGameCanvas({
       <Button onClick={() => poolGameAreaController.startGame()}>Play Pool!</Button>
       <Button
         onClick={() => (poolGameAreaController.player1ID = townController.userID)}
-        disabled={!player1IDEnabled}>
+        disabled={poolGameAreaController.player1ID !== undefined}>
         Join as player 1
       </Button>
       <Button
         onClick={() => (poolGameAreaController.player2ID = townController.userID)}
-        disabled={!player2IDEnabled}>
+        disabled={poolGameAreaController.player2ID !== undefined}>
         Join as player 2
+      </Button>
+      <Button
+        onClick={() => poolGameAreaController.removePlayer(townController.userID)}
+        disabled={
+          poolGameAreaController.player1ID !== townController.userID &&
+          poolGameAreaController.player2ID !== townController.userID
+        }>
+        Leave Game
       </Button>
       <canvas
         id='board canvas'
