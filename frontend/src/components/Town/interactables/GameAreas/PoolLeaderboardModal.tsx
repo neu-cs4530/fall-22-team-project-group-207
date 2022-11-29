@@ -1,24 +1,20 @@
 import { Table, TableContainer, Tbody, Td, Th, Thead, Tr } from '@chakra-ui/react';
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-
-interface Leader {
-  id: string;
-  name: string;
-  wins: number;
-}
+import { Leader } from '../../../../poolLeaderboardServices/Leader';
+import { PoolLeaderboardServiceClient } from '../../../../poolLeaderboardServices/PoolLeaderboardServiceClient';
 /**
  * Returns a canvas that renders the pool game
  * @returns HTML canvas containing pool game display
  */
 export default function PoolLeaderboard(): JSX.Element {
-  const url = 'https://group-207-fp-database.herokuapp.com/';
-  const [leaderboard, setLeaderboard] = useState([{ id: 0, name: 'test', wins: 10 }]);
+  const leaderboardService = new PoolLeaderboardServiceClient();
+  const [leaderboard, setLeaderboard] = useState<Leader[]>([]);
   useEffect(() => {
-    axios(url + 'leaderboard').then(response => {
-      setLeaderboard(response.data.sort((a: Leader, b: Leader) => b.wins - a.wins));
-    });
-  }, [leaderboard]);
+    leaderboardService.leaderboard
+      .listLeaderboard()
+      .then(l => setLeaderboard(l.sort((a: Leader, b: Leader) => b.wins - a.wins)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div id='pool-leaderboard'>
       <TableContainer>
@@ -32,7 +28,7 @@ export default function PoolLeaderboard(): JSX.Element {
           {
             <Tbody>
               {leaderboard?.map(leader => (
-                <Tr key={leader.id}>
+                <Tr key={leader.user_id}>
                   <Td role='cell'>{leader.name}</Td>
                   <Td role='cell'>{leader.wins}</Td>
                 </Tr>
