@@ -398,9 +398,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
     }
     // Tick until every ball stops moving
-    while (this._areAnyPoolBallsMoving() || !this.isGameOver().isGameOver) {
+    for (let i = 0; i < 100; i++) {
       this.gameTick();
     }
+    // while (this._areAnyPoolBallsMoving() || !this.isGameOver().isGameOver) {
+    //   this.gameTick();
+    // }
 
     // emits a history update to listeners, passing the new model history.
     this.emit('onHistoryUpdate', this.modelHistory);
@@ -415,7 +418,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   /**
-   * Helper function
+   * Helper function that returns whether any pool ball is moving.
    * @returns a boolean that stores whether any of the pool balls are moving
    */
   private _areAnyPoolBallsMoving(): boolean {
