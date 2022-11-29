@@ -17,6 +17,7 @@ import {
 import {
   PoolBall as PoolBallModel,
   PoolGameArea as PoolGameAreaModel,
+  Vector,
 } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
 
@@ -149,7 +150,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   get isPlaying() {
-    return this.player1ID && this.player2ID && this.isGameStarted && !this.isGameOver;
+    return (
+      this.player1ID !== undefined &&
+      this.player2ID !== undefined &&
+      this.isGameStarted &&
+      !this.isGameOver
+    );
   }
 
   /**
@@ -276,6 +282,23 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   /**
+   * Place a cue ball
+   * @param position New position to place the pool ball at
+   */
+  placeCueBall(position: Vector): void {
+    // update the cue ball's position
+    this._physicsPoolBalls[0].position.x = position.x;
+    this._physicsPoolBalls[0].position.y = position.y;
+    this._physicsPoolBalls[0].position.z = position.z;
+
+    // unset the flag
+    this._isBallBeingPlaced = false;
+
+    // update the model list
+    this.poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
+  }
+
+  /**
    * Function that returns an array of PoolBalls to the default break state.
    */
   resetPoolBalls(): PoolBall[] {
@@ -310,9 +333,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // POOL TODO
   startGame(): void {
     // if players aren't valid, we dont start the game
-    if (!this.player1ID || !this.player2ID) {
-      return;
-    }
+    // if (!this.player1ID || !this.player2ID) {
+    //   return;
+    // }
     // randomly decide who is first
     this._isPlayer1Turn = Math.random() <= 0.5;
 
@@ -415,7 +438,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // whatever else needs to go here, maybe physics
   poolPhysicsGoHere(cue: PoolCue | undefined = undefined): void {
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
-    const movingBalls: PoolBall[] = this._physicsPoolBalls.filter(ball => ball.isMoving);
+    // const movingBalls: PoolBall[] = this._physicsPoolBalls.filter(ball => ball.isMoving);
+    const movingBalls: PoolBall[] = this._physicsPoolBalls;
     // holds all of the pool balls we've already checked for collisions to prevent duplicate collisions
     const alreadyCheckedBalls: PoolBall[] = [];
 
