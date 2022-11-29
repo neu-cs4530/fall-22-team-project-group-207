@@ -352,6 +352,24 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     ];
   }
 
+  // resets the pool balls to their starting position and scores to 0.
+  resetGame(): void {
+    // set pool balls into break position. Declaring new pool balls is to reset their fields.
+    this._physicsPoolBalls = this.resetPoolBalls();
+    this._poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
+
+    // reset score and type for both players
+    this._player1BallType = undefined;
+    this._player2BallType = undefined;
+    this._player1BallsPocketed = 0;
+    this._player2BallsPocketed = 0;
+
+    this._isBallBeingPlaced = false;
+    
+    // tell listeners to reset the game
+    this.emit('onTick', this.toPoolGameAreaModel());
+  }
+
   // POOL TODO
   startGame(): void {
     // if players aren't valid, we dont start the game
