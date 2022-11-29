@@ -12,7 +12,7 @@ const BALL_RADIUS = 0.028575; // m
 const OUTSIDE_BORDER_WIDTH = 0.18; // m
 const POOL_TABLE_WIDTH = 2.9; // m
 const POOL_TABLE_HEIGHT = 1.63; // m
-const METER_TO_PIXEL_SCALAR = 400; // scalar
+const METER_TO_PIXEL_SCALAR = 400.0; // scalar
 
 /**
  * function to convert position of a ball in meters to the pixel value
@@ -104,9 +104,13 @@ export default function PoolGameCanvas({
             return;
           }
           const velocityUnitVector: Vector = unitVector(
-            subtractVectors(cueBall.position, { x: mousePos.x, y: 0, z: mousePos.y }),
+            subtractVectors(cueBall.position, {
+              x: mousePos.x / METER_TO_PIXEL_SCALAR,
+              y: cueBall.position.y,
+              z: mousePos.y / METER_TO_PIXEL_SCALAR,
+            }),
           );
-          const velocity: Vector = scale(velocityUnitVector, 1); // POOL TODO: get scalar for velocity
+          const velocity: Vector = scale(velocityUnitVector, 0.1); // POOL TODO: get scalar for velocity
 
           const collisionPoint: Vector = addVectors(
             cueBall.position,
