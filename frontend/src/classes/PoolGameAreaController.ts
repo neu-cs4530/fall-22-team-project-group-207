@@ -92,6 +92,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // List of Pool Ball objects in the game at their default break position. Updated by calling toModel on the physicsPoolBall list
   private _poolBalls: PoolBallModel[] = this._physicsPoolBalls.map(ball => ball.toModel());
 
+  // These indexes are dynamically set in the constructor-- these are assuming that all 16 pool balls exist in the list.
   private _cueBallIndex = 0;
 
   private _8ballIndex = 5;
@@ -143,18 +144,16 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   constructor(poolGameModel: PoolGameAreaModel) {
     super();
     this._id = poolGameModel.id;
-    this.currentModel = {
-      id: this._id,
-      player1ID: this._player1ID,
-      player2ID: this._player2ID,
-      poolBalls: this._poolBalls,
-      player1BallType: this._player1BallType,
-      player2BallType: this._player2BallType,
-      isPlayer1Turn: this._isPlayer1Turn,
-      isBallBeingPlaced: this._isBallBeingPlaced,
-      isBallMoving: this._isBallMoving,
-      playerIDToMove: this._playerIDToMove,
-    };
+    this.currentModel = this.toPoolGameAreaModel();
+    // Avoid hard-coding index values
+    for (let i = 0; i < this._physicsPoolBalls.length; i++) {
+      if (this._physicsPoolBalls[i].ballNumber === 0) {
+        this._cueBallIndex = i;
+      }
+      if (this._physicsPoolBalls[i].ballNumber === 8) {
+        this._8ballIndex = i;
+      }
+    }
   }
 
   /**
