@@ -53,9 +53,6 @@ export class PoolLeaderboardService {
         return this.httpRequest.request({
             method: 'PATCH',
             url: '/leaderboard/update/',
-            body: {
-                'userid': user_id,
-            },
             body: requestBody,
             mediaType: 'application/json'
         });
