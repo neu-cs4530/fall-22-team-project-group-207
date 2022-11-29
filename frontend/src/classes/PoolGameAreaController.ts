@@ -18,7 +18,6 @@ import {
 import {
   PoolBall as PoolBallModel,
   PoolGameArea as PoolGameAreaModel,
-  Vector,
 } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
 
@@ -470,10 +469,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     }
 
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
-    const movingBalls: PoolBall[] = this._physicsPoolBalls.filter(ball => ball.isMoving && !ball.isPocketed);
+    const movingBalls: PoolBall[] = this._physicsPoolBalls.filter(
+      ball => ball.isMoving && !ball.isPocketed,
+      );
     // holds all of the pool balls we've already checked for collisions to prevent duplicate collisions
     const alreadyCheckedBalls: PoolBall[] = [];
-    
+
     // we can only scratch once per turn, so this boolean represents whether that has happened yet
     let canScratch = true;
 
@@ -490,7 +491,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         // ball-ball collisions
         this._physicsPoolBalls.forEach(otherBall => {
           // check if the two current poolballs are different, and have not already been checked
-          if (!otherBall.isPocketed && ball !== otherBall && !alreadyCheckedBalls.includes(otherBall)) {
+          if (
+            !otherBall.isPocketed &&
+            ball !== otherBall &&
+            !alreadyCheckedBalls.includes(otherBall)
+            ) {
             if (magnitude(subtractVectors(ball.position, otherBall.position)) <= BALL_RADIUS * 2) {
               ballBallCollision(ball, otherBall);
               alreadyCheckedBalls.push(ball);
