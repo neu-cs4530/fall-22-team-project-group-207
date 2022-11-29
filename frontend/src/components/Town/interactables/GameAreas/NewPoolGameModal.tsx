@@ -1,4 +1,8 @@
 import {
+  Button,
+  // FormControl,
+  // FormLabel,
+  // Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -8,12 +12,14 @@ import {
   ModalOverlay,
   useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react'; // useState
+// import { PoolGameModel } from '../../../../classes/PoolGameAreaController';
 import { useInteractable } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import PoolGameCanvas from './PoolGameCanvas';
 import { PoolGameArea as PoolGameAreaModel } from '../../../../types/CoveyTownSocket';
 import PoolGameArea from './PoolGameArea';
+import PoolLeaderboard from './PoolLeaderboardModal';
 
 /**
  * Returns a modal that contains a display for the pool game
@@ -22,6 +28,7 @@ import PoolGameArea from './PoolGameArea';
 export default function NewPoolGameModal(): JSX.Element {
   const townController = useTownController();
   const poolGameArea = useInteractable<PoolGameArea>('gameArea');
+  const [viewLeaderboard, setViewLeaderboard] = useState(false);
 
   const [gameState, setGameState] = useState<PoolGameAreaModel>();
 
@@ -118,11 +125,18 @@ export default function NewPoolGameModal(): JSX.Element {
           townController.unPause();
         }}>
         <ModalOverlay />
-        <ModalContent maxW='1000px' height='800px'>
+        <ModalContent maxW='1800px' height='800px'>
           <ModalHeader>Play Pool!!!</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <PoolGameCanvas poolGameArea={poolGameArea} />
+            <Button onClick={() => setViewLeaderboard(true)} hidden={viewLeaderboard}>
+              View Leaderboard
+            </Button>
+            <Button onClick={() => setViewLeaderboard(false)} hidden={!viewLeaderboard}>
+              Back
+            </Button>
+            {viewLeaderboard && <PoolLeaderboard />}
+            {!viewLeaderboard && <PoolGameCanvas poolGameArea={poolGameArea} />}
             {/**
              * POOL TODO: update poolGameArea above to be not undefined
              * some references:

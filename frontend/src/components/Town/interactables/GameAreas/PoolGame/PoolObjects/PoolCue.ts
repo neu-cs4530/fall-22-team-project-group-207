@@ -7,9 +7,9 @@ export default class PoolCue {
 
   private _position: Vector;
 
-  constructor() {
-    this._velocity = { x: 0, y: 0, z: 0 };
-    this._position = { x: 0, y: 0, z: 0 };
+  constructor(velocity: Vector, position: Vector) {
+    this._velocity = velocity;
+    this._position = position;
   }
 
   get velocity() {
