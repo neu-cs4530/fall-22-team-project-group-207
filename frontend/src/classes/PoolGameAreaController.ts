@@ -165,8 +165,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   get isPlaying() {
     return (
-      this.player1ID !== undefined &&
-      this.player2ID !== undefined &&
+      (this.player1ID !== undefined ||
+      this.player2ID !== undefined) &&
       this.isGameStarted &&
       !this.isGameOver
     );
