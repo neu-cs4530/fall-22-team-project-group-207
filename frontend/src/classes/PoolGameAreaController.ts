@@ -397,7 +397,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
     }
     // Tick until every ball stops moving
-    while (this._areAnyPoolBallsMoving()) {
+    while (this._areAnyPoolBallsMoving() || !this.isGameOver().isGameOver) {
       this.gameTick();
     }
 
