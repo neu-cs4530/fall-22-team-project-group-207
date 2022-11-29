@@ -58,7 +58,7 @@ export type PoolGameAreaEvents = {
 };
 
 const BALL_RADIUS = 0.028575; // m
-const TICK_RATE = 0.1; // s
+const TICK_RATE = 0.015; // s
 const POCKET_RADIUS = 0.05; // m
 const RAIL_WIDTH = 0.051; // m
 
@@ -70,6 +70,12 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   // Current state of the game that we send to the front end for rendering
   public currentModel: PoolGameAreaModel;
+
+  // A history of the game models at every tick-- index 0 is the model at tick 0, index 1 is the model at tick 1, etc.
+  // public modelHistory: PoolGameAreaModel[] = [];
+
+  // The tick the game is currently on, for use indexing the modelHistory
+  // public currentTick: number = 0;
 
   private _player1ID: string | undefined;
 
@@ -193,7 +199,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   set isBallBeingPlaced(value) {
     if (value !== this.isBallBeingPlaced) {
       this._isBallBeingPlaced = value;
-      this.emit('onBallPlacement', )
+      if (this._playerIDToMove) {
+        this.emit('onBallPlacement', this._playerIDToMove);
+      }
     }
   }
 
@@ -351,6 +359,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // if (!this.player1ID || !this.player2ID) {
     //   return;
     // }
+    // this.currentTick = 0;
+    // this.modelHistory = [this.currentModel];
     // randomly decide who is first
     this._isPlayer1Turn = Math.random() <= 0.5;
 
@@ -399,6 +409,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       }
     }
     this.emit('onTick', this.currentModel);
+    // this.modelHistory.push(this.currentModel);
+    // this.currentTick++;
   }
 
   /**
@@ -738,9 +750,9 @@ export function usePoolGameAreaOccupants(area: PoolGameAreaController): PlayerCo
 }
 
 /**
- * A react hook to retrieve the PoolGameModel of a PoolGameAreaController, returning a PoolGameModel.
+ * A react hook to retrieve the PoolGameAreaModel of a PoolGameAreaController, returning a PoolGameAreaModel.
  *
- * This hook will re-render any components that use it when the current PoolGameModel changes.
+ * This hook will re-render any components that use it when the current PoolGameAreaModel changes.
  */
 export function usePoolGameModel(area: PoolGameAreaController): PoolGameAreaModel {
   const [gameModel, setGameModel] = useState(area.currentModel);
