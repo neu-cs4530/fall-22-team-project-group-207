@@ -72,8 +72,8 @@ export class PoolLeaderboardService {
     ): CancelablePromise<void> {
         return this.httpRequest.request({
             method: 'PATCH',
-            url: '/leaderboard/win/{userid}',
-            path: {
+            url: '/leaderboard/win/',
+            body: {
                 'userid': user_id,
             },
             mediaType: 'application/json'
