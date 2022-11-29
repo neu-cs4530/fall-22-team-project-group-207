@@ -625,7 +625,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with right rail
-          cushionBallCollision(ball, false);
+          cushionBallCollision(ball, 0);
           alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.x > 0 &&
@@ -639,7 +639,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with left rail
-          cushionBallCollision(ball, false);
+          cushionBallCollision(ball, 2);
           alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.y > 0 &&
@@ -653,7 +653,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with top rail
-          cushionBallCollision(ball, true);
+          cushionBallCollision(ball, 1);
           alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.y > 0 &&
@@ -667,7 +667,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with bottom rail
-          cushionBallCollision(ball, true);
+          cushionBallCollision(ball, 3);
           alreadyCheckedBalls.push(ball);
         }
 

@@ -150,7 +150,6 @@ export default class PoolBall {
   }
 
   private _updateRollingBall(elapsedTime: number) {
-    // const oldVelocityMagnitude = magnitude(this.velocity);
     const frictionVector: Vector = scale(
       unitVector(this.velocity),
       BALL_CLOTH_ROLLING_FRICTION * GRAVITATIONAL_CONSTANT * elapsedTime,
@@ -185,8 +184,16 @@ export default class PoolBall {
       { x: this.angularVelocity.x, y: this.angularVelocity.y, z: 0 },
       scale(crossProduct(kHat, relativeVelocity), ANGULAR_SLIDING_DECEL_COEFF * elapsedTime),
     );
-    this._angularVelocity.x = xyPlaneAngularVelocity.x;
-    this._angularVelocity.y = xyPlaneAngularVelocity.y;
+    if (
+      Math.abs(xyPlaneAngularVelocity.x - this.velocity.x / BALL_RADIUS) < 0.01 &&
+      Math.abs(xyPlaneAngularVelocity.y - this.velocity.y / BALL_RADIUS) < 0.01
+    ) {
+      this._angularVelocity.y = this.velocity.x / BALL_RADIUS;
+      this._angularVelocity.x = this.velocity.y / BALL_RADIUS;
+    } else {
+      this._angularVelocity.x = xyPlaneAngularVelocity.x;
+      this._angularVelocity.y = xyPlaneAngularVelocity.y;
+    }
   }
 
   // Convert to a PoolBallModel suitable for broadcasting
