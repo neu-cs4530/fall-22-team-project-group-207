@@ -102,8 +102,7 @@ export default class PoolGameArea extends GameArea {
           }
         };
         updateListener(area.isPlayer1Turn);
-        // POOL TODO: add this event??
-        // area.addListener('turnChange', updateListener);
+        area.addListener('turnChange', updateListener);
       }
     }
   }

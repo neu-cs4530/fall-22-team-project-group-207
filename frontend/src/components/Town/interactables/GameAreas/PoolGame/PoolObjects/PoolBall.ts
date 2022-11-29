@@ -37,7 +37,7 @@ export default class PoolBall {
     this._ballNumber = ballNumber;
     this._angularOrientation = { x: 0, y: 0, z: 0 };
     this._angularVelocity = { x: 0, y: 0, z: 0 };
-    this._position = { x: xPosition, y: yPosition, z: BALL_RADIUS };
+    this._position = { x: xPosition, y: yPosition, z: 0 };
     this._velocity = { x: 0, y: 0, z: 0 };
     this._isMoving = false;
     this._isAirborne = false;
@@ -45,19 +45,19 @@ export default class PoolBall {
   }
 
   get angularVelocity() {
-    return this._angularVelocity;
+    return { x: this._angularVelocity.x, y: this._angularVelocity.y, z: this._angularVelocity.z };
   }
 
   set angularVelocity(v: Vector) {
-    this._angularVelocity = v;
+    Object.assign(this._angularVelocity, v);
   }
 
   get velocity(): Vector {
-    return this._velocity;
+    return { x: this._velocity.x, y: this._velocity.y, z: this._velocity.z };
   }
 
   set velocity(v: Vector) {
-    this._velocity = v;
+    Object.assign(this._velocity, v);
     if (v.x !== 0 || v.y !== 0) {
       this._isMoving = true;
     }
@@ -68,11 +68,19 @@ export default class PoolBall {
   }
 
   get position(): Vector {
-    return this._position;
+    return { x: this._position.x, y: this._position.y, z: this._position.z };
+  }
+
+  set position(v: Vector) {
+    Object.assign(this._position, v);
   }
 
   get angularOrientation(): Vector {
-    return this._angularOrientation;
+    return {
+      x: this._angularOrientation.x,
+      y: this._angularOrientation.y,
+      z: this._angularOrientation.z,
+    };
   }
 
   set isAirborne(isAirborne: boolean) {
@@ -150,7 +158,6 @@ export default class PoolBall {
   }
 
   private _updateRollingBall(elapsedTime: number) {
-    // const oldVelocityMagnitude = magnitude(this.velocity);
     const frictionVector: Vector = scale(
       unitVector(this.velocity),
       BALL_CLOTH_ROLLING_FRICTION * GRAVITATIONAL_CONSTANT * elapsedTime,
@@ -185,8 +192,16 @@ export default class PoolBall {
       { x: this.angularVelocity.x, y: this.angularVelocity.y, z: 0 },
       scale(crossProduct(kHat, relativeVelocity), ANGULAR_SLIDING_DECEL_COEFF * elapsedTime),
     );
-    this._angularVelocity.x = xyPlaneAngularVelocity.x;
-    this._angularVelocity.y = xyPlaneAngularVelocity.y;
+    if (
+      Math.abs(xyPlaneAngularVelocity.x - this.velocity.x / BALL_RADIUS) < 0.01 &&
+      Math.abs(xyPlaneAngularVelocity.y - this.velocity.y / BALL_RADIUS) < 0.01
+    ) {
+      this._angularVelocity.y = this.velocity.x / BALL_RADIUS;
+      this._angularVelocity.x = this.velocity.y / BALL_RADIUS;
+    } else {
+      this._angularVelocity.x = xyPlaneAngularVelocity.x;
+      this._angularVelocity.y = xyPlaneAngularVelocity.y;
+    }
   }
 
   // Convert to a PoolBallModel suitable for broadcasting
