@@ -334,7 +334,7 @@ export default function PoolGameCanvas({
         }>
         Leave Game
       </Button>
-      <Button onClick={() => poolGameAreaController.resetPoolBalls()}>Reset game</Button>
+      <Button onClick={() => poolGameAreaController.resetGame()}>Reset game</Button>
       <Button onClick={() => poolGameAreaController.gameTick()}>Tick game</Button>
       <canvas
         id='board canvas'
