@@ -723,20 +723,19 @@ describe('Town', () => {
       expect(
         town.addPoolGameArea({ 
           id: nanoid(),
-          player1ID?: undefined,
-          player2ID?: undefined,
+          player1ID: undefined,
+          player2ID: undefined,
           poolBalls: [],
-          player1BallType?: undefined,
-          player2BallType?: undefined,
+          player1BallType: undefined,
+          player2BallType: undefined,
           isPlayer1Turn: false,
           isBallBeingPlaced: false,
           isBallMoving: false,
-          playerIDToMove?: undefined,
+          playerIDToMove: undefined,
         }),
       ).toBe(false);
     });
-  },
-
+  });
   describe('disconnectAllPlayers', () => {
     beforeEach(() => {
       town.disconnectAllPlayers();
