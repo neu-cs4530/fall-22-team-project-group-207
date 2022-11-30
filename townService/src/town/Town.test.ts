@@ -17,6 +17,7 @@ import {
   PlayerLocation,
   TownEmitter,
   ViewingArea as ViewingAreaModel,
+  PoolGameArea as PoolGameAreaModel,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import Town from './Town';
@@ -42,13 +43,13 @@ const testingMaps: TestMapDict = {
           {
             type: 'PoolGameArea',
             height: 237,
-            id: 39,
-            name: 'Name1',
+            id: 100,
+            name: 'PoolName',
             rotation: 0,
             visible: true,
             width: 326,
-            x: 40,
-            y: 120,
+            x: 5000,
+            y: 5000,
           },
         ],
         opacity: 1,
@@ -733,6 +734,28 @@ describe('Town', () => {
           playerIDToMove: undefined,
         }),
       ).toBe(false);
+    });
+  });
+  describe('When successful', () => {
+    const newModel: PoolGameAreaModel = {
+      id: 'PoolName',
+      poolBalls: [],
+      player1ID: undefined,
+      player2ID: undefined,
+      player1BallType: undefined,
+      player2BallType: undefined,
+      isPlayer1Turn: false,
+      isBallBeingPlaced: false,
+      playerIDToMove: undefined,
+    };
+    beforeEach(() => {
+      town.initializeFromMap(testingMaps.onePoolGame);
+      playerTestData.moveTo(5000, 5000); // Inside of "PoolName" area
+      expect(town.addPoolGameArea(newModel)).toBe(true);
+    });
+    it('Should include any players in that area as occupants', () => {
+      const poolGameArea = town.getInteractable('PoolName');
+      expect(poolGameArea.occupantsByID).toEqual([player.id]);
     });
   });
   describe('disconnectAllPlayers', () => {
