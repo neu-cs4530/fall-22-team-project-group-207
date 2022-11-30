@@ -749,8 +749,9 @@ describe('Town', () => {
       playerIDToMove: undefined,
     };
     beforeEach(() => {
+      town.initializeFromMap(testingMaps.onePoolGame);
       playerTestData.moveTo(5000, 5000); // Inside of "PoolName" area
-      // expect(town.addPoolGameArea(newModel)).toBe(true);
+      expect(town.addPoolGameArea(newModel)).toBe(true);
     });
 
     it('Should update the local model for that area', () => {
