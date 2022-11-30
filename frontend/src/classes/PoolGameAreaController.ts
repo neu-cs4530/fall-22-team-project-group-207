@@ -602,7 +602,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
                   ) {
                     // player 1 hit the wrong ball, scratch
                     this._isBallBeingPlaced = true;
-                    this._isPlayer1Turn = false;
                     this._playerIDToMove = this.player2ID;
                     canScratch = false;
                   }
@@ -614,7 +613,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
                   ) {
                     // player 1 hit the wrong ball, scratch
                     this._isBallBeingPlaced = true;
-                    this._isPlayer1Turn = false;
                     this._playerIDToMove = this.player2ID;
                     canScratch = false;
                   }
@@ -628,7 +626,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
                   ) {
                     // player 2 hit the wrong ball, scratch
                     this._isBallBeingPlaced = true;
-                    this._isPlayer1Turn = true;
                     this._playerIDToMove = this.player1ID;
                     canScratch = false;
                   }
@@ -640,7 +637,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
                   ) {
                     // player 2 hit the wrong ball, scratch
                     this._isBallBeingPlaced = true;
-                    this._isPlayer1Turn = true;
                     this._playerIDToMove = this.player1ID;
                     canScratch = false;
                   }
