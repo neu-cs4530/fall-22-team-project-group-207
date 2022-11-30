@@ -10,8 +10,10 @@ import { Button } from '@chakra-ui/react';
 
 const BALL_RADIUS = 0.028575; // m
 const OUTSIDE_BORDER_WIDTH = 0.18; // m
-const POOL_TABLE_WIDTH = 2.9; // m
-const POOL_TABLE_HEIGHT = 1.63; // m
+const POOL_TABLE_LEFT_OFFSET = 50; // pixels
+const POOL_TABLE_TOP_OFFSET = 50; // pixels
+const POOL_TABLE_WIDTH = 1060; // pixels
+const POOL_TABLE_HEIGHT = 550; // pixels
 const METER_TO_PIXEL_SCALAR = 400.0; // scalar
 
 /**
@@ -241,10 +243,10 @@ export default function PoolGameCanvas({
       const img = POOL_TABLE_IMAGE[0];
       ctx.drawImage(
         img,
-        0,
-        0,
-        POOL_TABLE_WIDTH * METER_TO_PIXEL_SCALAR,
-        POOL_TABLE_HEIGHT * METER_TO_PIXEL_SCALAR,
+        POOL_TABLE_LEFT_OFFSET,
+        POOL_TABLE_TOP_OFFSET,
+        POOL_TABLE_WIDTH,
+        POOL_TABLE_HEIGHT,
       );
     }
 
