@@ -103,6 +103,7 @@ export interface PoolGameArea {
   player2BallType?: string;
   isPlayer1Turn: boolean;
   isBallBeingPlaced: boolean;
+
   // Player ID of the next player to move, or undefined if no player is up next
   playerIDToMove?: string;
 }
