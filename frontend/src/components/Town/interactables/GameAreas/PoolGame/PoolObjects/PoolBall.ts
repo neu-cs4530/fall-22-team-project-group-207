@@ -210,7 +210,9 @@ export default class PoolBall {
     );
     const totalFrictionDirection: Vector = unitVector(relativeVelocity);
     console.log('total friction direction: ' + totalFrictionDirection);
-    console.log('this.velocity (of pool ball ' + this.ballNumber + ') before subtract: ' + this.velocity);
+    console.log(
+      'this.velocity (of pool ball ' + this.ballNumber + ') before subtract: ' + this.velocity,
+    );
     this.velocity = subtractVectors(
       this.velocity,
       scale(
@@ -218,7 +220,9 @@ export default class PoolBall {
         BALL_CLOTH_SLIDING_FRICTION * GRAVITATIONAL_CONSTANT * elapsedTime,
       ),
     );
-    console.log('this.velocity (of pool ball ' + this.ballNumber + ') after subtract: ' + this.velocity);
+    console.log(
+      'this.velocity (of pool ball ' + this.ballNumber + ') after subtract: ' + this.velocity,
+    );
     const xyPlaneAngularVelocity: Vector = subtractVectors(
       { x: this.angularVelocity.x, y: this.angularVelocity.y, z: 0 },
       scale(crossProduct(kHat, relativeVelocity), ANGULAR_SLIDING_DECEL_COEFF * elapsedTime),
