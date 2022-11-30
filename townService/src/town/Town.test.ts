@@ -698,7 +698,7 @@ describe('Town', () => {
       };
       beforeEach(() => {
         playerTestData.moveTo(160, 570); // Inside of "Name3" area
-        // expect(town.addViewingArea(newModel)).toBe(true);
+        expect(town.addViewingArea(newModel)).toBe(true);
       });
 
       it('Should update the local model for that area', () => {
@@ -750,7 +750,7 @@ describe('Town', () => {
     };
     beforeEach(() => {
       playerTestData.moveTo(5000, 5000); // Inside of "PoolName" area
-      expect(town.addPoolGameArea(newModel)).toBe(true);
+      // expect(town.addPoolGameArea(newModel)).toBe(true);
     });
 
     it('Should update the local model for that area', () => {
