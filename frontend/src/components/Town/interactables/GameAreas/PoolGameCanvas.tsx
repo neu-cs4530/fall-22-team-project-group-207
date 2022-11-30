@@ -11,9 +11,9 @@ import { Button } from '@chakra-ui/react';
 const BALL_RADIUS = 0.028575; // m
 const OUTSIDE_BORDER_WIDTH = 0.18; // m
 const POOL_TABLE_LEFT_OFFSET = 50; // pixels
-const POOL_TABLE_TOP_OFFSET = 50; // pixels
-const POOL_TABLE_WIDTH = 1060; // pixels
-const POOL_TABLE_HEIGHT = 550; // pixels
+const POOL_TABLE_TOP_OFFSET = 52; // pixels
+const POOL_TABLE_WIDTH = 1095; // pixels
+const POOL_TABLE_HEIGHT = 588; // pixels
 const METER_TO_PIXEL_SCALAR = 400.0; // scalar
 
 /**
@@ -154,7 +154,7 @@ export default function PoolGameCanvas({
                   250,
                 ),
                 15,
-              ) / 10;
+              ) / 5;
 
             const velocity: Vector = scale(velocityUnitVector, velocityScalar);
 
@@ -459,6 +459,13 @@ export default function PoolGameCanvas({
           setTickToggle(!tickToggle);
         }}>
         Tick Game
+      </Button>
+      <Button
+        onClick={() => {
+          poolGameAreaController.fastForward();
+          setTickToggle(!tickToggle);
+        }}>
+        Fast Forward Game
       </Button>
       <canvas
         id='board canvas'
