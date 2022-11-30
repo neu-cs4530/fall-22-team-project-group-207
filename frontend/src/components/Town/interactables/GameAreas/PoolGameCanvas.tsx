@@ -116,11 +116,11 @@ export default function PoolGameCanvas({
       // console.log('player1id ' + poolGameAreaController.player1ID + ' end');
       // console.log('player2id ' + poolGameAreaController.player2ID + ' end');
       // console.log('myid ' + townController.userID + ' end');
-      console.log('isGameStarted ' + poolGameAreaController.isGameStarted);
-      console.log(
-        'cue ball moving? ' +
-          poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.isMoving,
-      );
+      // console.log('isGameStarted ' + poolGameAreaController.isGameStarted);
+      // console.log(
+      //   'cue ball moving? ' +
+      //   poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.isMoving,
+      // );
       const handlePlayerInput = () => {
         // Handle player's move
         // Place down a ball
@@ -191,27 +191,27 @@ export default function PoolGameCanvas({
         }
       };
 
-      //if (poolGameAreaController.isPlaying) {
-      // Draw the player's inputs based on the current state of the game
-      // If the the previous player scratched, the current player gets to place the cue ball
-      if (
-        // Player 1's turn, Player 1 is this player
-        poolGameAreaController.isPlayer1Turn &&
-        townController.userID === poolGameAreaController.player1ID
-      ) {
-        // Player 1 gets to move
-        handlePlayerInput();
-      } else if (
-        // Player 2's turn, Player 2 is this player
-        !poolGameAreaController.isPlayer1Turn &&
-        townController.userID === poolGameAreaController.player2ID
-      ) {
-        // Player 2 gets to move
-        handlePlayerInput();
-      } else {
-        // Do nothing
+      if (poolGameAreaController.isGameStarted) {
+        // Draw the player's inputs based on the current state of the game
+        // If the the previous player scratched, the current player gets to place the cue ball
+        if (
+          // Player 1's turn, Player 1 is this player
+          poolGameAreaController.isPlayer1Turn &&
+          townController.userID === poolGameAreaController.player1ID
+        ) {
+          // Player 1 gets to move
+          handlePlayerInput();
+        } else if (
+          // Player 2's turn, Player 2 is this player
+          !poolGameAreaController.isPlayer1Turn &&
+          townController.userID === poolGameAreaController.player2ID
+        ) {
+          // Player 2 gets to move
+          handlePlayerInput();
+        } else {
+          // Do nothing
+        }
       }
-      //  }
     };
     // Listeners
     window.addEventListener('mousemove', handleMouseMove);
@@ -261,6 +261,10 @@ export default function PoolGameCanvas({
      * @param ball Pool ball to be drawn
      */
     function drawBall(ctx: CanvasRenderingContext2D, ball: PoolBall) {
+      if (ball.isPocketed) {
+        return;
+      }
+
       const displayPos = positionToPixels(ball.position);
 
       const img = POOL_BALL_IMAGES[ball.ballNumber];
@@ -373,28 +377,28 @@ export default function PoolGameCanvas({
       }
     };
 
-    //if (poolGameAreaController.isPlaying) {
-    // Draw the player's inputs based on the current state of the game
-    // If the the previous player scratched, the current player gets to place the cue ball
-    if (
-      // Player 1's turn, Player 1 is this player
-      poolGameAreaController.isPlayer1Turn &&
-      townController.userID === poolGameAreaController.player1ID
-    ) {
-      // Player 1 gets to move, draw the cue stick
-      drawPlayerInput();
-    } else if (
-      // Player 2's turn, Player 2 is this player
-      !poolGameAreaController.isPlayer1Turn &&
-      townController.userID === poolGameAreaController.player2ID
-    ) {
-      // Player 2 gets to move, draw the cue stick
-      drawPlayerInput();
-    } else {
-      // When the current player is spectating or waiting on the other player's move
-      inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
+    if (poolGameAreaController.isGameStarted) {
+      // Draw the player's inputs based on the current state of the game
+      // If the the previous player scratched, the current player gets to place the cue ball
+      if (
+        // Player 1's turn, Player 1 is this player
+        poolGameAreaController.isPlayer1Turn &&
+        townController.userID === poolGameAreaController.player1ID
+      ) {
+        // Player 1 gets to move, draw the cue stick
+        drawPlayerInput();
+      } else if (
+        // Player 2's turn, Player 2 is this player
+        !poolGameAreaController.isPlayer1Turn &&
+        townController.userID === poolGameAreaController.player2ID
+      ) {
+        // Player 2 gets to move, draw the cue stick
+        drawPlayerInput();
+      } else {
+        // When the current player is spectating or waiting on the other player's move
+        inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
+      }
     }
-    //}
   }, [
     mouseClick1Pos,
     mousePos,
