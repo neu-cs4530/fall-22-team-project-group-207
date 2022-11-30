@@ -2,7 +2,13 @@ import assert from 'assert';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { Town } from '../api/Model';
-import { ConversationArea, Interactable, TownEmitter, ViewingArea } from '../types/CoveyTownSocket';
+import {
+  ConversationArea,
+  Interactable,
+  TownEmitter,
+  ViewingArea,
+  PoolGameArea,
+} from '../types/CoveyTownSocket';
 import TownsStore from '../lib/TownsStore';
 import {
   createConversationForTesting,
@@ -12,6 +18,7 @@ import {
   isViewingArea,
   isConversationArea,
   MockedPlayer,
+  isPoolGameArea,
 } from '../TestUtils';
 import { TownsController } from './TownsController';
 
@@ -353,6 +360,80 @@ describe('TownsController integration tests', () => {
         viewingArea.id = nanoid();
         await expect(
           controller.createViewingArea(testingTown.townID, sessionToken, viewingArea),
+        ).rejects.toThrow();
+      });
+    });
+    describe('Create Pool Game Area', () => {
+      it('Executes without error when creating a new pool game area', async () => {
+        const poolGameArea = interactables.find(isPoolGameArea) as PoolGameArea;
+        if (!poolGameArea) {
+          fail('Expected at least one pool game area to be returned in the initial join data');
+        } else {
+          const newPoolGameArea: PoolGameArea = {
+            id: poolGameArea.id,
+            player1ID: poolGameArea.player1ID,
+            player2ID: poolGameArea.player2ID,
+            poolBalls: poolGameArea.poolBalls,
+            player1BallType: poolGameArea.player1BallType,
+            player2BallType: poolGameArea.player2BallType,
+            isPlayer1Turn: poolGameArea.isPlayer1Turn,
+            isBallBeingPlaced: poolGameArea.isBallBeingPlaced,
+            isBallMoving: poolGameArea.isBallMoving,
+            playerIDToMove: poolGameArea.playerIDToMove,
+          };
+          await controller.createPoolGameArea(testingTown.townID, sessionToken, newPoolGameArea);
+          // Check to see that the viewing area was successfully updated
+          const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
+          const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+          if (isPoolGameArea(updateMessage)) {
+            expect(updateMessage).toEqual(newPoolGameArea);
+          } else {
+            fail('Expected an interactableUpdate to be dispatched with the new pool game area');
+          }
+        }
+      });
+      it('Returns an error message if the town ID is invalid', async () => {
+        const poolGameArea = interactables.find(isPoolGameArea) as PoolGameArea;
+        const newPoolGameArea: PoolGameArea = {
+          id: poolGameArea.id,
+          player1ID: poolGameArea.player1ID,
+          player2ID: poolGameArea.player2ID,
+          poolBalls: poolGameArea.poolBalls,
+          player1BallType: poolGameArea.player1BallType,
+          player2BallType: poolGameArea.player2BallType,
+          isPlayer1Turn: poolGameArea.isPlayer1Turn,
+          isBallBeingPlaced: poolGameArea.isBallBeingPlaced,
+          isBallMoving: poolGameArea.isBallMoving,
+          playerIDToMove: poolGameArea.playerIDToMove,
+        };
+        await expect(
+          controller.createPoolGameArea(nanoid(), sessionToken, newPoolGameArea),
+        ).rejects.toThrow();
+      });
+      it('Checks for a valid session token before creating a pool game area', async () => {
+        const invalidSessionToken = nanoid();
+        const poolGameArea = interactables.find(isPoolGameArea) as PoolGameArea;
+        const newPoolGameArea: PoolGameArea = {
+          id: poolGameArea.id,
+          player1ID: poolGameArea.player1ID,
+          player2ID: poolGameArea.player2ID,
+          poolBalls: poolGameArea.poolBalls,
+          player1BallType: poolGameArea.player1BallType,
+          player2BallType: poolGameArea.player2BallType,
+          isPlayer1Turn: poolGameArea.isPlayer1Turn,
+          isBallBeingPlaced: poolGameArea.isBallBeingPlaced,
+          isBallMoving: poolGameArea.isBallMoving,
+          playerIDToMove: poolGameArea.playerIDToMove,
+        };
+        await expect(
+          controller.createPoolGameArea(testingTown.townID, invalidSessionToken, newPoolGameArea),
+        ).rejects.toThrow();
+      });
+      it('Returns an error message if addPoolGameArea returns false', async () => {
+        const poolGameArea = interactables.find(isPoolGameArea) as PoolGameArea;
+        poolGameArea.id = nanoid();
+        await expect(
+          controller.createPoolGameArea(testingTown.townID, sessionToken, poolGameArea),
         ).rejects.toThrow();
       });
     });
