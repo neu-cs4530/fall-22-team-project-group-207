@@ -289,6 +289,10 @@ export default function PoolGameCanvas({
       balls.map(ball => drawBall(ctx, ball));
     }
 
+    /**
+     * Draw win state on the canvas
+     * @param ctx Canvas context
+     */
     function drawWinState(ctx: CanvasRenderingContext2D) {
       const winner = townController.players.find(player => player.id === gameWinner)?.userName;
       ctx.font = 'small-caps bold 80px sans-serif';

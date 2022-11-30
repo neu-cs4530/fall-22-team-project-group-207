@@ -50,7 +50,7 @@ export type PoolGameAreaEvents = {
   // Player joins or leaves game (interacts with area or presses exit)
   playersChange: (newPlayers: PlayerController[]) => void;
 
-  // Sends an update out to signify a turn has been made for a player
+  // Sends an update out to signify the game is over
   gameOver: (winnerID: string) => void;
 
   // To tell other clients that a player is placing the ball
@@ -189,6 +189,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     }
   }
 
+  /**
+   * Whether the game has has been won.
+   */
   get isGameWon() {
     return this.isGameOver();
   }
