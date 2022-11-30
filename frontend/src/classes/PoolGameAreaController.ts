@@ -50,6 +50,9 @@ export type PoolGameAreaEvents = {
   // Player joins or leaves game (interacts with area or presses exit)
   playersChange: (newPlayers: PlayerController[]) => void;
 
+  // Sends an update out to signify a turn has been made for a player
+  gameOver: (winnerID: string) => void;
+
   // To tell other clients that a player is placing the ball
   onBallPlacement: (playerPlacingID: string) => void;
 
@@ -184,6 +187,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       this._isPlayer1Turn = newPlayerTurn;
       this.emit('turnChange', true);
     }
+  }
+
+  get isGameWon() {
+    return this.isGameOver();
   }
 
   /**
@@ -496,6 +503,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    */
   gameTick(): void {
     console.log('gametick');
+    this.emit('gameOver', '123456');
     // only tick the game if we've actually started it. Assuming we'll start via an input in covey.town.
     if (this.isGameStarted) {
       this.poolPhysicsGoHere();
@@ -555,9 +563,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
     if (gameOverStruct.didPlayer1Win && this.player1ID) {
       this._leaderboardService.leaderboard.playerWon(this.player1ID);
-      // send update to frontend saying that player 1 won.
+      this.emit('gameOver', this.player1ID);
     } else if (!gameOverStruct.didPlayer1Win && this.player2ID) {
       this._leaderboardService.leaderboard.playerWon(this.player2ID);
+      this.emit('gameOver', this.player2ID);
       // send update to frontend saying that player 2 won.
     }
   }

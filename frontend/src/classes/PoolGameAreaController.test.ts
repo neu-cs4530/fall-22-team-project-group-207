@@ -131,7 +131,6 @@ describe('PoolGameAreaController', () => {
     testArea.addListener('onBallPlacement', mockListeners.onBallPlacement);
     testArea.addListener('onHistoryUpdate', mockListeners.onHistoryUpdate);
   });
-  // POOL TODO: write tests for PoolGameAreaController
   describe('setting the occupants property', () => {
     it('does not update the property if the new occupants are the same set as the old', () => {
       const origOccupants = testArea.occupants;

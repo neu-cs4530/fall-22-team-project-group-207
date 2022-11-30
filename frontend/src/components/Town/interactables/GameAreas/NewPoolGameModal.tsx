@@ -11,14 +11,15 @@ import {
   ModalOverlay,
   useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useState } from 'react'; // useState
+import React, { useCallback, useEffect, useRef, useState } from 'react'; // useState
 // import { PoolGameModel } from '../../../../classes/PoolGameAreaController';
-import { useInteractable } from '../../../../classes/TownController';
+import { useInteractable, usePoolGameAreaController } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import PoolGameCanvas from './PoolGameCanvas';
 import { PoolGameArea as PoolGameAreaModel } from '../../../../types/CoveyTownSocket';
 import PoolGameArea from './PoolGameArea';
 import PoolLeaderboard from './PoolLeaderboardModal';
+import PoolGameAreaController from '../../../../classes/PoolGameAreaController';
 
 /**
  * Returns a modal that contains a display for the pool game
@@ -28,7 +29,6 @@ export default function NewPoolGameModal(): JSX.Element {
   const townController = useTownController();
   const poolGameArea = useInteractable<PoolGameArea>('gameArea');
   const [viewLeaderboard, setViewLeaderboard] = useState(false);
-
   const [gameState, setGameState] = useState<PoolGameAreaModel>();
 
   const isOpen = poolGameArea !== undefined;
@@ -51,28 +51,7 @@ export default function NewPoolGameModal(): JSX.Element {
 
   const toast = useToast();
 
-  /**
-   * The datatypes we are working with
-   * POOL TODO: finalize these and update once datatype for frontend-backend communication is finalized
-   * 
-    export type PoolGameArea = {
-      id: string;
-      player1ID?: string;
-      player2ID?: string;
-      player1BallType?: string;
-      player2BallType?: string;
-      isPlayer1Turn: boolean;
-      poolBalls: Array<PoolBall>;
-    };
-
-    type PoolGameModel = {
-      poolBalls: FrontEndPoolBall[];
-      player1BallType: BallType;
-      player2BallType: BallType;
-      isPlayer1Turn: boolean;
-    }
-   */
-  const createPoolGame = useCallback(async () => {
+  useCallback(async () => {
     if (gameState && poolGameArea) {
       const poolGameToCreate: PoolGameAreaModel = {
         id: poolGameArea.id,
@@ -111,7 +90,6 @@ export default function NewPoolGameModal(): JSX.Element {
       }
     }
   }, [gameState, setGameState, townController, poolGameArea, closeModal, toast]);
-  console.log('POOL TODO create pool game log to remove eslint error' + createPoolGame);
 
   if (poolGameArea) {
     return (
@@ -135,12 +113,6 @@ export default function NewPoolGameModal(): JSX.Element {
             </Button>
             {viewLeaderboard && <PoolLeaderboard />}
             {!viewLeaderboard && <PoolGameCanvas poolGameArea={poolGameArea} />}
-            {/**
-             * POOL TODO: update poolGameArea above to be not undefined
-             * some references:
-             * https://kernhanda.github.io/tutorial-typescript-canvas-drawing/
-             * https://www.cluemediator.com/draw-a-line-on-canvas-using-react/
-             */}
           </ModalBody>
         </ModalContent>
       </Modal>
