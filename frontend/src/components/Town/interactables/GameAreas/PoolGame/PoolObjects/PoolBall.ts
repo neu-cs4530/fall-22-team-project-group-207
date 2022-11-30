@@ -144,9 +144,11 @@ export default class PoolBall {
           this.angularVelocity.x !== this.velocity.x / BALL_RADIUS ||
           this.angularVelocity.y !== this.velocity.y / BALL_RADIUS
         ) {
+          console.log('sliding ball ' + this.ballNumber);
           // sliding
           this._updateSlidingBall(elapsedTime);
         } else {
+          console.log('rolling ball ' + this.ballNumber);
           // rolling
           this._updateRollingBall(elapsedTime);
         }
