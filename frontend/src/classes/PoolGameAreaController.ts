@@ -123,7 +123,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   private _tableWidth = 1.27; //m
 
-  private _cushionHeight = 0.005715; //m
+  //private _cushionHeight = 0.005715; //m
 
   // Boolean that represents whether the game has started or not.
   private _isGameStarted = false;
@@ -548,12 +548,64 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // whatever else needs to go here, maybe physics
   poolPhysicsGoHere(): void {
     // check every pool ball's overlappingBalls list. If not overlapping with any ball, remove them from the list.
+    // in addition, check every pool ball's recently hit rails list. if we're sufficiently far from them, remove them from the list.
     this._physicsPoolBalls.forEach(ball => {
       ball.overlappingBalls.forEach(oBall => {
         if (magnitude(subtractVectors(ball.position, oBall.position)) > BALL_RADIUS * 2) {
           ball.removeOverlappingBall(oBall);
         }
       });
+      ball.recentlyHitRails.forEach(rail => {
+        switch(rail) {
+          case 'top': {
+            if (magnitude(
+              subtractVectors(ball.position, {
+                x: ball.position.x,
+                y: RAIL_WIDTH,
+                z: 0,
+              }),
+            )) {
+              ball.removeRecentlyHitRail(rail);
+            }
+          }
+          case 'bottom': {
+            if (magnitude(
+              subtractVectors(ball.position, {
+                x: ball.position.x,
+                y: this._tableWidth + RAIL_WIDTH,
+                z: 0,
+              }),
+            )) {
+              ball.removeRecentlyHitRail(rail);
+            }
+          }
+          case 'left': {
+            if (magnitude(
+              subtractVectors(ball.position, {
+                x: RAIL_WIDTH,
+                y: ball.position.y,
+                z: 0,
+              }),
+            )) {
+              ball.removeRecentlyHitRail(rail);
+            }
+          }
+          case 'right': {
+            if (magnitude(
+              subtractVectors(ball.position, {
+                x: ball.position.x,
+                y: RAIL_WIDTH,
+                z: 0,
+              }),
+            )) {
+              ball.removeRecentlyHitRail(rail);
+            }
+          }
+          default: {
+            break;
+          }
+        }
+      })
     });
 
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
@@ -709,6 +761,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         // check if the ball has collided with the side rails
         if (
           ball.velocity.x > 0 &&
+          !ball.recentlyHitRails.includes('right') &&
           magnitude(
             subtractVectors(ball.position, {
               x: this._tableLength + RAIL_WIDTH,
@@ -721,8 +774,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           // collided with right rail
           cushionBallCollision(ball, 0);
           alreadyCheckedBalls.push(ball);
+          ball.addRecentlyHitRail('right');
         } else if (
           ball.velocity.x > 0 &&
+          !ball.recentlyHitRails.includes('left') &&
           magnitude(
             subtractVectors(ball.position, {
               x: RAIL_WIDTH,
@@ -735,10 +790,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           // collided with left rail
           cushionBallCollision(ball, 2);
           alreadyCheckedBalls.push(ball);
+          ball.addRecentlyHitRail('left');
         } else if (
           ball.velocity.y > 0 &&
-          ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS &&
-          ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS &&
+          !ball.recentlyHitRails.includes('top') &&
+          (ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS || ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS) &&
           magnitude(
             subtractVectors(ball.position, {
               x: ball.position.x,
@@ -751,10 +807,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           // collided with top rail, but NOT with the pocket
           cushionBallCollision(ball, 1);
           alreadyCheckedBalls.push(ball);
+          ball.addRecentlyHitRail('top');
         } else if (
           ball.velocity.y > 0 &&
-          ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS &&
-          ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS &&
+          !ball.recentlyHitRails.includes('bottom') &&
+          (ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS || ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS) &&
           magnitude(
             subtractVectors(ball.position, {
               x: ball.position.x,
@@ -767,6 +824,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           // collided with bottom rail, but NOT with the pocket
           cushionBallCollision(ball, 3);
           alreadyCheckedBalls.push(ball);
+          ball.addRecentlyHitRail('bottom');
         }
 
         // check if the ball has gone off the board/ over the rails
