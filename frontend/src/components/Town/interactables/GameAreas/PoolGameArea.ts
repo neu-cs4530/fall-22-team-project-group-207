@@ -95,9 +95,9 @@ export default class PoolGameArea extends GameArea {
               if (this._infoTextBox.visible) {
                 this._infoTextBox.setVisible(false);
               }
-              this._infoTextBox.text = 'Player 1\'s Turn';
+              this._infoTextBox.text = "Player 1's Turn";
             } else if (newTurn === !isPlayer1Turn) {
-              this._infoTextBox.text = 'Player 2\'s Turn';
+              this._infoTextBox.text = "Player 2's Turn";
             } else {
               this._infoTextBox.text = 'Play Pool!';
             }

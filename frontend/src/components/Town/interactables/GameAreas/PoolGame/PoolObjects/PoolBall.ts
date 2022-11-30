@@ -33,7 +33,7 @@ export default class PoolBall {
 
   private _isPocketed: boolean;
 
-  private _overlappingBalls: PoolBall [];
+  private _overlappingBalls: PoolBall[];
 
   constructor(xPosition: number, yPosition: number, ballNumber: number) {
     this._ballNumber = ballNumber;
