@@ -161,7 +161,7 @@ describe('PoolGameAreaController', () => {
     });
   });
   describe('isGameOver', () => {
-    it('Recognizes when the game is over', () => {
+    it('Recognizes when the game is over and player 1 wins', () => {
       const player1ID = nanoid();
       const player2ID = nanoid();
       const player1BallType = 'Solids';
@@ -186,6 +186,31 @@ describe('PoolGameAreaController', () => {
       testArea.updatePocketedBalls();
       expect(testArea.isGameOver()).toEqual({ isGameOver: true, didPlayer1Win: true });
     });
+    it('Recognizes when the game is over but player 2 wins because player 1 pocketed 8 ball', () => {
+      const player1ID = nanoid();
+      const player2ID = nanoid();
+      const player1BallType = 'Solids';
+      const player2BallType = 'Stripes';
+      testUpdateAreaModel = {
+        id: testArea.id,
+        player1ID: player1ID,
+        player2ID: player2ID,
+        player1BallType: player1BallType,
+        player2BallType: player2BallType,
+        playerIDToMove: player1ID,
+        isPlayer1Turn: true,
+        isBallBeingPlaced: false,
+        poolBalls: initPoolBallModels,
+      };
+      testArea.updateFrom(testUpdateAreaModel);
+      testArea.poolBalls.map(ball => {
+        if ((ball.ballNumber !== 0 && ball.ballNumber <= 5) || ball.ballNumber === 8) {
+          ball.isPocketed = true;
+        }
+      });
+      testArea.updatePocketedBalls();
+      expect(testArea.isGameOver()).toEqual({ isGameOver: true, didPlayer1Win: false });
+    });
   });
   describe('getBallTypeByNumber', () => {
     it('Accurately returns the correct ball type for the given number', () => {
@@ -193,6 +218,7 @@ describe('PoolGameAreaController', () => {
       expect(testArea.getBallTypeByNumber(13)).toEqual('Stripes');
       expect(testArea.getBallTypeByNumber(8)).toEqual('8ball');
       expect(testArea.getBallTypeByNumber(0)).toEqual('CueBall');
+      expect(testArea.getBallTypeByNumber(17)).toEqual('Invalid');
     });
   });
   describe('gameTick', () => {
