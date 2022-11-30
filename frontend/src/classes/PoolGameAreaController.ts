@@ -567,6 +567,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // check every pool ball's overlappingBalls list. If not overlapping with any ball, remove them from the list.
     // in addition, check every pool ball's recently hit rails list. if we're sufficiently far from them, remove them from the list.
     this._physicsPoolBalls.forEach(ball => {
+      ball.velocity.z = 0;
+      ball.position.z = 0;
       if (ball.ballNumber === 4) {
         ball.overlappingBalls.map(b => console.log('overlap ' + b.ballNumber));
       }
