@@ -50,6 +50,9 @@ export type PoolGameAreaEvents = {
   // Player joins or leaves game (interacts with area or presses exit)
   playersChange: (newPlayers: PlayerController[]) => void;
 
+  // Sends an update out to signify the game is over
+  gameOver: (winnerID: string) => void;
+
   // To tell other clients that a player is placing the ball
   onBallPlacement: (playerPlacingID: string) => void;
 
@@ -184,6 +187,13 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       this._isPlayer1Turn = newPlayerTurn;
       this.emit('turnChange', true);
     }
+  }
+
+  /**
+   * Whether the game has has been won.
+   */
+  get isGameWon() {
+    return this.isGameOver();
   }
 
   /**
@@ -486,9 +496,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       return '8ball';
     } else if (ballNumber >= 9 && ballNumber <= 15) {
       return 'Stripes';
+    } else if (ballNumber === 0) {
+      return 'CueBall';
+    } else {
+      return 'Invalid';
     }
-    // Cue ball has a number of 0?
-    return 'CueBall';
   }
 
   /**
@@ -555,9 +567,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
     if (gameOverStruct.didPlayer1Win && this.player1ID) {
       this._leaderboardService.leaderboard.playerWon(this.player1ID);
-      // send update to frontend saying that player 1 won.
+      this.emit('gameOver', this.player1ID);
     } else if (!gameOverStruct.didPlayer1Win && this.player2ID) {
       this._leaderboardService.leaderboard.playerWon(this.player2ID);
+      this.emit('gameOver', this.player2ID);
       // send update to frontend saying that player 2 won.
     }
   }

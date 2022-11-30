@@ -15,6 +15,7 @@ import ball7 from './ball_7.png';
 import ball8 from './ball_8.png';
 import ball9 from './ball_9.png';
 import pool_table from './pool_table.png';
+import confetti from './confetti.png';
 
 /**
  * Paths for the images for each pool ball (in order 0-10)
@@ -41,6 +42,8 @@ export const POOL_BALL_PATHS = [
 
 export const POOL_TABLE_PATH = pool_table;
 
+export const CONFETTI_PATH = confetti;
+
 /**
  * Preload the images so they display on first render
  */
@@ -53,6 +56,13 @@ export const POOL_TABLE_IMAGE = [POOL_TABLE_PATH].map(p => {
 
 export const POOL_BALL_IMAGES = POOL_BALL_PATHS.map(p => {
   console.log('loading pool ball');
+  const img = new Image();
+  img.src = p;
+  return img;
+});
+
+export const CONFETTI_IMAGE = [CONFETTI_PATH].map(p => {
+  console.log('loading pool board');
   const img = new Image();
   img.src = p;
   return img;

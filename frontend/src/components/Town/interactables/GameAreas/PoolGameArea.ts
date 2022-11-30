@@ -5,13 +5,10 @@ import TownGameScene from '../../TownGameScene';
 import GameArea from '../GameArea';
 
 export default class PoolGameArea extends GameArea {
-  // POOL TODO May want this to display the current player's turn?
   private _infoTextBox?: Phaser.GameObjects.Text;
 
-  // POOL TODO
   private _poolGameArea?: PoolGameAreaController;
 
-  // POOL TODO
   private _townController: TownController;
 
   private _labelText?: Phaser.GameObjects.Text;
