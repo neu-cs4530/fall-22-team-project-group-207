@@ -61,7 +61,7 @@ export type PoolGameAreaEvents = {
 };
 
 const BALL_RADIUS = 0.028575; // m
-const TICK_RATE = 0.015; // s
+const TICK_RATE = 0.005; // s
 const POCKET_RADIUS = 0.05; // m
 const RAIL_WIDTH = 0.051; // m
 
@@ -337,27 +337,25 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       // cue ball at break position
       new PoolBall(0.847, 0.634, 0),
       // front of triangle
-      new PoolBall(1.905, 0.634, 1),
+      //new PoolBall(1.905, 0.634, 1),
       // second row
-      new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 - BALL_RADIUS, 2),
-      new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 + BALL_RADIUS, 9),
+      //new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 - BALL_RADIUS, 2),
+      //new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 + BALL_RADIUS, 9),
       // third row
-      new PoolBall(0, 0, 3),
-      new PoolBall(2.54, 1.27, 8),
       // new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 3),
-      // new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634, 8),
-      new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 10),
+      new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634, 8),
+      //new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 10),
       // fourth row
-      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - 3 * BALL_RADIUS, 4),
-      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - BALL_RADIUS, 14),
-      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 + BALL_RADIUS, 7),
-      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 + 3 * BALL_RADIUS, 11),
+      //new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - 3 * BALL_RADIUS, 4),
+      //new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - BALL_RADIUS, 14),
+      //new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 + BALL_RADIUS, 7),
+      //new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 + 3 * BALL_RADIUS, 11),
       // fifth row
-      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 - 4 * BALL_RADIUS, 12),
-      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 6),
-      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634, 15),
-      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 13),
-      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 + 4 * BALL_RADIUS, 5),
+      //new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 - 4 * BALL_RADIUS, 12),
+      //new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 6),
+      //new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634, 15),
+      //new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 13),
+      //new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 + 4 * BALL_RADIUS, 5),
     ];
   }
 
@@ -775,6 +773,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       }
     });
     // update the poolballmodels
+    console.log('update pool balls from controller');
     this.poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
   }
 

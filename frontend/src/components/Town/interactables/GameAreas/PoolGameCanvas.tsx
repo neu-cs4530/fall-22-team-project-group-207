@@ -75,6 +75,12 @@ export default function PoolGameCanvas({
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
 
+  useEffect(() => {
+    console.log('got pool ball update');
+    console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.position);
+    console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.velocity);
+  }, [poolGameAreaController]);
+
   // Handle mouse events, namely movement and clicking
   useEffect(() => {
     const canvas = boardCanvasRef.current;
@@ -109,11 +115,12 @@ export default function PoolGameCanvas({
     // Handle user input based on the state of the game
     const handleMouseClick = () => {
       // If click out of bounds, don't process it
-      if (mousePos.x < 0 || mousePos.x > 1170 || mousePos.y < 0 || mousePos.y > 1170) {
+      if (mousePos.x < 0 || mousePos.x > 1170 || mousePos.y < 0 || mousePos.y > 670) {
+        console.log('suppressed click');
         return;
       }
       // const qwe: Vector = pixelsToPosition({ x: mousePos.x, y: mousePos.y, z: 0 });
-      // console.log('player clicked at ' + mousePos.x + ' ' + mousePos.y);
+      console.log('player clicked at ' + mousePos.x + ' ' + mousePos.y);
       // console.log('player clicked at ' + qwe.x + ' ' + qwe.y);
       // if (mouseClick1Pos) {
       //   console.log('saved mouse click ' + mouseClick1Pos.x + ' ' + mouseClick1Pos.y);
@@ -156,10 +163,15 @@ export default function PoolGameCanvas({
               return;
             }
 
+            const mouseClickPosMeters = pixelsToPosition({
+              x: mouseClick1Pos.x,
+              y: mouseClick1Pos.y,
+              z: 0,
+            });
             const velocityUnitVector: Vector = unitVector(
               subtractVectors(cueBall.position, {
-                x: mousePos.x / METER_TO_PIXEL_SCALAR,
-                y: mousePos.y / METER_TO_PIXEL_SCALAR,
+                x: mouseClickPosMeters.x,
+                y: mouseClickPosMeters.y,
                 z: 0,
               }),
             );
@@ -169,7 +181,8 @@ export default function PoolGameCanvas({
               Math.max(
                 Math.min(
                   Math.sqrt(
-                    Math.pow(mousePos.y - ballPos.y, 2) + Math.pow(mousePos.x - ballPos.x, 2),
+                    Math.pow(mouseClick1Pos.y - ballPos.y, 2) +
+                      Math.pow(mouseClick1Pos.x - ballPos.x, 2),
                   ),
                   200,
                 ),
@@ -183,7 +196,8 @@ export default function PoolGameCanvas({
               scale(velocityUnitVector, -BALL_RADIUS),
             );
 
-            console.log(velocity, collisionPoint);
+            console.log(mouseClick1Pos);
+            console.log(velocity, velocityUnitVector, velocityScalar, collisionPoint);
             const cue: PoolCue = new PoolCue(velocity, collisionPoint);
             console.log('making pool move');
             poolGameAreaController.poolMove(cue);
@@ -348,10 +362,10 @@ export default function PoolGameCanvas({
           15,
         );
         handleOffset = ballOffset + 270;
-        console.log('mousePos ' + mousePos.x + ' ' + mousePos.y);
-        console.log('ball pos' + ballPos.x + ' ' + ballPos.y);
-        console.log('ballOffset ' + ballOffset);
-        console.log('handleOffset ' + handleOffset);
+        // console.log('mousePos ' + mousePos.x + ' ' + mousePos.y);
+        // console.log('ball pos' + ballPos.x + ' ' + ballPos.y);
+        // console.log('ballOffset ' + ballOffset);
+        // console.log('handleOffset ' + handleOffset);
       }
       ctx.beginPath();
       ctx.moveTo(ballOffset * Math.cos(r) + ballPos.x, ballOffset * Math.sin(r) + ballPos.y);

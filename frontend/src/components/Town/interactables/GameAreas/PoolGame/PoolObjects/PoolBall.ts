@@ -112,6 +112,7 @@ export default class PoolBall {
   }
 
   public tick(elapsedTime: number) {
+    console.log('tick from ball ' + this.ballNumber);
     if (this._isMoving) {
       this._updatePosition(elapsedTime);
       this._updateOrientation(elapsedTime);
