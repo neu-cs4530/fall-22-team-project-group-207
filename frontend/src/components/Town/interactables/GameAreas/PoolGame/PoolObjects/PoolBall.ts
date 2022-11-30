@@ -40,6 +40,8 @@ export default class PoolBall {
 
   private _overlappingBalls: PoolBall[];
 
+  private _recentlyHitRails: string[];
+
   constructor(xPosition: number, yPosition: number, ballNumber: number) {
     this._ballNumber = ballNumber;
     this._angularOrientation = { x: 0, y: 0, z: 0 };
@@ -50,6 +52,7 @@ export default class PoolBall {
     this._isAirborne = false;
     this._isPocketed = false;
     this._overlappingBalls = [];
+    this._recentlyHitRails = [];
   }
 
   get angularVelocity() {
@@ -135,6 +138,24 @@ export default class PoolBall {
 
   public removeOverlappingBall(ball: PoolBall) {
     this._overlappingBalls = this._overlappingBalls.filter(oball => oball !== ball);
+  }
+
+  get recentlyHitRails() {
+    return this._recentlyHitRails;
+  }
+
+  set recentlyHitRails(recentlyHitRails: string[]) {
+    this._recentlyHitRails = recentlyHitRails;
+  }
+
+  public addRecentlyHitRail(rail: string) {
+    if (!this._recentlyHitRails.includes(rail)) {
+      this._recentlyHitRails.push(rail);
+    }
+  }
+
+  public removeRecentlyHitRail(rail: string) {
+    this._recentlyHitRails = this._recentlyHitRails.filter(oRail => oRail !== rail);
   }
 
   public tick(elapsedTime: number) {
