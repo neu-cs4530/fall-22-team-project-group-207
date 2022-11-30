@@ -416,7 +416,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    */
   private _areAnyPoolBallsMoving(): boolean {
     this._physicsPoolBalls.forEach(ball => {
-      if (ball.isMoving) {
+      if (ball.velocity.x !== 0 || ball.velocity.y !== 0) {
+        console.log('a pool ball is moving! Ball is: ' + ball.ballNumber);
         return true;
       }
     });
