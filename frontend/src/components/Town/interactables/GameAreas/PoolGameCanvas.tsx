@@ -457,23 +457,6 @@ export default function PoolGameCanvas({
         height='670'
         style={{ position: 'absolute' }}></canvas>
       <div style={{ height: '670px' }}>{/* div to hold space for canvas */}</div>
-      <div>
-        {/* POOL TODO: delete this div*/}
-        {/* Get mouse coordinates relative to element */}
-        <hr />
-        <hr />
-        <hr />
-        <div style={{ padding: '3rem', backgroundColor: 'lightgray' }}>
-          <h2>
-            Canvas coords: {mousePos.x} {mousePos.y}
-          </h2>
-        </div>
-
-        <hr />
-        <h2>
-          Canvas coords: {mousePos.x} {mousePos.y}
-        </h2>
-      </div>
     </div>
   );
 }
