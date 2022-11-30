@@ -422,6 +422,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _areAnyPoolBallsMoving(): boolean {
     this._physicsPoolBalls.forEach(ball => {
       if (ball.isMoving) {
+        console.log('a pool ball is moving! Ball is: ' + ball.ballNumber);
         return true;
       }
     });
@@ -429,7 +430,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     return false;
   }
 
-  // POOL TODO
+  /**
+   * Starts the current PoolGame. Sets all of the variables to default AND sets this.isGameStarted to true.
+   */
   startGame(): void {
     // if players aren't valid, we dont start the game
     // if (!this.player1ID || !this.player2ID) {
