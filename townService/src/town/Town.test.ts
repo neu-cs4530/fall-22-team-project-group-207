@@ -44,7 +44,7 @@ const testingMaps: TestMapDict = {
             type: 'PoolGameArea',
             height: 237,
             id: 39,
-            name: 'Name1',
+            name: 'PoolName',
             rotation: 0,
             visible: true,
             width: 326,
@@ -738,7 +738,7 @@ describe('Town', () => {
   });
   describe('When successful', () => {
     const newModel: PoolGameAreaModel = {
-      id: 'Name3',
+      id: 'PoolName',
       poolBalls: [],
       isPlayer1Turn: true,
       isBallBeingPlaced: false,
@@ -749,7 +749,7 @@ describe('Town', () => {
     });
 
     it('Should update the local model for that area', () => {
-      const poolGameArea = town.getInteractable('Name3');
+      const poolGameArea = town.getInteractable('PoolName');
       expect(poolGameArea.toModel()).toEqual(newModel);
     });
 
@@ -758,7 +758,7 @@ describe('Town', () => {
       expect(lastEmittedUpdate).toEqual(newModel);
     });
     it('Should include any players in that area as occupants', () => {
-      const poolGameArea = town.getInteractable('Name3');
+      const poolGameArea = town.getInteractable('PoolName');
       expect(poolGameArea.occupantsByID).toEqual([player.id]);
     });
   });
