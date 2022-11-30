@@ -3,7 +3,7 @@ import { PoolBall } from '../../../../types/CoveyTownSocket';
 import { usePoolGameAreaController } from '../../../../classes/TownController';
 import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
 import PoolGameArea from './PoolGameArea';
-import { POOL_BALL_IMAGES, POOL_TABLE_IMAGE } from './PoolGameAssets/assets';
+import { CONFETTI_IMAGE, POOL_BALL_IMAGES, POOL_TABLE_IMAGE } from './PoolGameAssets/assets';
 import useTownController from '../../../../hooks/useTownController';
 import PoolCue from './PoolGame/PoolObjects/PoolCue';
 import { Button } from '@chakra-ui/react';
@@ -59,6 +59,7 @@ export default function PoolGameCanvas({
 }): JSX.Element {
   // Controllers
   const townController = useTownController();
+  const [gameWinner, setGameWinner] = useState('');
   const poolGameAreaController = usePoolGameAreaController(poolGameArea.id);
 
   // Player move variables for shooting
@@ -219,6 +220,19 @@ export default function PoolGameCanvas({
   }, [mouseClick1Pos, mousePos, poolGameAreaController, townController.userID]);
 
   /**
+   * useEffect to get game end condition
+   */
+  useEffect(() => {
+    const setWinner = (winnerID: string) => {
+      setGameWinner(winnerID);
+    };
+    poolGameAreaController.addListener('gameOver', setWinner);
+    return () => {
+      poolGameAreaController.removeListener('gameOver', setWinner);
+    };
+  }, [poolGameAreaController, townController]);
+
+  /**
    * useEffect to render the board state and ball movements
    */
   useEffect(() => {
@@ -240,7 +254,7 @@ export default function PoolGameCanvas({
      * @param ctx Canvas context
      */
     function drawBoard(ctx: CanvasRenderingContext2D) {
-      const img = POOL_TABLE_IMAGE[0];
+      const img = gameWinner ? CONFETTI_IMAGE[0] : POOL_TABLE_IMAGE[0];
       ctx.drawImage(
         img,
         POOL_TABLE_LEFT_OFFSET,
@@ -278,11 +292,26 @@ export default function PoolGameCanvas({
       balls.map(ball => drawBall(ctx, ball));
     }
 
+    /**
+     * Draw win state on the canvas
+     * @param ctx Canvas context
+     */
+    function drawWinState(ctx: CanvasRenderingContext2D) {
+      const winner = townController.players.find(player => player.id === gameWinner)?.userName;
+      ctx.font = 'small-caps bold 80px sans-serif';
+      ctx.fillText('The Winner Is', 350, 300);
+      ctx.fillText(winner?.concat('!') || 'No One!', 450, 400);
+    }
+
     // Actually draw stuff
     boardCanvasCtx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
     drawBoard(boardCanvasCtx);
-    drawAllBalls(boardCanvasCtx, poolGameAreaController.poolBalls);
-  }, [poolGameAreaController.poolBalls, mousePos, tickToggle]);
+    if (gameWinner) {
+      drawWinState(boardCanvasCtx);
+    } else {
+      drawAllBalls(boardCanvasCtx, poolGameAreaController.poolBalls);
+    }
+  }, [poolGameAreaController.poolBalls, mousePos, tickToggle, gameWinner, townController.players]);
 
   /**
    * useEffect to render the player's inputs to the game

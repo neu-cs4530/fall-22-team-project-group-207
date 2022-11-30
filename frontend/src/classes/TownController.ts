@@ -748,7 +748,6 @@ export function useViewingAreaController(viewingAreaID: string): ViewingAreaCont
 }
 
 /**
- * POOL TODO FIX
  * A react hook to retrieve a pool game area controller.
  *
  * This function will throw an error if the pool game area controller does not exist.
