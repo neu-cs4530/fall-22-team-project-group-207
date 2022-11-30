@@ -561,7 +561,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     return { isGameOver: false, didPlayer1Win: false };
   }
 
-  // POOL TODO
+  /**
+   * Checks if the game has ended, and ends the game if a player has won.
+   *
+   * Emits gameOver with the ID of the player that won.
+   */
   endGame(): void {
     const gameOverStruct: { isGameOver: boolean; didPlayer1Win: boolean } = this.isGameOver();
 

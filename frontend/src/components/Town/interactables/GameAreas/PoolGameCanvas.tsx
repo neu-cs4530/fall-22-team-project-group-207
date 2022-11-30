@@ -317,8 +317,7 @@ export default function PoolGameCanvas({
 
     /**
      * Draw the cue ball's position when the player is placing it
-     * @param ctx
-     * @returns
+     * @param ctx canvas context
      */
     function drawPlaceCueBall(ctx: CanvasRenderingContext2D) {
       const displayPos = { x: mousePos.x, y: mousePos.y, z: 0 };

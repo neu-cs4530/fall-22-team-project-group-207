@@ -22,10 +22,6 @@ export default class PoolGameArea extends GameArea {
     this._townController = scene.coveyTownController;
     this.setTintFill();
     this.setAlpha(0.3);
-    // POOL TODO make this work somehow??
-    // We can either make a generic gameAreasChanged or make it specific for this area
-    // If we are able to abstract it that would work better
-    // To make this work, we need to implement the gameAreasChanged townEvent in TownController.ts
     this._townController.addListener('poolGameAreasChanged', this._updatePoolGameAreas);
   }
 
