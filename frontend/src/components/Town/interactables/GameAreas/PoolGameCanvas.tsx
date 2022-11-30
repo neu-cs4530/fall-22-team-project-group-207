@@ -17,8 +17,9 @@ const POOL_TABLE_HEIGHT = 550; // pixels
 const METER_TO_PIXEL_SCALAR = 400.0; // scalar
 
 /**
- * function to convert position of a ball in meters to the pixel value
- * @param position position of the ball in m
+ * Function to convert position of a ball in meters to the pixel value, taking in all offsets from drawing
+ * NOTE: A ball at position 0,0 would be in the center of the top-left pocket
+ * @param position position of the ball in meters
  * @returns new position of the ball to draw in pixels
  */
 const positionToPixels = (position: Vector) => {
@@ -31,7 +32,7 @@ const positionToPixels = (position: Vector) => {
 };
 
 /**
- * function to convert pixel value to position of a ball in meters
+ * Function to convert pixel value to position of a ball in meters
  * @param position position of the ball in pixels
  * @returns new position of the ball in meters
  */
@@ -49,8 +50,9 @@ const pixelsToPosition = (position: Vector) => {
 };
 
 /**
- * Returns a canvas that renders the pool game
- * @returns HTML canvas containing pool game display
+ * Returns an HTML element that renders the pool game, using an HTMLCanvasElement
+ * @param poolGameArea PoolGameArea to be rendered
+ * @returns HTML element containing pool game display
  */
 export default function PoolGameCanvas({
   poolGameArea,
@@ -101,24 +103,8 @@ export default function PoolGameCanvas({
       if ((event.target as HTMLElement).tagName !== canvas.tagName) {
         return;
       }
-      // const qwe: Vector = pixelsToPosition({ x: mousePos.x, y: mousePos.y, z: 0 });
-      console.log('player clicked at ' + mousePos.x + ' ' + mousePos.y);
-      // console.log('player clicked at ' + qwe.x + ' ' + qwe.y);
-      // if (mouseClick1Pos) {
-      //   console.log('saved mouse click ' + mouseClick1Pos.x + ' ' + mouseClick1Pos.y);
-      // }
-      // console.log('isplayer1turn ' + poolGameAreaController.isPlayer1Turn + ' end');
-      // console.log('place ball ' + poolGameAreaController.isBallBeingPlaced + ' end');
-      // console.log('player1id ' + poolGameAreaController.player1ID + ' end');
-      // console.log('player2id ' + poolGameAreaController.player2ID + ' end');
-      // console.log('myid ' + townController.userID + ' end');
-      // console.log('isGameStarted ' + poolGameAreaController.isGameStarted);
-      // console.log(
-      //   'cue ball moving? ' +
-      //   poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.isMoving,
-      // );
+      // Handle player's move
       const handlePlayerInput = () => {
-        // Handle player's move
         // Place down a ball
         if (poolGameAreaController.isBallBeingPlaced) {
           const pos: Vector = {
@@ -162,15 +148,14 @@ export default function PoolGameCanvas({
               Math.max(
                 Math.min(
                   Math.sqrt(
-                    Math.pow(mouseClick1Pos.y - ballPos.y, 2) +
-                      Math.pow(mouseClick1Pos.x - ballPos.x, 2),
+                    (mouseClick1Pos.y - ballPos.y) ** 2 + (mouseClick1Pos.x - ballPos.x) ** 2,
                   ),
                   250,
                 ),
                 15,
-              ) / 5;
+              ) / 10;
 
-            const velocity: Vector = scale(velocityUnitVector, velocityScalar); // POOL TODO: get scalar for velocity
+            const velocity: Vector = scale(velocityUnitVector, velocityScalar);
 
             const collisionPoint: Vector = addVectors(
               cueBall.position,
@@ -328,16 +313,19 @@ export default function PoolGameCanvas({
         return;
       }
 
-      let r: number;
-      let ballOffset: number;
-      let handleOffset: number;
+      let r: number; // Rotation about axis
+      let ballOffset: number; // Distance from cue tip to ball
+      let handleOffset: number; // Distance from cue handle to ball
       const ballPos = positionToPixels(ball.position);
 
+      // Handle case where we are rotating around ball
       if (mouseClick1Pos === undefined) {
         r = Math.atan2(mousePos.y - ballPos.y, mousePos.x - ballPos.x);
         ballOffset = 30;
         handleOffset = 300;
-      } else {
+      }
+      // Handle case where we are selecting velocity
+      else {
         r = Math.atan2(mouseClick1Pos.y - ballPos.y, mouseClick1Pos.x - ballPos.x);
         ballOffset = Math.max(
           Math.min(
@@ -347,10 +335,6 @@ export default function PoolGameCanvas({
           15,
         );
         handleOffset = ballOffset + 270;
-        // console.log('mousePos ' + mousePos.x + ' ' + mousePos.y);
-        // console.log('ball pos' + ballPos.x + ' ' + ballPos.y);
-        // console.log('ballOffset ' + ballOffset);
-        // console.log('handleOffset ' + handleOffset);
       }
       ctx.beginPath();
       ctx.moveTo(ballOffset * Math.cos(r) + ballPos.x, ballOffset * Math.sin(r) + ballPos.y);
@@ -360,8 +344,9 @@ export default function PoolGameCanvas({
       ctx.stroke();
     }
 
+    // Draw player's move
     const drawPlayerInput = () => {
-      // Draw player's move
+      // Draw cue ball at player's mouse
       if (poolGameAreaController.isBallBeingPlaced) {
         inputCanvasCtx.clearRect(0, 0, inputCanvas.width, inputCanvas.height);
         drawPlaceCueBall(inputCanvasCtx);
@@ -373,6 +358,7 @@ export default function PoolGameCanvas({
       }
     };
 
+    // Ensure that we don't display anything while the game is not started, and while balls are moving
     if (
       poolGameAreaController.isGameStarted &&
       poolGameAreaController.poolBalls.find(p => p.isMoving) === undefined
@@ -400,11 +386,13 @@ export default function PoolGameCanvas({
     }
   }, [
     mouseClick1Pos,
-    mousePos,
-    poolGameAreaController,
+    mousePos.x,
+    mousePos.y,
     poolGameAreaController.isBallBeingPlaced,
+    poolGameAreaController.isGameStarted,
     poolGameAreaController.isPlayer1Turn,
-    poolGameAreaController.players,
+    poolGameAreaController.player1ID,
+    poolGameAreaController.player2ID,
     poolGameAreaController.poolBalls,
     townController.userID,
   ]);
@@ -441,8 +429,6 @@ export default function PoolGameCanvas({
         onClick={() => {
           poolGameAreaController.gameTick();
           setTickToggle(!tickToggle);
-          console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.position);
-          console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.velocity);
         }}>
         Tick Game
       </Button>
