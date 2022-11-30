@@ -278,10 +278,10 @@ describe('PoolGameAreaController', () => {
   describe('placeCueBall', () => {
     it('sets the cue ball position', () => {
       const cueBall = testArea.poolBalls.find(p => p.ballNumber === 0);
-      expect(cueBall?.position).toBe({ x: 0.847, y: 0.634, z: 0 });
+      expect(cueBall?.position).toEqual({ x: 0.847, y: 0.634, z: 0 });
       const samplePos = { x: 12, y: 598, z: -21 };
       testArea.placeCueBall(samplePos);
-      expect(cueBall?.position).toBe({ x: 0.847, y: 0.634, z: 0 });
+      expect(cueBall?.position).toEqual({ x: 12, y: 598, z: -21 });
     });
     it('unsets isBallBeingPlaced', () => {
       testArea.isBallBeingPlaced = true;
@@ -290,6 +290,9 @@ describe('PoolGameAreaController', () => {
       expect(testArea.isBallBeingPlaced).toBe(false);
     });
     it('emits onBallPlacement event', () => {
+      testArea.isPlayer1Turn = true;
+      testArea.player1ID = nanoid();
+      testArea.player2ID = nanoid();
       testArea.placeCueBall({ x: 12, y: 598, z: -21 });
       expect(mockListeners.onBallPlacement).toBeCalled();
     });
