@@ -753,16 +753,6 @@ describe('Town', () => {
       playerTestData.moveTo(5000, 5000); // Inside of "PoolName" area
       expect(town.addPoolGameArea(newModel)).toBe(true);
     });
-
-    it('Should update the local model for that area', () => {
-      const poolGameArea = town.getInteractable('PoolName');
-      expect(poolGameArea.toModel()).toEqual(newModel);
-    });
-
-    it('Should emit an interactableUpdate message', () => {
-      const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
-      expect(lastEmittedUpdate).toEqual(newModel);
-    });
     it('Should include any players in that area as occupants', () => {
       const poolGameArea = town.getInteractable('PoolName');
       expect(poolGameArea.occupantsByID).toEqual([player.id]);
