@@ -6,7 +6,7 @@ import {
   ballBallCollision,
   ballSlateCollision,
   cueBallCollision,
-  // cushionBallCollision,
+  cushionBallCollision,
 } from '../components/Town/interactables/GameAreas/PoolGame/Collisions';
 import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
 import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
@@ -780,8 +780,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with right rail
-          // cushionBallCollision(ball, 0);
-          ball.velocity.x = -ball.velocity.x * 0.6;
+          cushionBallCollision(ball, 0);
+          // ball.velocity.x = -ball.velocity.x * 0.6;
           alreadyCheckedBalls.push(ball);
           ball.addRecentlyHitRail('right');
         } else if (
@@ -797,8 +797,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with left rail
-          // cushionBallCollision(ball, 2);
-          ball.velocity.x = -ball.velocity.x * 0.6;
+          cushionBallCollision(ball, 2);
+          // ball.velocity.x = -ball.velocity.x * 0.6;
           alreadyCheckedBalls.push(ball);
           ball.addRecentlyHitRail('left');
         } else if (
@@ -816,8 +816,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with top rail, but NOT with the pocket
-          // cushionBallCollision(ball, 1);
-          ball.velocity.y = -ball.velocity.y * 0.6;
+          cushionBallCollision(ball, 1);
+          // ball.velocity.y = -ball.velocity.y * 0.6;
           alreadyCheckedBalls.push(ball);
           ball.addRecentlyHitRail('top');
         } else if (
@@ -835,8 +835,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with bottom rail, but NOT with the pocket
-          // cushionBallCollision(ball, 3);
-          ball.velocity.y = -ball.velocity.y * 0.6;
+          cushionBallCollision(ball, 3);
+          // ball.velocity.y = -ball.velocity.y * 0.6;
           alreadyCheckedBalls.push(ball);
           ball.addRecentlyHitRail('bottom');
         }
@@ -844,16 +844,24 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         // check if the ball has gone off the board/ over the rails
         let haveWeScratchedOverTable = false;
         if (ball.position.x > this._tableLength) {
-          ball.position.x = this._tableLength - BALL_RADIUS;
+          ball.position.x = this._tableLength - 6 * BALL_RADIUS;
+          ball.velocity.x = 0;
+          ball.velocity.y = 0;
           alreadyCheckedBalls.push(ball);
         } else if (ball.position.x < 0) {
-          ball.position.x = RAIL_WIDTH + BALL_RADIUS;
+          ball.position.x = RAIL_WIDTH + 6 * BALL_RADIUS;
+          ball.velocity.x = 0;
+          ball.velocity.y = 0;
           alreadyCheckedBalls.push(ball);
         } else if (ball.position.y > this._tableWidth) {
-          ball.position.y = this._tableWidth - BALL_RADIUS;
+          ball.position.y = this._tableWidth - 6 * BALL_RADIUS;
+          ball.velocity.x = 0;
+          ball.velocity.y = 0;
           alreadyCheckedBalls.push(ball);
         } else if (ball.position.y < 0) {
-          ball.position.y = RAIL_WIDTH + BALL_RADIUS;
+          ball.position.y = RAIL_WIDTH + 6 * BALL_RADIUS;
+          ball.velocity.x = 0;
+          ball.velocity.y = 0;
           alreadyCheckedBalls.push(ball);
         }
         haveWeScratchedOverTable = ball.ballNumber === 0;
@@ -865,7 +873,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           } else {
             this._playerIDToMove = this.player1ID;
           }
-          this._isPlayer1Turn = !this._isPlayer1Turn;
           canScratch = false;
         }
       }
