@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { PoolBall, PoolGameArea as PoolGameAreaModel } from '../../../../types/CoveyTownSocket';
+import { PoolBall } from '../../../../types/CoveyTownSocket';
 import { usePoolGameAreaController } from '../../../../classes/TownController';
 import { addVectors, scale, subtractVectors, unitVector, Vector } from './PoolGame/Vector';
 import PoolGameArea from './PoolGameArea';

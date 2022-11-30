@@ -129,6 +129,9 @@ export function ballBallCollision(ball1: PoolBall, ball2: PoolBall) {
   // Friction and spin be damned.
   ball1.velocity = vA;
   ball2.velocity = vB;
+
+  console.log('from collisions.txt');
+  console.log(v0, vA, vB);
 }
 
 export function cueBallCollision(cue: PoolCue, ball: PoolBall) {
@@ -177,6 +180,7 @@ export function cueBallCollision(cue: PoolCue, ball: PoolBall) {
 }
 
 export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
+  console.log('cushion ball collision ' + ball.ballNumber);
   // Rotate the table frame of reference so it's as if the rail is always perpendicular to the x direction unit vector
   const rotationAngle: number = (cushionNumber * Math.PI) / 2;
   let xVelocityAdjusted: number =
