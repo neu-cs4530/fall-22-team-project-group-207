@@ -115,9 +115,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // Boolean that represents whether a player has to replace a ball or not
   private _isBallBeingPlaced = false;
 
-  // Boolean that represents whether the balls are currently moving
-  private _isBallMoving = false;
-
   // Constants representing the length and width of a 7-foot pool table. (0, 0) is the top-left corner of the playable area.
   private _tableLength = 2.54; //m
 
@@ -343,25 +340,25 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       // cue ball at break position
       new PoolBall(0.847, 0.634, 0),
       // front of triangle
-      //new PoolBall(1.905, 0.634, 1),
+      new PoolBall(1.905, 0.634, 1),
       // second row
-      //new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 - BALL_RADIUS, 2),
-      //new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 + BALL_RADIUS, 9),
+      new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 - BALL_RADIUS, 2),
+      new PoolBall(1.905 + 2 * BALL_RADIUS, 0.634 + BALL_RADIUS, 9),
       // third row
-      // new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 3),
+      new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 3),
       new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634, 8),
-      //new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 10),
+      new PoolBall(1.905 + 4 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 10),
       // fourth row
-      //new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - 3 * BALL_RADIUS, 4),
-      //new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - BALL_RADIUS, 14),
-      //new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 + BALL_RADIUS, 7),
-      //new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 + 3 * BALL_RADIUS, 11),
+      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - 3 * BALL_RADIUS, 4),
+      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 - BALL_RADIUS, 14),
+      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 + BALL_RADIUS, 7),
+      new PoolBall(1.905 + 6 * BALL_RADIUS, 0.634 + 3 * BALL_RADIUS, 11),
       // fifth row
-      //new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 - 4 * BALL_RADIUS, 12),
-      //new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 6),
-      //new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634, 15),
-      //new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 13),
-      //new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 + 4 * BALL_RADIUS, 5),
+      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 - 4 * BALL_RADIUS, 12),
+      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 - 2 * BALL_RADIUS, 6),
+      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634, 15),
+      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 + 2 * BALL_RADIUS, 13),
+      new PoolBall(1.905 + 8 * BALL_RADIUS, 0.634 + 4 * BALL_RADIUS, 5),
     ];
   }
 
@@ -550,6 +547,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // check every pool ball's overlappingBalls list. If not overlapping with any ball, remove them from the list.
     // in addition, check every pool ball's recently hit rails list. if we're sufficiently far from them, remove them from the list.
     this._physicsPoolBalls.forEach(ball => {
+      if (ball.ballNumber === 4) {
+        ball.overlappingBalls.map(b => console.log('overlap ' + b.ballNumber));
+      }
       ball.overlappingBalls.forEach(oBall => {
         if (magnitude(subtractVectors(ball.position, oBall.position)) > BALL_RADIUS * 2) {
           ball.removeOverlappingBall(oBall);
@@ -881,7 +881,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       playerIDToMove: this._playerIDToMove,
       isPlayer1Turn: this._isPlayer1Turn,
       isBallBeingPlaced: this._isBallBeingPlaced,
-      isBallMoving: this._isBallMoving,
       poolBalls: this._poolBalls,
     };
   }
@@ -894,7 +893,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this._id = updatedModel.id;
     this._player1ID = updatedModel.player1ID;
     this._player2ID = updatedModel.player2ID;
-    this._isPlayer1Turn = updatedModel.isPlayer1Turn;
   }
 }
 

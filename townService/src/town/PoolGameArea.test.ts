@@ -24,7 +24,6 @@ describe('PoolGameArea', () => {
   const player2BallType = 'Solids';
   const isPlayer1Turn = true;
   const isBallBeingPlaced = false;
-  const isBallMoving = false;
   const poolBall1: PoolBallModel = {
     angularOrientation: { x: 0, y: 0, z: 0 },
     angularVelocity: { x: 0, y: 0, z: 0 },
@@ -60,7 +59,6 @@ describe('PoolGameArea', () => {
         player2BallType,
         isPlayer1Turn,
         isBallBeingPlaced,
-        isBallMoving,
         poolBalls,
       },
       testAreaBox,
@@ -86,7 +84,6 @@ describe('PoolGameArea', () => {
         player2BallType,
         isPlayer1Turn,
         isBallBeingPlaced,
-        isBallMoving,
         poolBalls,
       });
     });
@@ -108,7 +105,6 @@ describe('PoolGameArea', () => {
         player2BallType,
         isPlayer1Turn,
         isBallBeingPlaced,
-        isBallMoving,
         poolBalls,
       });
     });
@@ -134,7 +130,6 @@ describe('PoolGameArea', () => {
       player2BallType,
       isPlayer1Turn,
       isBallBeingPlaced,
-      isBallMoving,
       poolBalls,
     });
   });
@@ -147,7 +142,6 @@ describe('PoolGameArea', () => {
       player2BallType: 'Solids',
       isPlayer1Turn: true,
       isBallBeingPlaced: false,
-      isBallMoving: false,
       poolBalls,
     });
     expect(testArea.player1ID).toBe('123');

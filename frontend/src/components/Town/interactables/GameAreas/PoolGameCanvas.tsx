@@ -10,8 +10,10 @@ import { Button } from '@chakra-ui/react';
 
 const BALL_RADIUS = 0.028575; // m
 const OUTSIDE_BORDER_WIDTH = 0.18; // m
-const POOL_TABLE_WIDTH = 2.9; // m
-const POOL_TABLE_HEIGHT = 1.63; // m
+const POOL_TABLE_LEFT_OFFSET = 50; // pixels
+const POOL_TABLE_TOP_OFFSET = 50; // pixels
+const POOL_TABLE_WIDTH = 1060; // pixels
+const POOL_TABLE_HEIGHT = 550; // pixels
 const METER_TO_PIXEL_SCALAR = 400.0; // scalar
 
 /**
@@ -73,12 +75,6 @@ export default function PoolGameCanvas({
   const boardCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
-
-  useEffect(() => {
-    console.log('got pool ball update');
-    console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.position);
-    console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.velocity);
-  }, [poolGameAreaController]);
 
   // Handle mouse events, namely movement and clicking
   useEffect(() => {
@@ -169,10 +165,10 @@ export default function PoolGameCanvas({
                     Math.pow(mouseClick1Pos.y - ballPos.y, 2) +
                       Math.pow(mouseClick1Pos.x - ballPos.x, 2),
                   ),
-                  200,
+                  250,
                 ),
                 15,
-              ) / 10;
+              ) / 5;
 
             const velocity: Vector = scale(velocityUnitVector, velocityScalar); // POOL TODO: get scalar for velocity
 
@@ -181,17 +177,17 @@ export default function PoolGameCanvas({
               scale(velocityUnitVector, -BALL_RADIUS),
             );
 
-            console.log(mouseClick1Pos);
-            console.log(velocity, velocityUnitVector, velocityScalar, collisionPoint);
             const cue: PoolCue = new PoolCue(velocity, collisionPoint);
-            console.log('making pool move');
             poolGameAreaController.poolMove(cue);
             setMouseClick1Pos(undefined);
           }
         }
       };
 
-      if (poolGameAreaController.isGameStarted) {
+      if (
+        poolGameAreaController.isGameStarted &&
+        poolGameAreaController.poolBalls.find(p => p.isMoving) === undefined
+      ) {
         // Draw the player's inputs based on the current state of the game
         // If the the previous player scratched, the current player gets to place the cue ball
         if (
@@ -247,10 +243,10 @@ export default function PoolGameCanvas({
       const img = POOL_TABLE_IMAGE[0];
       ctx.drawImage(
         img,
-        0,
-        0,
-        POOL_TABLE_WIDTH * METER_TO_PIXEL_SCALAR,
-        POOL_TABLE_HEIGHT * METER_TO_PIXEL_SCALAR,
+        POOL_TABLE_LEFT_OFFSET,
+        POOL_TABLE_TOP_OFFSET,
+        POOL_TABLE_WIDTH,
+        POOL_TABLE_HEIGHT,
       );
     }
 
@@ -346,7 +342,7 @@ export default function PoolGameCanvas({
         ballOffset = Math.max(
           Math.min(
             Math.sqrt(Math.pow(mousePos.y - ballPos.y, 2) + Math.pow(mousePos.x - ballPos.x, 2)),
-            200,
+            250,
           ),
           15,
         );
@@ -377,7 +373,10 @@ export default function PoolGameCanvas({
       }
     };
 
-    if (poolGameAreaController.isGameStarted) {
+    if (
+      poolGameAreaController.isGameStarted &&
+      poolGameAreaController.poolBalls.find(p => p.isMoving) === undefined
+    ) {
       // Draw the player's inputs based on the current state of the game
       // If the the previous player scratched, the current player gets to place the cue ball
       if (
@@ -416,12 +415,12 @@ export default function PoolGameCanvas({
       <Button
         onClick={() => (poolGameAreaController.player1ID = townController.userID)}
         disabled={poolGameAreaController.player1ID !== undefined}>
-        Join as player 1
+        Join as Player 1
       </Button>
       <Button
         onClick={() => (poolGameAreaController.player2ID = townController.userID)}
         disabled={poolGameAreaController.player2ID !== undefined}>
-        Join as player 2
+        Join as Player 2
       </Button>
       <Button
         onClick={() => poolGameAreaController.removePlayer(townController.userID)}
@@ -433,10 +432,10 @@ export default function PoolGameCanvas({
       </Button>
       <Button
         onClick={() => {
-          console.log('click reset game button');
           poolGameAreaController.resetGame();
+          setTickToggle(!tickToggle);
         }}>
-        Reset game
+        Reset Game
       </Button>
       <Button
         onClick={() => {
@@ -445,7 +444,7 @@ export default function PoolGameCanvas({
           console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.position);
           console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.velocity);
         }}>
-        Tick game
+        Tick Game
       </Button>
       <canvas
         id='board canvas'
@@ -462,23 +461,6 @@ export default function PoolGameCanvas({
         height='670'
         style={{ position: 'absolute' }}></canvas>
       <div style={{ height: '670px' }}>{/* div to hold space for canvas */}</div>
-      <div>
-        {/* POOL TODO: delete this div*/}
-        {/* Get mouse coordinates relative to element */}
-        <hr />
-        <hr />
-        <hr />
-        <div style={{ padding: '3rem', backgroundColor: 'lightgray' }}>
-          <h2>
-            Canvas coords: {mousePos.x} {mousePos.y}
-          </h2>
-        </div>
-
-        <hr />
-        <h2>
-          Canvas coords: {mousePos.x} {mousePos.y}
-        </h2>
-      </div>
     </div>
   );
 }

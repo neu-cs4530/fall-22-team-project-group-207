@@ -10,12 +10,17 @@ import {
 
 const BALL_CLOTH_ANGULAR_DECELERATION_RATE = 10; //rad/s^2
 const BALL_CLOTH_ROLLING_FRICTION = 0.01;
-const BALL_CLOTH_SLIDING_FRICTION = 0.2; // tentative
+const BALL_CLOTH_SLIDING_FRICTION = 0.4; // tentative
 const GRAVITATIONAL_CONSTANT = 9.8; // m/s^2
 const BALL_RADIUS = 0.028575; // m
 const ANGULAR_SLIDING_DECEL_COEFF =
   (5 * BALL_CLOTH_SLIDING_FRICTION * GRAVITATIONAL_CONSTANT) / (2 * BALL_RADIUS);
 
+/**
+ * Represents a pool ball with physics implemented
+ *
+ * NOTE: these were tested manually since these calculations are much too complicated to test in a test file
+ */
 export default class PoolBall {
   private _angularOrientation: Vector;
 

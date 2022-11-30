@@ -62,7 +62,6 @@ describe('PoolGameAreaController', () => {
       isPlayer1Turn,
       poolBalls,
       isBallBeingPlaced: false,
-      isBallMoving: false,
     });
     testArea.occupants = [
       new PlayerController(nanoid(), nanoid(), playerLocation),

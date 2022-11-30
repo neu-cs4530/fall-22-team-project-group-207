@@ -103,7 +103,6 @@ export interface PoolGameArea {
   player2BallType?: string;
   isPlayer1Turn: boolean; // POOL TODO: potentially we could remove this
   isBallBeingPlaced: boolean;
-  isBallMoving: boolean;
   // Player ID of the next player to move, or undefined if no player is up next
   playerIDToMove?: string;
 }
