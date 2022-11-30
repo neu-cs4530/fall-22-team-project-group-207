@@ -33,6 +33,8 @@ export default class PoolBall {
 
   private _isPocketed: boolean;
 
+  private _overlappingBalls: PoolBall [];
+
   constructor(xPosition: number, yPosition: number, ballNumber: number) {
     this._ballNumber = ballNumber;
     this._angularOrientation = { x: 0, y: 0, z: 0 };
@@ -42,6 +44,7 @@ export default class PoolBall {
     this._isMoving = false;
     this._isAirborne = false;
     this._isPocketed = false;
+    this._overlappingBalls = [];
   }
 
   get angularVelocity() {
@@ -109,6 +112,24 @@ export default class PoolBall {
 
   set isMoving(isMoving: boolean) {
     this._isMoving = isMoving;
+  }
+
+  get overlappingBalls() {
+    return this._overlappingBalls;
+  }
+
+  set overlappingBalls(overlappingBalls: PoolBall[]) {
+    this._overlappingBalls = overlappingBalls;
+  }
+
+  public addOverlappingBall(ball: PoolBall) {
+    if (!this._overlappingBalls.includes(ball)) {
+      this._overlappingBalls.push(ball);
+    }
+  }
+
+  public removeOverlappingBall(ball: PoolBall) {
+    this._overlappingBalls = this._overlappingBalls.filter(oball => oball !== ball);
   }
 
   public tick(elapsedTime: number) {
