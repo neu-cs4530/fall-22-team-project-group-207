@@ -184,7 +184,7 @@ export default function PoolGameCanvas({
 
       if (
         poolGameAreaController.isGameStarted &&
-        poolGameAreaController.poolBalls.find(p => p.isMoving) !== undefined
+        poolGameAreaController.poolBalls.find(p => p.isMoving) === undefined
       ) {
         // Draw the player's inputs based on the current state of the game
         // If the the previous player scratched, the current player gets to place the cue ball
@@ -373,7 +373,7 @@ export default function PoolGameCanvas({
 
     if (
       poolGameAreaController.isGameStarted &&
-      poolGameAreaController.poolBalls.find(p => p.isMoving) !== undefined
+      poolGameAreaController.poolBalls.find(p => p.isMoving) === undefined
     ) {
       // Draw the player's inputs based on the current state of the game
       // If the the previous player scratched, the current player gets to place the cue ball
