@@ -575,6 +575,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // check every pool ball's overlappingBalls list. If not overlapping with any ball, remove them from the list.
     // in addition, check every pool ball's recently hit rails list. if we're sufficiently far from them, remove them from the list.
     this._physicsPoolBalls.forEach(ball => {
+      ball.velocity.z = 0;
+      ball.position.z = 0;
       if (ball.ballNumber === 4) {
         ball.overlappingBalls.map(b => console.log('overlap ' + b.ballNumber));
       }
@@ -832,8 +834,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         } else if (
           ball.velocity.y < 0 &&
           !ball.recentlyHitRails.includes('top') &&
-          (ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS ||
-            ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS) &&
+          (ball.position.x < this._tableLength / 2 - POCKET_RADIUS ||
+            ball.position.x > this._tableLength / 2 + POCKET_RADIUS) &&
           magnitude(
             subtractVectors(ball.position, {
               x: ball.position.x,
@@ -851,8 +853,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         } else if (
           ball.velocity.y > 0 &&
           !ball.recentlyHitRails.includes('bottom') &&
-          (ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS ||
-            ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS) &&
+          (ball.position.x < this._tableLength / 2 - POCKET_RADIUS ||
+            ball.position.x > this._tableLength / 2 + POCKET_RADIUS) &&
           magnitude(
             subtractVectors(ball.position, {
               x: ball.position.x,
@@ -872,16 +874,24 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         // check if the ball has gone off the board/ over the rails
         let haveWeScratchedOverTable = false;
         if (ball.position.x > this._tableLength) {
-          ball.position.x = this._tableLength - BALL_RADIUS;
+          ball.position.x = this._tableLength - 6 * BALL_RADIUS;
+          ball.velocity.x = 0;
+          ball.velocity.y = 0;
           alreadyCheckedBalls.push(ball);
         } else if (ball.position.x < 0) {
-          ball.position.x = RAIL_WIDTH + BALL_RADIUS;
+          ball.position.x = RAIL_WIDTH + 6 * BALL_RADIUS;
+          ball.velocity.x = 0;
+          ball.velocity.y = 0;
           alreadyCheckedBalls.push(ball);
         } else if (ball.position.y > this._tableWidth) {
-          ball.position.y = this._tableWidth - BALL_RADIUS;
+          ball.position.y = this._tableWidth - 6 * BALL_RADIUS;
+          ball.velocity.x = 0;
+          ball.velocity.y = 0;
           alreadyCheckedBalls.push(ball);
         } else if (ball.position.y < 0) {
-          ball.position.y = RAIL_WIDTH + BALL_RADIUS;
+          ball.position.y = RAIL_WIDTH + 6 * BALL_RADIUS;
+          ball.velocity.x = 0;
+          ball.velocity.y = 0;
           alreadyCheckedBalls.push(ball);
         }
         haveWeScratchedOverTable = ball.ballNumber === 0;
@@ -893,7 +903,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           } else {
             this._playerIDToMove = this.player1ID;
           }
-          this._isPlayer1Turn = !this._isPlayer1Turn;
           canScratch = false;
         }
       }
