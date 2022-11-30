@@ -281,7 +281,8 @@ describe('PoolGameAreaController', () => {
       expect(cueBall?.position).toEqual({ x: 0.847, y: 0.634, z: 0 });
       const samplePos = { x: 12, y: 598, z: -21 };
       testArea.placeCueBall(samplePos);
-      expect(cueBall?.position).toEqual({ x: 12, y: 598, z: -21 });
+      const newCueBall = testArea.poolBalls.find(p => p.ballNumber === 0);
+      expect(newCueBall?.position).toEqual({ x: 12, y: 598, z: -21 });
     });
     it('unsets isBallBeingPlaced', () => {
       testArea.isBallBeingPlaced = true;
@@ -289,12 +290,12 @@ describe('PoolGameAreaController', () => {
       testArea.placeCueBall({ x: 12, y: 598, z: -21 });
       expect(testArea.isBallBeingPlaced).toBe(false);
     });
-    it('emits onBallPlacement event', () => {
+    it('emits onBallPlacement event only when playerIDToMove is set', () => {
       testArea.isPlayer1Turn = true;
       testArea.player1ID = nanoid();
       testArea.player2ID = nanoid();
       testArea.placeCueBall({ x: 12, y: 598, z: -21 });
-      expect(mockListeners.onBallPlacement).toBeCalled();
+      expect(mockListeners.onBallPlacement).toBeCalledTimes(0);
     });
   });
   describe('turnChange', () => {
