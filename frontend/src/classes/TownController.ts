@@ -808,11 +808,11 @@ export function useActiveConversationAreas(): ConversationAreaController[] {
 export function usePoolGameAreas(): PoolGameAreaController[] {
   const townController = useTownController();
   const [poolGameAreas, setPoolGameAreas] = useState<PoolGameAreaController[]>(
-    townController.poolGameAreas.filter(eachArea => eachArea.isPlaying),
+    townController.poolGameAreas.filter(eachArea => eachArea.isGameStarted),
   );
   useEffect(() => {
     const updater = (allAreas: PoolGameAreaController[]) => {
-      setPoolGameAreas(allAreas.filter(eachArea => eachArea.isPlaying));
+      setPoolGameAreas(allAreas.filter(eachArea => eachArea.isGameStarted));
     };
     townController.addListener('poolGameAreasChanged', updater);
     return () => {

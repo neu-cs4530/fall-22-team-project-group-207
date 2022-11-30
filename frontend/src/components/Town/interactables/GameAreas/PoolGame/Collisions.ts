@@ -129,9 +129,13 @@ export function ballBallCollision(ball1: PoolBall, ball2: PoolBall) {
   // Friction and spin be damned.
   ball1.velocity = vA;
   ball2.velocity = vB;
+
+  console.log('from collisions.txt');
+  console.log(v0, vA, vB);
 }
 
 export function cueBallCollision(cue: PoolCue, ball: PoolBall) {
+  console.log('cue ball collision from collision.ts');
   // We multiply the initial velocity by the coefficient of restition to account for some of the
   // energy loss that occurs, and then treat the rest of the collision as elastic
   const cueInitialVelocity: Vector = scale(cue.velocity, CUE_TIP_BALL_RESTITUTION);
@@ -170,9 +174,13 @@ export function cueBallCollision(cue: PoolCue, ball: PoolBall) {
     1 / BALL_MOMENT_OF_INERTIA,
   );
   ball.velocity = ballFinalVelocity;
+  console.log('final velocity');
+  console.log(ballFinalVelocity);
+  console.log(ball.isMoving);
 }
 
 export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
+  console.log('cushion ball collision ' + ball.ballNumber);
   // Rotate the table frame of reference so it's as if the rail is always perpendicular to the x direction unit vector
   const rotationAngle: number = (cushionNumber * Math.PI) / 2;
   let xVelocityAdjusted: number =
