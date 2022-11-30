@@ -59,8 +59,7 @@ export default function NewPoolGameModal(): JSX.Element {
         poolBalls: gameState.poolBalls,
       };
       try {
-        await townController.createPoolGameArea(poolGameToCreate); // POOL TODO: fix this
-        // we could probably change this to take in a PoolGameModel
+        await townController.createPoolGameArea(poolGameToCreate);
         toast({
           title: 'Pool Area Created!',
           status: 'success',
