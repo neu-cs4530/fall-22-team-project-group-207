@@ -1,6 +1,7 @@
-import { mock, mockClear } from 'jest-mock-extended';
+import { mock, mockClear, MockProxy } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
+import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
 import {
   PlayerLocation,
   PoolBall as PoolBallModel,
@@ -8,13 +9,13 @@ import {
 } from '../types/CoveyTownSocket';
 import PlayerController from './PlayerController';
 import PoolGameAreaController, { PoolGameAreaEvents } from './PoolGameAreaController';
-
-export {};
+import TownController from './TownController';
 
 describe('PoolGameAreaController', () => {
   // A valid PoolGameAreaController to be reused within the tests
   let testArea: PoolGameAreaController;
   let testAreaModel: PoolGameAreaModel;
+  const townController: MockProxy<TownController> = mock<TownController>();
   let testUpdateAreaModel: PoolGameAreaModel;
   let initPoolBallModels: PoolBallModel[];
   const mockListeners = mock<PoolGameAreaEvents>();
@@ -118,11 +119,17 @@ describe('PoolGameAreaController', () => {
       new PlayerController(nanoid(), nanoid(), playerLocation),
     ];
 
+    mockClear(townController);
     mockClear(mockListeners.occupantsChange);
     mockClear(mockListeners.turnChange);
     mockClear(mockListeners.onTick);
     mockClear(mockListeners.playersChange);
     testArea.addListener('occupantsChange', mockListeners.occupantsChange);
+    testArea.addListener('onTick', mockListeners.onTick);
+    testArea.addListener('playersChange', mockListeners.playersChange);
+    testArea.addListener('turnChange', mockListeners.turnChange);
+    testArea.addListener('onBallPlacement', mockListeners.onBallPlacement);
+    testArea.addListener('onHistoryUpdate', mockListeners.onHistoryUpdate);
   });
   // POOL TODO: write tests for PoolGameAreaController
   describe('setting the occupants property', () => {
@@ -186,6 +193,40 @@ describe('PoolGameAreaController', () => {
       expect(testArea.getBallTypeByNumber(13)).toEqual('Stripes');
       expect(testArea.getBallTypeByNumber(8)).toEqual('8ball');
       expect(testArea.getBallTypeByNumber(0)).toEqual('CueBall');
+    });
+  });
+  describe('gameTick', () => {
+    it('emits the onTick event', () => {
+      const currentTick = testArea.currentTick;
+      testArea.isGameStarted = true;
+      testArea.gameTick();
+      expect(mockListeners.onTick).toBeCalled();
+      expect(testArea.currentTick).toEqual(currentTick + 1);
+    });
+  });
+  describe('occupantsChange', () => {
+    it('emits the occupantsChange event', () => {
+      testArea.occupants = testArea.occupants.slice(1);
+      expect(mockListeners.occupantsChange).toBeCalled();
+    });
+  });
+  describe('playersChange', () => {
+    it('emits the playerChange event', () => {
+      const nonPlayer1 = testArea.occupants.filter(player => player.id != testArea.player1ID)[0];
+      testArea.player1ID = nonPlayer1.id;
+      expect(mockListeners.playersChange).toBeCalled();
+    });
+  });
+  describe('turnChange', () => {
+    it('emits the playerCturnChangehange event', () => {
+      testArea.isPlayer1Turn = true;
+      expect(mockListeners.turnChange).toBeCalled();
+    });
+  });
+  describe('onHistoryUpdate', () => {
+    it('emits the onHistoryUpdate event', () => {
+      testArea.poolMove(new PoolCue({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 }));
+      expect(mockListeners.onHistoryUpdate).toBeCalled();
     });
   });
 });
