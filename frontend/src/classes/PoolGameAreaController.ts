@@ -166,14 +166,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     return this._id;
   }
 
-  get isPlaying() {
-    return (
-      (this.player1ID !== undefined || this.player2ID !== undefined) &&
-      this.isGameStarted &&
-      !this.isGameOver
-    );
-  }
-
   /**
    * The Current Turn of this pool area
    */
@@ -371,6 +363,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   // resets the pool balls to their starting position and scores to 0.
   resetGame(): void {
+    console.log('reset game from controller');
     // reset the model history.
     this.currentTick = 0;
     this.modelHistory = [this.currentModel];
@@ -396,6 +389,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    * @param cue information stored in the cue, which is passed to the physics engine
    */
   poolMove(cue: PoolCue) {
+    console.log('are any balls moving ' + this._areAnyPoolBallsMoving());
     // Player hits the cue ball
     if (cue) {
       cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
@@ -478,6 +472,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    * Placeholder function that is called every tick. Checks for collisions, scratches, game overs, etc.
    */
   gameTick(): void {
+    console.log('gametick');
     // only tick the game if we've actually started it. Assuming we'll start via an input in covey.town.
     if (this.isGameStarted) {
       this.poolPhysicsGoHere();
