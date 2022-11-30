@@ -721,7 +721,7 @@ describe('Town', () => {
     });
     it('Should return false if no area exists with that ID', () => {
       expect(
-        town.addPoolGameArea({ 
+        town.addPoolGameArea({
           id: nanoid(),
           player1ID: undefined,
           player2ID: undefined,
