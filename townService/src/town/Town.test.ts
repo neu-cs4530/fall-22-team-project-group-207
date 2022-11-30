@@ -48,8 +48,8 @@ const testingMaps: TestMapDict = {
             rotation: 0,
             visible: true,
             width: 326,
-            x: 40,
-            y: 120,
+            x: 5000,
+            y: 5000,
           },
         ],
         opacity: 1,
@@ -744,7 +744,7 @@ describe('Town', () => {
       isBallBeingPlaced: false,
     };
     beforeEach(() => {
-      playerTestData.moveTo(160, 570); // Inside of "Name3" area
+      playerTestData.moveTo(5000, 5000); // Inside of "PoolName" area
       expect(town.addPoolGameArea(newModel)).toBe(true);
     });
 
