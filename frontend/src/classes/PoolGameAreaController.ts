@@ -899,26 +899,22 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         let haveWeScratchedOverTable = false;
         if (ball.position.x > this._tableLength) {
           ball.position.x = this._tableLength - 6 * BALL_RADIUS;
-          ball.velocity.x = 0;
-          ball.velocity.y = 0;
+          ball.velocity = { x: 0, y: 0, z: 0 };
           alreadyCheckedBalls.push(ball);
           haveWeScratchedOverTable = ball.ballNumber === 0;
         } else if (ball.position.x < 0) {
           ball.position.x = RAIL_WIDTH + 6 * BALL_RADIUS;
-          ball.velocity.x = 0;
-          ball.velocity.y = 0;
+          ball.velocity = { x: 0, y: 0, z: 0 };
           alreadyCheckedBalls.push(ball);
           haveWeScratchedOverTable = ball.ballNumber === 0;
         } else if (ball.position.y > this._tableWidth) {
           ball.position.y = this._tableWidth - 6 * BALL_RADIUS;
-          ball.velocity.x = 0;
-          ball.velocity.y = 0;
+          ball.velocity = { x: 0, y: 0, z: 0 };
           alreadyCheckedBalls.push(ball);
           haveWeScratchedOverTable = ball.ballNumber === 0;
         } else if (ball.position.y < 0) {
           ball.position.y = RAIL_WIDTH + 6 * BALL_RADIUS;
-          ball.velocity.x = 0;
-          ball.velocity.y = 0;
+          ball.velocity = { x: 0, y: 0, z: 0 };
           alreadyCheckedBalls.push(ball);
           haveWeScratchedOverTable = ball.ballNumber === 0;
         }
