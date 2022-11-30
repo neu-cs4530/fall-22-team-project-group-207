@@ -17,7 +17,7 @@ import {
   PlayerLocation,
   TownEmitter,
   ViewingArea as ViewingAreaModel,
-  PoolGameArea as PoolGameAreaModel
+  PoolGameArea as PoolGameAreaModel,
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import Town from './Town';
