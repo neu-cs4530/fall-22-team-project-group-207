@@ -185,12 +185,8 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
   const rotationAngle: number = (cushionNumber * Math.PI) / 2;
   let xVelocityAdjusted: number =
     ball.velocity.x * Math.cos(rotationAngle) + ball.velocity.y * Math.sin(rotationAngle);
-  console.log('x initial');
-  console.log(xVelocityAdjusted);
   let yVelocityAdjusted: number =
     -ball.velocity.x * Math.sin(rotationAngle) + ball.velocity.y * Math.cos(rotationAngle);
-  console.log('y initial');
-  console.log(yVelocityAdjusted);
   let xAngularVelocityAdjusted: number =
     ball.angularVelocity.x * Math.cos(rotationAngle) +
     ball.angularVelocity.y * Math.sin(rotationAngle);
