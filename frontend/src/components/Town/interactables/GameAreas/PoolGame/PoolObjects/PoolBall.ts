@@ -78,11 +78,6 @@ export default class PoolBall {
     }
   }
 
-  public resetZVelocityAndPos(): void {
-    this._velocity.z = 0;
-    this._position.z = 0;
-  }
-
   get position(): Vector {
     return { x: this._position.x, y: this._position.y, z: this._position.z };
   }
