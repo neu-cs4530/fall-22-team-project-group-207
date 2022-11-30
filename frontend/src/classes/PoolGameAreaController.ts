@@ -6,7 +6,7 @@ import {
   ballBallCollision,
   ballSlateCollision,
   cueBallCollision,
-  cushionBallCollision,
+  // cushionBallCollision,
 } from '../components/Town/interactables/GameAreas/PoolGame/Collisions';
 import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
 import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
@@ -780,8 +780,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with right rail
-          cushionBallCollision(ball, 0);
-          // ball.velocity.x = -ball.velocity.x * 0.6;
+          // cushionBallCollision(ball, 0);
+          ball.velocity.x = -ball.velocity.x * 0.6;
           alreadyCheckedBalls.push(ball);
           ball.addRecentlyHitRail('right');
         } else if (
@@ -797,8 +797,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with left rail
-          cushionBallCollision(ball, 2);
-          // ball.velocity.x = -ball.velocity.x * 0.6;
+          // cushionBallCollision(ball, 2);
+          ball.velocity.x = -ball.velocity.x * 0.6;
           alreadyCheckedBalls.push(ball);
           ball.addRecentlyHitRail('left');
         } else if (
@@ -816,8 +816,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with top rail, but NOT with the pocket
-          cushionBallCollision(ball, 1);
-          // ball.velocity.y = -ball.velocity.y * 0.6;
+          // cushionBallCollision(ball, 1);
+          ball.velocity.y = -ball.velocity.y * 0.6;
           alreadyCheckedBalls.push(ball);
           ball.addRecentlyHitRail('top');
         } else if (
@@ -835,8 +835,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with bottom rail, but NOT with the pocket
-          cushionBallCollision(ball, 3);
-          // ball.velocity.y = -ball.velocity.y * 0.6;
+          // cushionBallCollision(ball, 3);
+          ball.velocity.y = -ball.velocity.y * 0.6;
           alreadyCheckedBalls.push(ball);
           ball.addRecentlyHitRail('bottom');
         }
