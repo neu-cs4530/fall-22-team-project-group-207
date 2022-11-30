@@ -548,69 +548,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           ball.removeOverlappingBall(oBall);
         }
       });
-      ball.recentlyHitRails.forEach(rail => {
-        switch (rail) {
-          case 'top': {
-            if (
-              magnitude(
-                subtractVectors(ball.position, {
-                  x: ball.position.x,
-                  y: RAIL_WIDTH,
-                  z: 0,
-                }),
-              )
-            ) {
-              ball.removeRecentlyHitRail(rail);
-            }
-            break;
-          }
-          case 'bottom': {
-            if (
-              magnitude(
-                subtractVectors(ball.position, {
-                  x: ball.position.x,
-                  y: this._tableWidth + RAIL_WIDTH,
-                  z: 0,
-                }),
-              )
-            ) {
-              ball.removeRecentlyHitRail(rail);
-            }
-            break;
-          }
-          case 'left': {
-            if (
-              magnitude(
-                subtractVectors(ball.position, {
-                  x: RAIL_WIDTH,
-                  y: ball.position.y,
-                  z: 0,
-                }),
-              )
-            ) {
-              ball.removeRecentlyHitRail(rail);
-            }
-            break;
-          }
-          case 'right': {
-            if (
-              magnitude(
-                subtractVectors(ball.position, {
-                  x: ball.position.x,
-                  y: RAIL_WIDTH,
-                  z: 0,
-                }),
-              )
-            ) {
-              ball.removeRecentlyHitRail(rail);
-            }
-            break;
-          }
-          default: {
-            break;
-          }
-        }
-      });
     });
 
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
@@ -793,9 +730,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.y < 0 &&
-          !ball.recentlyHitRails.includes('top') &&
-          (ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS ||
-            ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS) &&
+          ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS &&
+          ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS &&
           magnitude(
             subtractVectors(ball.position, {
               x: ball.position.x,
@@ -811,9 +747,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.y > 0 &&
-          !ball.recentlyHitRails.includes('bottom') &&
-          (ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS ||
-            ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS) &&
+          ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS &&
+          ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS &&
           magnitude(
             subtractVectors(ball.position, {
               x: ball.position.x,
