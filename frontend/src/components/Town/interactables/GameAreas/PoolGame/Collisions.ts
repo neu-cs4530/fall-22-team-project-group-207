@@ -1,3 +1,4 @@
+import { max } from 'lodash';
 import PoolBall from './PoolObjects/PoolBall';
 import PoolCue from './PoolObjects/PoolCue';
 import {
@@ -134,9 +135,6 @@ export function ballBallCollision(ball1: PoolBall, ball2: PoolBall) {
   // Friction and spin be damned.
   ball1.velocity = vA;
   ball2.velocity = vB;
-
-  console.log('from collisions.txt');
-  console.log(v0, vA, vB);
 }
 
 export function cueBallCollision(cue: PoolCue, ball: PoolBall) {
@@ -203,9 +201,14 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
     { x: 1, y: 0, z: 0 },
     { x: xVelocityAdjusted, y: yVelocityAdjusted, z: 0 },
   );
+  console.log('phi ' + phi);
   const ballRailFriction: number = 0.471 - 0.241 * theta;
-  const ballRailRestitution: number =
-    0.39 + 0.257 * xVelocityAdjusted - 0.044 * xVelocityAdjusted ** 2;
+  const ballRailRestitution: number = Math.max(
+    0.39 + 0.257 * xVelocityAdjusted - 0.044 * xVelocityAdjusted ** 2,
+    0.4,
+  );
+  console.log('fric ' + ballRailFriction);
+  console.log('rest ' + ballRailRestitution);
   const sx: number =
     xVelocityAdjusted * Math.sin(theta) -
     yVelocityAdjusted * Math.cos(theta) +
@@ -214,18 +217,25 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
     -yVelocityAdjusted -
     BALL_RADIUS * ball.velocity.z * Math.cos(theta) +
     BALL_RADIUS * xAngularVelocityAdjusted * Math.sin(theta);
+  console.log('sx ' + sx);
+  console.log('sy ' + sy);
+  console.log('x velocity adjusted ' + xVelocityAdjusted);
+  console.log('theta ' + theta);
   let c: number = xVelocityAdjusted * Math.cos(theta);
+  console.log('original c ' + c);
   const pzE: number = BALL_MASS * c * (1 + ballRailRestitution);
   const pzS: number = ((2 * BALL_MASS) / 7) * Math.sqrt(sx ** 2 + sy ** 2);
   const velocityFinal: Vector = { x: 0, y: 0, z: 0 };
   const angularVelocityFinal: Vector = { x: 0, y: 0, z: 0 };
   if (pzS <= pzE) {
+    console.log('entered if statement');
     xVelocityAdjusted =
       (-2 / 7) * sx * Math.sin(theta) - (1 + ballRailRestitution) * c * Math.cos(theta);
     yVelocityAdjusted = (2 / 7) * sy;
     velocityFinal.z =
       (2 / 7) * sx * Math.cos(theta) - (1 + ballRailRestitution) * c * Math.sin(theta);
   } else {
+    console.log('entered else statement');
     xVelocityAdjusted =
       -c *
       (1 + ballRailRestitution) *
@@ -235,6 +245,7 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
       c *
       (1 + ballRailRestitution) *
       (ballRailFriction * Math.cos(phi) * Math.cos(theta) - Math.sin(theta));
+    console.log(xVelocityAdjusted);
   }
   c = (BALL_MASS * BALL_RADIUS) / BALL_MOMENT_OF_INERTIA;
   xAngularVelocityAdjusted = -c * yVelocityAdjusted * Math.sin(theta);
@@ -254,6 +265,11 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
     yAngularVelocityAdjusted * Math.cos(-rotationAngle);
   ball.velocity = velocityFinal;
   ball.angularVelocity = angularVelocityFinal;
+  console.log(velocityFinal);
+  console.log(ballRailFriction);
+  console.log(ballRailRestitution);
+  console.log(c);
+  console.log(theta);
 }
 
 export function ballSlateCollision(ball: PoolBall) {

@@ -364,7 +364,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   // resets the pool balls to their starting position and scores to 0.
   resetGame(): void {
-    console.log('reset game from controller');
     // reset the model history.
     this.currentTick = 0;
     this.modelHistory = [this.currentModel];
@@ -390,7 +389,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    * @param cue information stored in the cue, which is passed to the physics engine
    */
   poolMove(cue: PoolCue) {
-    console.log('are any balls moving ' + this._areAnyPoolBallsMoving());
     // Player hits the cue ball
     if (cue) {
       cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
@@ -419,7 +417,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   private _areAnyPoolBallsMoving(): boolean {
     this._physicsPoolBalls.forEach(ball => {
       if (ball.isMoving) {
-        console.log('a pool ball is moving! Ball is: ' + ball.ballNumber);
         return true;
       }
     });
@@ -476,7 +473,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    * Placeholder function that is called every tick. Checks for collisions, scratches, game overs, etc.
    */
   gameTick(): void {
-    console.log('gametick');
     // only tick the game if we've actually started it. Assuming we'll start via an input in covey.town.
     if (this.isGameStarted) {
       this.poolPhysicsGoHere();
@@ -546,9 +542,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   poolPhysicsGoHere(): void {
     // check every pool ball's overlappingBalls list. If not overlapping with any ball, remove them from the list.
     this._physicsPoolBalls.forEach(ball => {
-      if (ball.ballNumber === 4) {
-        ball.overlappingBalls.map(b => console.log('overlap ' + b.ballNumber));
-      }
       ball.overlappingBalls.forEach(oBall => {
         if (magnitude(subtractVectors(ball.position, oBall.position)) > BALL_RADIUS * 2) {
           ball.removeOverlappingBall(oBall);
@@ -722,7 +715,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           cushionBallCollision(ball, 0);
           alreadyCheckedBalls.push(ball);
         } else if (
-          ball.velocity.x > 0 &&
+          ball.velocity.x < 0 &&
           magnitude(
             subtractVectors(ball.position, {
               x: RAIL_WIDTH,
@@ -736,7 +729,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           cushionBallCollision(ball, 2);
           alreadyCheckedBalls.push(ball);
         } else if (
-          ball.velocity.y > 0 &&
+          ball.velocity.y < 0 &&
           ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS &&
           ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS &&
           magnitude(
@@ -799,7 +792,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       }
     });
     // update the poolballmodels
-    console.log('update pool balls from controller');
     this.poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
   }
 

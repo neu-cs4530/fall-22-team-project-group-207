@@ -138,7 +138,6 @@ export default class PoolBall {
   }
 
   public tick(elapsedTime: number) {
-    console.log('tick from ball ' + this.ballNumber);
     if (this._isMoving) {
       this._updatePosition(elapsedTime);
       this._updateOrientation(elapsedTime);
@@ -149,11 +148,9 @@ export default class PoolBall {
           this.angularVelocity.x !== this.velocity.x / BALL_RADIUS ||
           this.angularVelocity.y !== this.velocity.y / BALL_RADIUS
         ) {
-          console.log('sliding ball ' + this.ballNumber);
           // sliding
           this._updateSlidingBall(elapsedTime);
         } else {
-          console.log('rolling ball ' + this.ballNumber);
           // rolling
           this._updateRollingBall(elapsedTime);
         }
@@ -214,19 +211,12 @@ export default class PoolBall {
       crossProduct(scale(kHat, BALL_RADIUS), this.angularVelocity),
     );
     const totalFrictionDirection: Vector = unitVector(relativeVelocity);
-    console.log('total friction direction: ' + totalFrictionDirection);
-    console.log(
-      'this.velocity (of pool ball ' + this.ballNumber + ') before subtract: ' + this.velocity,
-    );
     this.velocity = subtractVectors(
       this.velocity,
       scale(
         totalFrictionDirection,
         BALL_CLOTH_SLIDING_FRICTION * GRAVITATIONAL_CONSTANT * elapsedTime,
       ),
-    );
-    console.log(
-      'this.velocity (of pool ball ' + this.ballNumber + ') after subtract: ' + this.velocity,
     );
     const xyPlaneAngularVelocity: Vector = subtractVectors(
       { x: this.angularVelocity.x, y: this.angularVelocity.y, z: 0 },

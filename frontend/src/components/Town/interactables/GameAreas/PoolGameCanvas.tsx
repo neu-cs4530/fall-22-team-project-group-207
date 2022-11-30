@@ -168,7 +168,7 @@ export default function PoolGameCanvas({
                   250,
                 ),
                 15,
-              ) / 5;
+              ) / 10;
 
             const velocity: Vector = scale(velocityUnitVector, velocityScalar); // POOL TODO: get scalar for velocity
 
@@ -260,7 +260,10 @@ export default function PoolGameCanvas({
       if (ball.isPocketed) {
         return;
       }
-
+      if (ball.ballNumber === 12) {
+        console.log(ball.position);
+        console.log(ball.velocity);
+      }
       const displayPos = positionToPixels(ball.position);
 
       const img = POOL_BALL_IMAGES[ball.ballNumber];
