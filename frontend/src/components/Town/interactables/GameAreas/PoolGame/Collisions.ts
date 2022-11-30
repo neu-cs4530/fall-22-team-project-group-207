@@ -22,6 +22,11 @@ const CUE_TIP_BALL_RESTITUTION = 0.75;
 const CUSHION_HEIGHT = BALL_RADIUS * 0.2;
 const BALL_SLATE_RESTITUTION = 0.5;
 
+/**
+ * Represents types of collisions used in our pool physics
+ *
+ * NOTE: these were tested manually since these calculations are much too complicated to test in a test file
+ */
 export function ballBallCollisionWithFriction(ball1: PoolBall, ball2: PoolBall) {
   // v0 is the velocity vector of ball 1 as it's approaching. We multiply by the coeff of restitution for ball-ball collision to account for the small
   // loss of energy that occurs as a resalut of the collision

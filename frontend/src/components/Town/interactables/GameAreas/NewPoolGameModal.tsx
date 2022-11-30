@@ -7,7 +7,6 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   ModalOverlay,
   useToast,
@@ -83,7 +82,6 @@ export default function NewPoolGameModal(): JSX.Element {
         player1BallType: gameState.player1BallType,
         player2BallType: gameState.player2BallType,
         isBallBeingPlaced: gameState.isBallBeingPlaced,
-        isBallMoving: gameState.isBallMoving,
         poolBalls: gameState.poolBalls,
       };
       try {
@@ -125,7 +123,7 @@ export default function NewPoolGameModal(): JSX.Element {
           townController.unPause();
         }}>
         <ModalOverlay />
-        <ModalContent maxW='1800px' height='800px'>
+        <ModalContent maxW='1210px' height='1000px'>
           <ModalHeader>Play Pool!!!</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
@@ -144,7 +142,6 @@ export default function NewPoolGameModal(): JSX.Element {
              * https://www.cluemediator.com/draw-a-line-on-canvas-using-react/
              */}
           </ModalBody>
-          <ModalFooter>exit</ModalFooter>
         </ModalContent>
       </Modal>
     );
