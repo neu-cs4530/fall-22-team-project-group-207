@@ -13,8 +13,8 @@ const OUTSIDE_BORDER_WIDTH = 0.18; // m
 const POOL_TABLE_WIDTH = 2.9; // m
 const POOL_TABLE_HEIGHT = 1.63; // m
 const METER_TO_PIXEL_SCALAR = 400.0; // scalar
-const MOUSE_LEFT_OFFSET = 0;
-const MOUSE_TOP_OFFSET = 70;
+const MOUSE_LEFT_OFFSET = 0; // pixels
+const MOUSE_TOP_OFFSET = 70; // pixels
 
 /**
  * function to convert position of a ball in meters to the pixel value
