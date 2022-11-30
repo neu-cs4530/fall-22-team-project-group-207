@@ -378,7 +378,6 @@ describe('TownsController integration tests', () => {
             player2BallType: poolGameArea.player2BallType,
             isPlayer1Turn: poolGameArea.isPlayer1Turn,
             isBallBeingPlaced: poolGameArea.isBallBeingPlaced,
-            isBallMoving: poolGameArea.isBallMoving,
             playerIDToMove: poolGameArea.playerIDToMove,
           };
           await controller.createPoolGameArea(testingTown.townID, sessionToken, newPoolGameArea);
@@ -403,7 +402,6 @@ describe('TownsController integration tests', () => {
           player2BallType: poolGameArea.player2BallType,
           isPlayer1Turn: poolGameArea.isPlayer1Turn,
           isBallBeingPlaced: poolGameArea.isBallBeingPlaced,
-          isBallMoving: poolGameArea.isBallMoving,
           playerIDToMove: poolGameArea.playerIDToMove,
         };
         await expect(
@@ -422,7 +420,6 @@ describe('TownsController integration tests', () => {
           player2BallType: poolGameArea.player2BallType,
           isPlayer1Turn: poolGameArea.isPlayer1Turn,
           isBallBeingPlaced: poolGameArea.isBallBeingPlaced,
-          isBallMoving: poolGameArea.isBallMoving,
           playerIDToMove: poolGameArea.playerIDToMove,
         };
         await expect(

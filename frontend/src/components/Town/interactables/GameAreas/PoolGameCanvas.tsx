@@ -74,12 +74,6 @@ export default function PoolGameCanvas({
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
 
-  useEffect(() => {
-    console.log('got pool ball update');
-    console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.position);
-    console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.velocity);
-  }, [poolGameAreaController]);
-
   // Handle mouse events, namely movement and clicking
   useEffect(() => {
     const canvas = boardCanvasRef.current;
@@ -169,10 +163,10 @@ export default function PoolGameCanvas({
                     Math.pow(mouseClick1Pos.y - ballPos.y, 2) +
                       Math.pow(mouseClick1Pos.x - ballPos.x, 2),
                   ),
-                  200,
+                  250,
                 ),
                 15,
-              ) / 10;
+              ) / 5;
 
             const velocity: Vector = scale(velocityUnitVector, velocityScalar); // POOL TODO: get scalar for velocity
 
@@ -181,17 +175,17 @@ export default function PoolGameCanvas({
               scale(velocityUnitVector, -BALL_RADIUS),
             );
 
-            console.log(mouseClick1Pos);
-            console.log(velocity, velocityUnitVector, velocityScalar, collisionPoint);
             const cue: PoolCue = new PoolCue(velocity, collisionPoint);
-            console.log('making pool move');
             poolGameAreaController.poolMove(cue);
             setMouseClick1Pos(undefined);
           }
         }
       };
 
-      if (poolGameAreaController.isGameStarted) {
+      if (
+        poolGameAreaController.isGameStarted &&
+        poolGameAreaController.poolBalls.find(p => p.isMoving) !== undefined
+      ) {
         // Draw the player's inputs based on the current state of the game
         // If the the previous player scratched, the current player gets to place the cue ball
         if (
@@ -346,7 +340,7 @@ export default function PoolGameCanvas({
         ballOffset = Math.max(
           Math.min(
             Math.sqrt(Math.pow(mousePos.y - ballPos.y, 2) + Math.pow(mousePos.x - ballPos.x, 2)),
-            200,
+            250,
           ),
           15,
         );
@@ -377,7 +371,10 @@ export default function PoolGameCanvas({
       }
     };
 
-    if (poolGameAreaController.isGameStarted) {
+    if (
+      poolGameAreaController.isGameStarted &&
+      poolGameAreaController.poolBalls.find(p => p.isMoving) !== undefined
+    ) {
       // Draw the player's inputs based on the current state of the game
       // If the the previous player scratched, the current player gets to place the cue ball
       if (
@@ -433,8 +430,8 @@ export default function PoolGameCanvas({
       </Button>
       <Button
         onClick={() => {
-          console.log('click reset game button');
           poolGameAreaController.resetGame();
+          setTickToggle(!tickToggle);
         }}>
         Reset game
       </Button>

@@ -653,7 +653,6 @@ export default class TownController extends (EventEmitter as new () => TypedEmit
         poolBalls: [],
         isPlayer1Turn: true,
         isBallBeingPlaced: false,
-        isBallMoving: false,
       });
       this._poolGameAreas.push(newController);
       return newController;

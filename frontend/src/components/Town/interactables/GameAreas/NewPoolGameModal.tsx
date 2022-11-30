@@ -83,7 +83,6 @@ export default function NewPoolGameModal(): JSX.Element {
         player1BallType: gameState.player1BallType,
         player2BallType: gameState.player2BallType,
         isBallBeingPlaced: gameState.isBallBeingPlaced,
-        isBallMoving: gameState.isBallMoving,
         poolBalls: gameState.poolBalls,
       };
       try {
