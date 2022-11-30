@@ -212,11 +212,13 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
   let c: number = xVelocityAdjusted * Math.cos(theta);
   const pzE: number = BALL_MASS * c * (1 + ballRailRestitution);
   const pzS: number = ((2 * BALL_MASS) / 7) * Math.sqrt(sx ** 2 + sy ** 2);
+  const velocityFinal: Vector = { x: 0, y: 0, z: 0 };
+  const angularVelocityFinal: Vector = { x: 0, y: 0, z: 0 };
   if (pzS <= pzE) {
     xVelocityAdjusted =
       (-2 / 7) * sx * Math.sin(theta) - (1 + ballRailRestitution) * c * Math.cos(theta);
     yVelocityAdjusted = (2 / 7) * sy;
-    ball.velocity.z =
+    velocityFinal.z =
       (2 / 7) * sx * Math.cos(theta) - (1 + ballRailRestitution) * c * Math.sin(theta);
   } else {
     xVelocityAdjusted =
@@ -224,7 +226,7 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
       (1 + ballRailRestitution) *
       (ballRailFriction * Math.cos(phi) * Math.sin(theta) + Math.cos(theta));
     yVelocityAdjusted = c * (1 + ballRailRestitution) * ballRailFriction * Math.sin(phi);
-    ball.velocity.z =
+    velocityFinal.z =
       c *
       (1 + ballRailRestitution) *
       (ballRailFriction * Math.cos(phi) * Math.cos(theta) - Math.sin(theta));
@@ -234,17 +236,19 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
   yAngularVelocityAdjusted =
     c * (xVelocityAdjusted * Math.sin(theta) - ball.velocity.z * Math.cos(theta));
   // Restore frame of reference
-  ball.angularVelocity.z = c * yVelocityAdjusted * Math.cos(theta);
-  ball.velocity.x =
+  angularVelocityFinal.z = c * yVelocityAdjusted * Math.cos(theta);
+  velocityFinal.x =
     xVelocityAdjusted * Math.cos(-rotationAngle) + yVelocityAdjusted * Math.sin(-rotationAngle);
-  ball.velocity.y =
+  velocityFinal.y =
     -xVelocityAdjusted * Math.sin(-rotationAngle) + yVelocityAdjusted * Math.cos(-rotationAngle);
-  ball.angularVelocity.x =
+  angularVelocityFinal.x =
     xAngularVelocityAdjusted * Math.cos(-rotationAngle) +
     yAngularVelocityAdjusted * Math.sin(-rotationAngle);
-  ball.angularVelocity.y =
+  angularVelocityFinal.y =
     -xAngularVelocityAdjusted * Math.sin(-rotationAngle) +
     yAngularVelocityAdjusted * Math.cos(-rotationAngle);
+  ball.velocity = velocityFinal;
+  ball.angularVelocity = angularVelocityFinal;
 }
 
 export function ballSlateCollision(ball: PoolBall) {

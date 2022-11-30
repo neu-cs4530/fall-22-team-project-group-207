@@ -33,6 +33,8 @@ export default class PoolBall {
 
   private _isPocketed: boolean;
 
+  private _overlappingBalls: PoolBall[];
+
   constructor(xPosition: number, yPosition: number, ballNumber: number) {
     this._ballNumber = ballNumber;
     this._angularOrientation = { x: 0, y: 0, z: 0 };
@@ -42,6 +44,7 @@ export default class PoolBall {
     this._isMoving = false;
     this._isAirborne = false;
     this._isPocketed = false;
+    this._overlappingBalls = [];
   }
 
   get angularVelocity() {
@@ -111,6 +114,24 @@ export default class PoolBall {
     this._isMoving = isMoving;
   }
 
+  get overlappingBalls() {
+    return this._overlappingBalls;
+  }
+
+  set overlappingBalls(overlappingBalls: PoolBall[]) {
+    this._overlappingBalls = overlappingBalls;
+  }
+
+  public addOverlappingBall(ball: PoolBall) {
+    if (!this._overlappingBalls.includes(ball)) {
+      this._overlappingBalls.push(ball);
+    }
+  }
+
+  public removeOverlappingBall(ball: PoolBall) {
+    this._overlappingBalls = this._overlappingBalls.filter(oball => oball !== ball);
+  }
+
   public tick(elapsedTime: number) {
     console.log('tick from ball ' + this.ballNumber);
     if (this._isMoving) {
@@ -123,9 +144,11 @@ export default class PoolBall {
           this.angularVelocity.x !== this.velocity.x / BALL_RADIUS ||
           this.angularVelocity.y !== this.velocity.y / BALL_RADIUS
         ) {
+          console.log('sliding ball ' + this.ballNumber);
           // sliding
           this._updateSlidingBall(elapsedTime);
         } else {
+          console.log('rolling ball ' + this.ballNumber);
           // rolling
           this._updateRollingBall(elapsedTime);
         }
@@ -186,13 +209,16 @@ export default class PoolBall {
       crossProduct(scale(kHat, BALL_RADIUS), this.angularVelocity),
     );
     const totalFrictionDirection: Vector = unitVector(relativeVelocity);
-    this._velocity = subtractVectors(
+    console.log('total friction direction: ' + totalFrictionDirection);
+    console.log('this.velocity (of pool ball ' + this.ballNumber + ') before subtract: ' + this.velocity);
+    this.velocity = subtractVectors(
       this.velocity,
       scale(
         totalFrictionDirection,
         BALL_CLOTH_SLIDING_FRICTION * GRAVITATIONAL_CONSTANT * elapsedTime,
       ),
     );
+    console.log('this.velocity (of pool ball ' + this.ballNumber + ') after subtract: ' + this.velocity);
     const xyPlaneAngularVelocity: Vector = subtractVectors(
       { x: this.angularVelocity.x, y: this.angularVelocity.y, z: 0 },
       scale(crossProduct(kHat, relativeVelocity), ANGULAR_SLIDING_DECEL_COEFF * elapsedTime),

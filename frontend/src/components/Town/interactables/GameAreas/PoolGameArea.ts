@@ -78,7 +78,6 @@ export default class PoolGameArea extends GameArea {
   }
 
   private _updatePoolGameAreas(areas: PoolGameAreaController[]) {
-    // POOL TODO: look at _updateWhateverAreas in other Areas for reference
     const area = areas.find(eachAreaInController => eachAreaInController.id === this.name);
     if (area !== this._poolGameArea) {
       if (area === undefined) {
@@ -91,13 +90,16 @@ export default class PoolGameArea extends GameArea {
         // This might be useful if we want to update a text box saying whos turn it is?
         const updateListener = (newTurn: boolean) => {
           if (this._infoTextBox) {
-            if (newTurn) {
+            const isPlayer1Turn: boolean = this._infoTextBox.text === 'Player 1 Turn';
+            if (newTurn === isPlayer1Turn) {
               if (this._infoTextBox.visible) {
                 this._infoTextBox.setVisible(false);
               }
-              this._infoTextBox.text = 'Player 1 Turn';
+              this._infoTextBox.text = "Player 1's Turn";
+            } else if (newTurn === !isPlayer1Turn) {
+              this._infoTextBox.text = "Player 2's Turn";
             } else {
-              this._infoTextBox.text = 'Player 2 Turn';
+              this._infoTextBox.text = 'Play Pool!';
             }
           }
         };
