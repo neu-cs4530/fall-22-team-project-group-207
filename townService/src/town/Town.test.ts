@@ -762,7 +762,6 @@ describe('Town', () => {
       expect(poolGameArea.occupantsByID).toEqual([player.id]);
     });
   });
-});
   describe('disconnectAllPlayers', () => {
     beforeEach(() => {
       town.disconnectAllPlayers();
