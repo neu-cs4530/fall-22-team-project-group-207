@@ -496,9 +496,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       return '8ball';
     } else if (ballNumber >= 9 && ballNumber <= 15) {
       return 'Stripes';
+    } else if (ballNumber === 0) {
+      return 'CueBall';
+    } else {
+      return 'Invalid';
     }
-    // Cue ball has a number of 0?
-    return 'CueBall';
   }
 
   /**

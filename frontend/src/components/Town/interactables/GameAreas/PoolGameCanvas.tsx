@@ -219,6 +219,9 @@ export default function PoolGameCanvas({
     };
   }, [mouseClick1Pos, mousePos, poolGameAreaController, townController.userID]);
 
+  /**
+   * useEffect to get game end condition
+   */
   useEffect(() => {
     const setWinner = (winnerID: string) => {
       setGameWinner(winnerID);
