@@ -1,8 +1,5 @@
 import {
   Button,
-  // FormControl,
-  // FormLabel,
-  // Input,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -11,15 +8,13 @@ import {
   ModalOverlay,
   useToast,
 } from '@chakra-ui/react';
-import React, { useCallback, useEffect, useRef, useState } from 'react'; // useState
-// import { PoolGameModel } from '../../../../classes/PoolGameAreaController';
-import { useInteractable, usePoolGameAreaController } from '../../../../classes/TownController';
+import React, { useCallback, useEffect, useState } from 'react'; // useState
+import { useInteractable } from '../../../../classes/TownController';
 import useTownController from '../../../../hooks/useTownController';
 import PoolGameCanvas from './PoolGameCanvas';
 import { PoolGameArea as PoolGameAreaModel } from '../../../../types/CoveyTownSocket';
 import PoolGameArea from './PoolGameArea';
 import PoolLeaderboard from './PoolLeaderboardModal';
-import PoolGameAreaController from '../../../../classes/PoolGameAreaController';
 
 /**
  * Returns a modal that contains a display for the pool game

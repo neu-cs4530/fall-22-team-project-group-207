@@ -503,7 +503,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    */
   gameTick(): void {
     console.log('gametick');
-    this.emit('gameOver', '123456');
     // only tick the game if we've actually started it. Assuming we'll start via an input in covey.town.
     if (this.isGameStarted) {
       this.poolPhysicsGoHere();

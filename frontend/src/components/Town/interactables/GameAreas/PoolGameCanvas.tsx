@@ -304,7 +304,7 @@ export default function PoolGameCanvas({
     } else {
       drawAllBalls(boardCanvasCtx, poolGameAreaController.poolBalls);
     }
-  }, [poolGameAreaController.poolBalls, mousePos, tickToggle]);
+  }, [poolGameAreaController.poolBalls, mousePos, tickToggle, gameWinner, townController.players]);
 
   /**
    * useEffect to render the player's inputs to the game
