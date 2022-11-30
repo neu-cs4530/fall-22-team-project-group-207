@@ -63,6 +63,7 @@ export default function PoolGameCanvas({
   const [mouseClick1Pos, setMouseClick1Pos] = useState<{ x: number; y: number } | undefined>(
     undefined,
   );
+  const [tickToggle, setTickToggle] = useState(false);
 
   // Coordinates of mouse
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -281,7 +282,7 @@ export default function PoolGameCanvas({
     boardCanvasCtx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
     drawBoard(boardCanvasCtx);
     drawAllBalls(boardCanvasCtx, poolGameAreaController.poolBalls);
-  }, [poolGameAreaController.poolBalls, mousePos]);
+  }, [poolGameAreaController.poolBalls, mousePos, tickToggle]);
 
   /**
    * useEffect to render the player's inputs to the game
@@ -433,7 +434,13 @@ export default function PoolGameCanvas({
         }}>
         Reset game
       </Button>
-      <Button onClick={() => poolGameAreaController.gameTick()}>Tick game</Button>
+      <Button
+        onClick={() => {
+          poolGameAreaController.gameTick();
+          setTickToggle(!tickToggle);
+        }}>
+        Tick game
+      </Button>
       <canvas
         id='board canvas'
         className='pool-canvas'
