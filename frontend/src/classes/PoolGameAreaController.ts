@@ -130,11 +130,17 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   // list of all pockets, which hold their own location and radius
   private _pockets: Pocket[] = [
+    // top left
     { posnX: 0, posnY: 0, radius: POCKET_RADIUS },
+    // top middle
     { posnX: this._tableLength / 2, posnY: 0, radius: POCKET_RADIUS },
+    // top right
     { posnX: this._tableLength, posnY: 0, radius: POCKET_RADIUS },
+    // bottom left
     { posnX: 0, posnY: this._tableWidth, radius: POCKET_RADIUS },
+    // bottom middle
     { posnX: this._tableLength / 2, posnY: this._tableWidth, radius: POCKET_RADIUS },
+    // bottom right
     { posnX: this._tableLength, posnY: this._tableWidth, radius: POCKET_RADIUS },
   ];
 
@@ -538,6 +544,15 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
   // whatever else needs to go here, maybe physics
   poolPhysicsGoHere(): void {
+    // check every pool ball's overlappingBalls list. If not overlapping with any ball, remove them from the list.
+    this._physicsPoolBalls.forEach(ball => {
+      ball.overlappingBalls.forEach(oBall => {
+        if (magnitude(subtractVectors(ball.position, oBall.position)) > BALL_RADIUS * 2) {
+          ball.removeOverlappingBall(oBall);
+        }
+      });
+    });
+
     // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
     const movingBalls: PoolBall[] = this._physicsPoolBalls.filter(
       ball => ball.isMoving && !ball.isPocketed,
@@ -560,16 +575,20 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
         // ball-ball collisions
         this._physicsPoolBalls.forEach(otherBall => {
-          // check if the two current poolballs are different, and have not already been checked
+          // check if the two current poolballs are different, not overlapping, and have not already been checked
           if (
             !otherBall.isPocketed &&
             ball !== otherBall &&
-            !alreadyCheckedBalls.includes(otherBall)
+            !alreadyCheckedBalls.includes(otherBall) &&
+            !ball.overlappingBalls.includes(otherBall) &&
+            !otherBall.overlappingBalls.includes(ball)
           ) {
             if (magnitude(subtractVectors(ball.position, otherBall.position)) <= BALL_RADIUS * 2) {
               ballBallCollision(ball, otherBall);
               alreadyCheckedBalls.push(ball);
               alreadyCheckedBalls.push(otherBall);
+              ball.addOverlappingBall(otherBall);
+              otherBall.addOverlappingBall(ball);
 
               // can only scratch on the first cue/ball collision
               if (
@@ -715,6 +734,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.y > 0 &&
+          ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS &&
+          ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS &&
           magnitude(
             subtractVectors(ball.position, {
               x: ball.position.x,
@@ -724,11 +745,13 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           ) <=
             2 * BALL_RADIUS
         ) {
-          // collided with top rail
+          // collided with top rail, but NOT with the pocket
           cushionBallCollision(ball, 1);
           alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.y > 0 &&
+          ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS &&
+          ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS &&
           magnitude(
             subtractVectors(ball.position, {
               x: ball.position.x,
@@ -738,7 +761,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           ) <=
             2 * BALL_RADIUS
         ) {
-          // collided with bottom rail
+          // collided with bottom rail, but NOT with the pocket
           cushionBallCollision(ball, 3);
           alreadyCheckedBalls.push(ball);
         }
