@@ -201,6 +201,25 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   /**
+   * Whether the game has started.
+   */
+  public playerBallsPocketed(player1: boolean) {
+    return player1 ? this._player1BallsPocketed : this._player2BallsPocketed;
+  }
+
+  /**
+   * Sets the number of balls pocketed depending on the contents of the pool ball array
+   */
+  public updatePocketedBalls() {
+    this._player1BallsPocketed = this._poolBalls.filter(
+      ball => ball.isPocketed && ball.ballType === this._player1BallType,
+    ).length;
+    this._player2BallsPocketed = this._poolBalls.filter(
+      ball => ball.isPocketed && ball.ballType === this._player2BallType,
+    ).length;
+  }
+
+  /**
    * Whether a player is currently placing the cue ball anywhere on the board following a scratch.
    */
   get isBallBeingPlaced() {
@@ -507,6 +526,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           return { isGameOver: true, didPlayer1Win: true };
         } else if (this._player1BallsPocketed < 7) {
           // player 1 sunk the 8 ball before all of their own, so they lost
+          console.log(this._player1BallsPocketed);
           return { isGameOver: true, didPlayer1Win: false };
         }
       }
