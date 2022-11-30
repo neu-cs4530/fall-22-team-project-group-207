@@ -28,6 +28,37 @@ type TestMapDict = {
   [key in string]: ITiledMap;
 };
 const testingMaps: TestMapDict = {
+  onePoolGame: {
+    tiledversion: '1.9.0',
+    tileheight: 32,
+    tilesets: [],
+    tilewidth: 32,
+    type: 'map',
+    layers: [
+      {
+        id: 4,
+        name: 'Objects',
+        objects: [
+          {
+            type: 'PoolGameArea',
+            height: 237,
+            id: 39,
+            name: 'Name1',
+            rotation: 0,
+            visible: true,
+            width: 326,
+            x: 40,
+            y: 120,
+          },
+        ],
+        opacity: 1,
+        type: 'objectgroup',
+        visible: true,
+        x: 0,
+        y: 0,
+      },
+    ],
+  },
   twoConv: {
     tiledversion: '1.9.0',
     tileheight: 32,
@@ -684,7 +715,26 @@ describe('Town', () => {
       });
     });
   });
-
+  describe('addPoolGameArea', () => {
+    beforeEach(async () => {
+      town.initializeFromMap(testingMaps.onePoolGame);
+    });
+    it('Should return false if no area exists with that ID', () => {
+      expect(
+        town.addPoolGameArea({
+          id: nanoid(),
+          player1ID: undefined,
+          player2ID: undefined,
+          poolBalls: [],
+          player1BallType: undefined,
+          player2BallType: undefined,
+          isPlayer1Turn: false,
+          isBallBeingPlaced: false,
+          playerIDToMove: undefined,
+        }),
+      ).toBe(false);
+    });
+  });
   describe('disconnectAllPlayers', () => {
     beforeEach(() => {
       town.disconnectAllPlayers();
