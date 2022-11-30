@@ -724,8 +724,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             2 * BALL_RADIUS
         ) {
           // collided with left rail
-          // cushionBallCollision(ball, 2);
-          ball.velocity.x = -ball.velocity.x * 0.6;
+          cushionBallCollision(ball, 2);
+          // ball.velocity.x = -ball.velocity.x * 0.6;
           alreadyCheckedBalls.push(ball);
         } else if (
           ball.velocity.y > 0 &&
