@@ -61,7 +61,7 @@ export type PoolGameAreaEvents = {
 };
 
 const BALL_RADIUS = 0.028575; // m
-const TICK_RATE = 0.005; // s
+const TICK_RATE = 0.0005; // s
 const POCKET_RADIUS = 0.05; // m
 const RAIL_WIDTH = 0.051; // m
 
@@ -691,7 +691,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             subtractVectors(ball.position, {
               x: this._tableLength + RAIL_WIDTH,
               y: ball.position.y,
-              z: this._cushionHeight,
+              z: 0,
             }),
           ) <=
             2 * BALL_RADIUS
@@ -705,7 +705,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             subtractVectors(ball.position, {
               x: RAIL_WIDTH,
               y: ball.position.y,
-              z: this._cushionHeight,
+              z: 0,
             }),
           ) <=
             2 * BALL_RADIUS
@@ -719,7 +719,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             subtractVectors(ball.position, {
               x: ball.position.x,
               y: RAIL_WIDTH,
-              z: this._cushionHeight,
+              z: 0,
             }),
           ) <=
             2 * BALL_RADIUS
@@ -733,7 +733,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
             subtractVectors(ball.position, {
               x: ball.position.x,
               y: this._tableWidth + RAIL_WIDTH,
-              z: this._cushionHeight,
+              z: 0,
             }),
           ) <=
             2 * BALL_RADIUS
