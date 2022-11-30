@@ -132,6 +132,7 @@ export function ballBallCollision(ball1: PoolBall, ball2: PoolBall) {
 }
 
 export function cueBallCollision(cue: PoolCue, ball: PoolBall) {
+  console.log('cue ball collision from collision.ts');
   // We multiply the initial velocity by the coefficient of restition to account for some of the
   // energy loss that occurs, and then treat the rest of the collision as elastic
   const cueInitialVelocity: Vector = scale(cue.velocity, CUE_TIP_BALL_RESTITUTION);
@@ -170,6 +171,9 @@ export function cueBallCollision(cue: PoolCue, ball: PoolBall) {
     1 / BALL_MOMENT_OF_INERTIA,
   );
   ball.velocity = ballFinalVelocity;
+  console.log('final velocity');
+  console.log(ballFinalVelocity);
+  console.log(ball.isMoving);
 }
 
 export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
