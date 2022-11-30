@@ -229,6 +229,15 @@ describe('PoolGameAreaController', () => {
       expect(testArea.currentTick).toEqual(currentTick + 1);
     });
   });
+  describe('fastForward', () => {
+    it('emits the onTick event 10 times', () => {
+      const currentTick = testArea.currentTick;
+      testArea.isGameStarted = true;
+      testArea.fastForward();
+      expect(mockListeners.onTick).toBeCalledTimes(10);
+      expect(testArea.currentTick).toEqual(currentTick + 10);
+    });
+  });
   describe('occupantsChange', () => {
     it('emits the occupantsChange event', () => {
       testArea.occupants = testArea.occupants.slice(1);
@@ -242,8 +251,51 @@ describe('PoolGameAreaController', () => {
       expect(mockListeners.playersChange).toBeCalled();
     });
   });
+  describe('removePlayer', () => {
+    it('removes player 1', () => {
+      const newPlayerID = nanoid();
+      testArea.player1ID = newPlayerID;
+      expect(testArea.player1ID).toBe(newPlayerID);
+      testArea.removePlayer(newPlayerID);
+      expect(testArea.player1ID).toBeUndefined();
+    });
+    it('removes player 2', () => {
+      const newPlayerID = nanoid();
+      testArea.player2ID = newPlayerID;
+      expect(testArea.player2ID).toBe(newPlayerID);
+      testArea.removePlayer(newPlayerID);
+      expect(testArea.player1ID).toBeUndefined();
+    });
+    it('given unknown ID, removePlayer shouldnt do anything', () => {
+      const newPlayerID = nanoid();
+      const unknownPlayerID = nanoid();
+      testArea.player1ID = newPlayerID;
+      expect(testArea.player1ID).toBe(newPlayerID);
+      testArea.removePlayer(unknownPlayerID);
+      expect(testArea.player1ID).toBe(newPlayerID);
+    });
+  });
+  describe('placeCueBall', () => {
+    it('sets the cue ball position', () => {
+      const cueBall = testArea.poolBalls.find(p => p.ballNumber === 0);
+      expect(cueBall?.position).toBe({ x: 0.847, y: 0.634, z: 0 });
+      const samplePos = { x: 12, y: 598, z: -21 };
+      testArea.placeCueBall(samplePos);
+      expect(cueBall?.position).toBe({ x: 0.847, y: 0.634, z: 0 });
+    });
+    it('unsets isBallBeingPlaced', () => {
+      testArea.isBallBeingPlaced = true;
+      expect(testArea.isBallBeingPlaced).toBe(true);
+      testArea.placeCueBall({ x: 12, y: 598, z: -21 });
+      expect(testArea.isBallBeingPlaced).toBe(false);
+    });
+    it('emits onBallPlacement event', () => {
+      testArea.placeCueBall({ x: 12, y: 598, z: -21 });
+      expect(mockListeners.onBallPlacement).toBeCalled();
+    });
+  });
   describe('turnChange', () => {
-    it('emits the playerCturnChangehange event', () => {
+    it('emits the turnChange event', () => {
       testArea.isPlayer1Turn = true;
       expect(mockListeners.turnChange).toBeCalled();
     });
