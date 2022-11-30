@@ -730,7 +730,6 @@ describe('Town', () => {
           player2BallType: undefined,
           isPlayer1Turn: false,
           isBallBeingPlaced: false,
-          isBallMoving: false,
           playerIDToMove: undefined,
         }),
       ).toBe(false);
