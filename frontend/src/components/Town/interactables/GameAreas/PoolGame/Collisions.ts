@@ -227,7 +227,7 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
   console.log('original c ' + c);
   const pzE: number = BALL_MASS * c * (1 + ballRailRestitution);
   const pzS: number = ((2 * BALL_MASS) / 7) * Math.sqrt(sx ** 2 + sy ** 2);
-  let velocityFinal: Vector = { x: 0, y: 0, z: 0 };
+  const velocityFinal: Vector = { x: 0, y: 0, z: 0 };
   const angularVelocityFinal: Vector = { x: 0, y: 0, z: 0 };
   if (pzS <= pzE) {
     console.log('entered if statement');
@@ -239,16 +239,12 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
   } else {
     console.log('entered else statement');
     xVelocityAdjusted =
-      -ballRailFriction *
-      (1 + ballRailRestitution) *
-      c *
-      Math.cos(phi) * Math.sin(theta) - (1 + ballRailRestitution) * c * Math.cos(theta);
+      -ballRailFriction * (1 + ballRailRestitution) * c * Math.cos(phi) * Math.sin(theta) -
+       (1 + ballRailRestitution) * c * Math.cos(theta);
     yVelocityAdjusted = ballRailFriction * c * (1 + ballRailRestitution) * Math.sin(phi);
     velocityFinal.z =
-      ballRailFriction *
-      c *
-      (1 + ballRailRestitution) *
-      Math.cos(phi) * Math.cos(theta) - (1 + ballRailRestitution) * c * Math.sin(theta);
+      ballRailFriction * c * (1 + ballRailRestitution) * Math.cos(phi) * Math.cos(theta) -
+       (1 + ballRailRestitution) * c * Math.sin(theta);
     console.log(xVelocityAdjusted);
   }
   c = BALL_RADIUS / BALL_MOMENT_OF_INERTIA;
