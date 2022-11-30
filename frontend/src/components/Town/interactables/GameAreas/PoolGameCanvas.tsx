@@ -442,6 +442,8 @@ export default function PoolGameCanvas({
         onClick={() => {
           poolGameAreaController.gameTick();
           setTickToggle(!tickToggle);
+          console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.position);
+          console.log(poolGameAreaController.poolBalls.find(p => p.ballNumber === 0)?.velocity);
         }}>
         Tick game
       </Button>
