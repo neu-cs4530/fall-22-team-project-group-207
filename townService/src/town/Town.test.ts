@@ -740,7 +740,7 @@ describe('Town', () => {
     const newModel: PoolGameAreaModel = {
       id: 'PoolName',
       poolBalls: [],
-      isPlayer1Turn: true,
+      isPlayer1Turn: false,
       isBallBeingPlaced: false,
     };
     beforeEach(() => {
