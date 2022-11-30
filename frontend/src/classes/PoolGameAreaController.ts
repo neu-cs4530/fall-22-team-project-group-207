@@ -859,7 +859,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
           ball.velocity.y = 0;
           alreadyCheckedBalls.push(ball);
         } else if (ball.position.y < 0) {
-          ball.position.y = RAIL_WIDTH +  6 * BALL_RADIUS;
+          ball.position.y = RAIL_WIDTH + 6 * BALL_RADIUS;
           ball.velocity.x = 0;
           ball.velocity.y = 0;
           alreadyCheckedBalls.push(ball);
