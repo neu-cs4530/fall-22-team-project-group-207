@@ -43,7 +43,7 @@ const testingMaps: TestMapDict = {
           {
             type: 'PoolGameArea',
             height: 237,
-            id: 39,
+            id: 100,
             name: 'PoolName',
             rotation: 0,
             visible: true,
@@ -740,8 +740,13 @@ describe('Town', () => {
     const newModel: PoolGameAreaModel = {
       id: 'PoolName',
       poolBalls: [],
+      player1ID: undefined,
+      player2ID: undefined,
+      player1BallType: undefined,
+      player2BallType: undefined,
       isPlayer1Turn: false,
       isBallBeingPlaced: false,
+      playerIDToMove: undefined,
     };
     beforeEach(() => {
       playerTestData.moveTo(5000, 5000); // Inside of "PoolName" area
