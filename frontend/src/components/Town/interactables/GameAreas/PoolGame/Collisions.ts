@@ -141,7 +141,8 @@ export function cueBallCollision(cue: PoolCue, ball: PoolBall) {
   // theta is the angle between the normal vector and initial cue velocity vector
   const theta: number = angleBetween(normalUnitVector, cueInitialVelocity);
   // phi is the angle between the normal vector and final ball velocity vector
-  const phi: number = Math.atan(1 / (CUE_TIP_BALL_FRICTION * Math.sin(theta)));
+  const phi: number =
+    Math.sin(theta) === 0 ? 0 : Math.atan(1 / (CUE_TIP_BALL_FRICTION * Math.sin(theta)));
   // alpha is the angle between the final ball velocity vector and the initial cue velocity vector
   const alpha: number = theta - phi;
   const ballVelocityMagnitude: number =
@@ -184,7 +185,7 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
   let yAngularVelocityAdjusted: number =
     -ball.angularVelocity.x * Math.sin(rotationAngle) +
     ball.angularVelocity.y * Math.cos(rotationAngle);
-  const theta: number = Math.asin((CUSHION_HEIGHT - BALL_RADIUS) / BALL_RADIUS);
+  const theta: number = Math.asin((CUSHION_HEIGHT - ball.position.z) / BALL_RADIUS);
   const phi: number = angleBetween(
     { x: 1, y: 0, z: 0 },
     { x: xVelocityAdjusted, y: yVelocityAdjusted, z: 0 },

@@ -28,7 +28,7 @@ export function addVectors(v1: Vector, v2: Vector): Vector {
 
 // take the dot product of 2 vectors
 export function dotProduct(v1: Vector, v2: Vector): number {
-  return v1.x * v2.x + v1.y * v2.y + v1.z + v2.z;
+  return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
 // take the cross product of 2 vectors
@@ -41,5 +41,9 @@ export function crossProduct(v1: Vector, v2: Vector): Vector {
 
 // find the small (acute) angle between 2 vectors
 export function angleBetween(v1: Vector, v2: Vector): number {
-  return Math.acos(dotProduct(v1, v2) / (magnitude(v1) * magnitude(v2)));
+  // to guard against js floating point magic:
+  let ratio: number = dotProduct(v1, v2) / (magnitude(v1) * magnitude(v2));
+  ratio = ratio > 1 ? 1 : ratio;
+  ratio = ratio < -1 ? -1 : ratio;
+  return Math.acos(ratio);
 }
