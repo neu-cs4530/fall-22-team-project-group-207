@@ -415,12 +415,12 @@ export default function PoolGameCanvas({
       <Button
         onClick={() => (poolGameAreaController.player1ID = townController.userID)}
         disabled={poolGameAreaController.player1ID !== undefined}>
-        Join as player 1
+        Join as Player 1
       </Button>
       <Button
         onClick={() => (poolGameAreaController.player2ID = townController.userID)}
         disabled={poolGameAreaController.player2ID !== undefined}>
-        Join as player 2
+        Join as Player 2
       </Button>
       <Button
         onClick={() => poolGameAreaController.removePlayer(townController.userID)}
@@ -435,14 +435,14 @@ export default function PoolGameCanvas({
           poolGameAreaController.resetGame();
           setTickToggle(!tickToggle);
         }}>
-        Reset game
+        Reset Game
       </Button>
       <Button
         onClick={() => {
           poolGameAreaController.gameTick();
           setTickToggle(!tickToggle);
         }}>
-        Tick game
+        Tick Game
       </Button>
       <canvas
         id='board canvas'
