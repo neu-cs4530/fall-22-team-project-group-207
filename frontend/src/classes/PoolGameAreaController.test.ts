@@ -1,4 +1,4 @@
-import { mock, mockClear /*, MockProxy*/ } from 'jest-mock-extended';
+import { mock, mockClear } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
 import {
@@ -17,7 +17,6 @@ describe('PoolGameAreaController', () => {
   let testAreaModel: PoolGameAreaModel;
   let testUpdateAreaModel: PoolGameAreaModel;
   let initPoolBallModels: PoolBallModel[];
-  //const townController: MockProxy<TownController> = mock<TownController>();
   const mockListeners = mock<PoolGameAreaEvents>();
   beforeEach(() => {
     const playerLocation: PlayerLocation = {
@@ -156,7 +155,6 @@ describe('PoolGameAreaController', () => {
   });
   describe('isGameOver', () => {
     it('Recognizes when the game is over', () => {
-      const id = nanoid();
       const player1ID = nanoid();
       const player2ID = nanoid();
       const player1BallType = 'Solids';
