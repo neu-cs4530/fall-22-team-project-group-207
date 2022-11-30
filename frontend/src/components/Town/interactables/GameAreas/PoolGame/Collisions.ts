@@ -240,11 +240,11 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
     console.log('entered else statement');
     xVelocityAdjusted =
       -ballRailFriction * (1 + ballRailRestitution) * c * Math.cos(phi) * Math.sin(theta) -
-       (1 + ballRailRestitution) * c * Math.cos(theta);
+      (1 + ballRailRestitution) * c * Math.cos(theta);
     yVelocityAdjusted = ballRailFriction * c * (1 + ballRailRestitution) * Math.sin(phi);
     velocityFinal.z =
       ballRailFriction * c * (1 + ballRailRestitution) * Math.cos(phi) * Math.cos(theta) -
-       (1 + ballRailRestitution) * c * Math.sin(theta);
+      (1 + ballRailRestitution) * c * Math.sin(theta);
     console.log(xVelocityAdjusted);
   }
   c = BALL_RADIUS / BALL_MOMENT_OF_INERTIA;

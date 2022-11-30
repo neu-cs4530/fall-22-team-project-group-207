@@ -824,8 +824,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         } else if (
           ball.velocity.y < 0 &&
           !ball.recentlyHitRails.includes('top') &&
-          (ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS ||
-            ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS) &&
+          (ball.position.x < this._tableLength / 2 - POCKET_RADIUS ||
+            ball.position.x > this._tableLength / 2 + POCKET_RADIUS) &&
           magnitude(
             subtractVectors(ball.position, {
               x: ball.position.x,
@@ -843,8 +843,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
         } else if (
           ball.velocity.y > 0 &&
           !ball.recentlyHitRails.includes('bottom') &&
-          (ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS ||
-            ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS) &&
+          (ball.position.x < this._tableLength / 2 - POCKET_RADIUS ||
+            ball.position.x > this._tableLength / 2 + POCKET_RADIUS) &&
           magnitude(
             subtractVectors(ball.position, {
               x: ball.position.x,
