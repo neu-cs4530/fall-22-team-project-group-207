@@ -432,11 +432,15 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     }
 
     // play out the animations until they are done
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 40; i++) {
       this.fastForward();
-      // emits a history update to listeners, passing the new model history.
-      this.emit('onHistoryUpdate', this.modelHistory);
+      (async () => {
+        await new Promise(f => setTimeout(f, TICK_RATE));
+      })
     }
+
+    // emits a history update to listeners, passing the new model history.
+    this.emit('onHistoryUpdate', this.modelHistory);
 
     // swap the turns
     if (this.isPlayer1Turn) {
