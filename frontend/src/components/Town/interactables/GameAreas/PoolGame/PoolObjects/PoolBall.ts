@@ -20,7 +20,7 @@ export enum MotionState {
   Airborne = 'Airborne',
 }
 
-/**
+ /**
  * Represents a pool ball with physics implemented
  *
  * NOTE: these were tested manually since these calculations are much too complicated to test in a test file
@@ -113,11 +113,14 @@ export default class PoolBall {
 
   public evolveByTime(time: number) {
     this._position = addVectors(
-      this.position,
-      addVectors(scale(this.velocity, time), scale(this.acceleration, 0.5 * time ** 2)),
+      this.position, 
+      addVectors(
+        scale(this.velocity, time),
+        scale(this.acceleration, 0.5 * (time ** 2))
+      )
     );
     this._velocity = addVectors(this.velocity, scale(this.acceleration, time));
-    switch (this.stateOfMotion) {
+    switch(this.stateOfMotion) {
       case MotionState.Stationary:
         break;
       case MotionState.Spinning:
@@ -138,24 +141,19 @@ export default class PoolBall {
   private _evolveSpinningAngular(time: number) {
     if (this.angularVelocity.z >= 0) {
       this._angularVelocity.z = this.angularVelocity.z - ANGULAR_SPINNING_ACCEL_COEFF * time;
-      this._angularOrientation.z =
-        this.angularOrientation.z +
-        this.angularVelocity.z * time -
-        0.5 * ANGULAR_SPINNING_ACCEL_COEFF * time ** 2;
+      this._angularOrientation.z = this.angularOrientation.z +
+      this.angularVelocity.z * time -
+      0.5 * ANGULAR_SPINNING_ACCEL_COEFF * (time ** 2);
     } else {
       this._angularVelocity.z = this.angularVelocity.z + ANGULAR_SPINNING_ACCEL_COEFF * time;
-      this._angularOrientation.z =
-        this.angularOrientation.z +
-        this.angularVelocity.z * time +
-        0.5 * ANGULAR_SPINNING_ACCEL_COEFF * time ** 2;
+      this._angularOrientation.z = this.angularOrientation.z +
+      this.angularVelocity.z * time +
+      0.5 * ANGULAR_SPINNING_ACCEL_COEFF * (time ** 2);
     }
   }
 
   private _evolveAirborneAngular(time: number) {
-    this._angularOrientation = addVectors(
-      this.angularOrientation,
-      scale(this.angularVelocity, time),
-    );
+    this._angularOrientation = addVectors(this.angularOrientation, scale(this.angularVelocity, time));
   }
 
   private _evolveRollingAngular(time: number) {
@@ -168,40 +166,35 @@ export default class PoolBall {
 
   private _evolveSlidingAngular(time: number) {
     const relativeVelocityUnit: Vector = unitVector(this.relativeVelocity());
-    this._angularVelocity.x =
-      this.angularVelocity.x + ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.y * time;
-    this._angularVelocity.y =
-      this.angularVelocity.y + ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.x * time;
-    this._angularOrientation.x =
-      this._angularOrientation.x +
-      this.angularVelocity.x * time +
-      0.5 * ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.y * time ** 2;
-    this._angularOrientation.y =
-      this.angularOrientation.y +
-      this.angularVelocity.y * time +
-      0.5 * ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.x * time ** 2;
+    this._angularVelocity.x = this.angularVelocity.x + ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.y * time;
+    this._angularVelocity.y = this.angularVelocity.y + ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.x * time;
+    this._angularOrientation.x = this._angularOrientation.x +
+    this.angularVelocity.x * time +
+    0.5 * ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.y * (time ** 2);
+    this._angularOrientation.y = this.angularOrientation.y +
+    this.angularVelocity.y * time +
+    0.5 * ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.x * (time ** 2);
     this._evolveSpinningAngular(time);
   }
 
   get acceleration(): Vector {
     let acceleration: Vector = { x: 0, y: 0, z: 0 };
-    switch (this.stateOfMotion) {
+    switch(this.stateOfMotion) {
       case MotionState.Stationary:
-        break;
+          break;
       case MotionState.Spinning:
-        break;
+          break;
       case MotionState.Airborne:
-        acceleration.z = -GRAVITATIONAL_CONSTANT;
-        break;
+          acceleration.z = -GRAVITATIONAL_CONSTANT;
+          break;
       case MotionState.Rolling:
-        acceleration = scale(unitVector(this.velocity), -ROLLING_FRICTION * GRAVITATIONAL_CONSTANT);
-        break;
+          const velocityUnit: Vector = unitVector(this.velocity);
+          acceleration = scale(velocityUnit, -ROLLING_FRICTION * GRAVITATIONAL_CONSTANT);
+          break;
       case MotionState.Sliding:
-        acceleration = scale(
-          unitVector(this.relativeVelocity()),
-          -SLIDING_FRICTION * GRAVITATIONAL_CONSTANT,
-        );
-        break;
+          const relativeVelocityUnit: Vector = unitVector(this.relativeVelocity());
+          acceleration = scale(relativeVelocityUnit, -SLIDING_FRICTION * GRAVITATIONAL_CONSTANT);
+          break;
     }
     return acceleration;
   }
@@ -210,11 +203,9 @@ export default class PoolBall {
     if (this.velocity.z !== 0) {
       this.stateOfMotion = MotionState.Airborne;
     } else if (this.velocity.x !== 0 || this.velocity.y !== 0) {
-      if (
-        this.angularVelocity.x === this.velocity.y / BALL_RADIUS &&
-        this.angularVelocity.y === this.velocity.x / BALL_RADIUS
-      ) {
-        this.stateOfMotion = MotionState.Rolling;
+      if (this.angularVelocity.x === this.velocity.y / BALL_RADIUS &&
+          this.angularVelocity.y === this.velocity.x / BALL_RADIUS) {
+            this.stateOfMotion = MotionState.Rolling;
       } else {
         this.stateOfMotion = MotionState.Sliding;
       }
@@ -230,7 +221,10 @@ export default class PoolBall {
   public relativeVelocity(): Vector {
     const kHat: Vector = { x: 0, y: 0, z: 1 }; // vertical unit vector
     // the "velocity" that must be used when calculating friction, as it accounts for both linear and angular momentum
-    return addVectors(this.velocity, crossProduct(scale(kHat, BALL_RADIUS), this.angularVelocity));
+    return addVectors(
+      this.velocity,
+      crossProduct(scale(kHat, BALL_RADIUS), this.angularVelocity),
+    );
   }
 
   // Convert to a PoolBallModel suitable for broadcasting
