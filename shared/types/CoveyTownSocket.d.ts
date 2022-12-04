@@ -85,8 +85,6 @@ export type PoolBall = {
   ballNumber: number;
   ballType: string;
   // Other useful information
-  isMoving: boolean;
-  isAirborne: boolean;
   isPocketed: boolean;
 };
 
