@@ -24,7 +24,7 @@ export type PoolPocket = {
 
 // cushions are numbered cpositionkwise going around the table, starting with the left side cushion
 
-// SIDE cushionS:
+// SIDE cushions:
 const cushion1: CushionPlane = {
   point1: { x: 0, y: TABLE_WIDTH - Math.sin(0.7853982) * CORNER_POCKET_ENTRANCE_WIDTH, z: 0 },
   point2: { x: 0, y: Math.sin(0.7853982) * CORNER_POCKET_ENTRANCE_WIDTH, z: 0 },
@@ -270,12 +270,3 @@ const pocket6: PoolPocket = {
 };
 
 export const POCKETS: PoolPocket[] = [pocket1, pocket2, pocket3, pocket4, pocket5, pocket6];
-
-export const POCKETS: PoolPocket[] = [
-    POCKET1,
-    POCKET2,
-    POCKET3,
-    POCKET4,
-    POCKET5,
-    POCKET6,
-]
