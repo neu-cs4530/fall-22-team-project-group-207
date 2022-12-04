@@ -270,3 +270,12 @@ const pocket6: PoolPocket = {
 };
 
 export const POCKETS: PoolPocket[] = [pocket1, pocket2, pocket3, pocket4, pocket5, pocket6];
+
+export const POCKETS: PoolPocket[] = [
+    POCKET1,
+    POCKET2,
+    POCKET3,
+    POCKET4,
+    POCKET5,
+    POCKET6,
+]
