@@ -431,6 +431,11 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       this.gameTick();
     }
 
+    // play out the animations until they are done
+    for (let i = 0; i < 20; i++) {
+      this.fastForward();
+    }
+
     // emits a history update to listeners, passing the new model history.
     this.emit('onHistoryUpdate', this.modelHistory);
 
