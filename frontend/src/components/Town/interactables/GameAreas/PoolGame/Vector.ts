@@ -47,3 +47,8 @@ export function angleBetween(v1: Vector, v2: Vector): number {
   ratio = ratio < -1 ? -1 : ratio;
   return Math.acos(ratio);
 }
+
+// find the midpoint between 2 vectors
+export function midpoint(v1: Vector, v2: Vector): Vector {
+  return scale(addVectors(v1, v2), 0.5);
+}
