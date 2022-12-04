@@ -1,22 +1,33 @@
 import {
   addVectors,
   crossProduct,
-  magnitude,
   scale,
-  subtractVectors,
   unitVector,
   Vector,
 } from '../Vector';
 
-const BALL_CLOTH_ANGULAR_DECELERATION_RATE = 10; //rad/s^2
-const BALL_CLOTH_ROLLING_FRICTION = 0.01;
-const BALL_CLOTH_SLIDING_FRICTION = 0.4; // tentative
+import { PoolBall as PoolBallModel } from '../../../../../../types/CoveyTownSocket';
+
+const ROLLING_FRICTION = 0.01;
+const SLIDING_FRICTION = 0.4; // tentative
 const GRAVITATIONAL_CONSTANT = 9.8; // m/s^2
 const BALL_RADIUS = 0.028575; // m
-const ANGULAR_SLIDING_DECEL_COEFF =
-  (5 * BALL_CLOTH_SLIDING_FRICTION * GRAVITATIONAL_CONSTANT) / (2 * BALL_RADIUS);
+const SPINNING_FRICTION = 0.4444 * BALL_RADIUS;
+const ANGULAR_SPINNING_ACCEL_COEFF =
+  (5 * SPINNING_FRICTION * GRAVITATIONAL_CONSTANT) / (2 * BALL_RADIUS);
+const ANGULAR_SLIDING_ACCEL_COEFF =
+  (5 * SLIDING_FRICTION * GRAVITATIONAL_CONSTANT) / (2 * BALL_RADIUS);
 
-/**
+
+export enum MotionState {
+  Stationary = 'Stationary',
+  Spinning = 'Spinning',
+  Sliding = 'Sliding',
+  Rolling = 'Rolling',
+  Airborne = 'Airborne',
+}
+
+ /**
  * Represents a pool ball with physics implemented
  *
  * NOTE: these were tested manually since these calculations are much too complicated to test in a test file
@@ -32,15 +43,9 @@ export default class PoolBall {
 
   private _ballNumber: number;
 
-  private _isMoving: boolean;
-
-  private _isAirborne: boolean;
-
   private _isPocketed: boolean;
 
-  private _overlappingBalls: PoolBall[];
-
-  private _recentlyHitRails: string[];
+  private _stateOfMotion: MotionState;
 
   constructor(xPosition: number, yPosition: number, ballNumber: number) {
     this._ballNumber = ballNumber;
@@ -48,11 +53,8 @@ export default class PoolBall {
     this._angularVelocity = { x: 0, y: 0, z: 0 };
     this._position = { x: xPosition, y: yPosition, z: 0 };
     this._velocity = { x: 0, y: 0, z: 0 };
-    this._isMoving = false;
-    this._isAirborne = false;
     this._isPocketed = false;
-    this._overlappingBalls = [];
-    this._recentlyHitRails = [];
+    this._stateOfMotion = MotionState.Stationary;
   }
 
   get angularVelocity() {
@@ -69,13 +71,7 @@ export default class PoolBall {
 
   set velocity(v: Vector) {
     Object.assign(this._velocity, v);
-    if (v.x !== 0 || v.y !== 0) {
-      this._isMoving = true;
-    }
-    if (v.z !== 0) {
-      this._isMoving = true;
-      this._isAirborne = true;
-    }
+    this._updateStateOfMotion();
   }
 
   get position(): Vector {
@@ -86,6 +82,10 @@ export default class PoolBall {
     Object.assign(this._position, v);
   }
 
+  set angularOrientation(v: Vector) {
+    Object.assign(this._angularOrientation, v);
+  }
+
   get angularOrientation(): Vector {
     return {
       x: this._angularOrientation.x,
@@ -94,16 +94,12 @@ export default class PoolBall {
     };
   }
 
-  set isAirborne(isAirborne: boolean) {
-    this._isAirborne = isAirborne;
-  }
-
-  get isAirborne() {
-    return this._isAirborne;
-  }
-
   get ballNumber() {
     return this._ballNumber;
+  }
+
+  set ballNumber(ballNumber: number) {
+    this._ballNumber = ballNumber;
   }
 
   set isPocketed(isPocketed: boolean) {
@@ -114,145 +110,128 @@ export default class PoolBall {
     return this._isPocketed;
   }
 
-  get isMoving() {
-    return this._isMoving;
+  get stateOfMotion() {
+    return this._stateOfMotion;
   }
 
-  set isMoving(isMoving: boolean) {
-    this._isMoving = isMoving;
+  set stateOfMotion(state: MotionState) {
+    this._stateOfMotion = state;
   }
 
-  get overlappingBalls() {
-    return this._overlappingBalls;
-  }
-
-  set overlappingBalls(overlappingBalls: PoolBall[]) {
-    this._overlappingBalls = overlappingBalls;
-  }
-
-  public addOverlappingBall(ball: PoolBall) {
-    if (!this._overlappingBalls.includes(ball)) {
-      this._overlappingBalls.push(ball);
+  public evolveByTime(time: number) {
+    this._position = addVectors(
+      this.position, 
+      addVectors(
+        scale(this.velocity, time),
+        scale(this.acceleration, 0.5 * (time ** 2))
+      )
+    );
+    this._velocity = addVectors(this.velocity, scale(this.acceleration, time));
+    switch(this.stateOfMotion) {
+      case MotionState.Stationary:
+        break;
+      case MotionState.Spinning:
+        this._evolveSpinningAngular(time);
+        break;
+      case MotionState.Airborne:
+        this._evolveAirborneAngular(time);
+        break;
+      case MotionState.Rolling:
+        this._evolveRollingAngular(time);
+        break;
+      case MotionState.Sliding:
+        this._evolveSlidingAngular(time);
+        break;
     }
   }
 
-  public removeOverlappingBall(ball: PoolBall) {
-    this._overlappingBalls = this._overlappingBalls.filter(oball => oball !== ball);
-  }
-
-  get recentlyHitRails() {
-    return this._recentlyHitRails;
-  }
-
-  set recentlyHitRails(recentlyHitRails: string[]) {
-    this._recentlyHitRails = recentlyHitRails;
-  }
-
-  public addRecentlyHitRail(rail: string) {
-    if (!this._recentlyHitRails.includes(rail)) {
-      this._recentlyHitRails.push(rail);
+  private _evolveSpinningAngular(time: number) {
+    if (this.angularVelocity.z >= 0) {
+      this._angularVelocity.z = this.angularVelocity.z - ANGULAR_SPINNING_ACCEL_COEFF * time;
+      this._angularOrientation.z = this.angularOrientation.z +
+      this.angularVelocity.z * time -
+      0.5 * ANGULAR_SPINNING_ACCEL_COEFF * (time ** 2);
+    } else {
+      this._angularVelocity.z = this.angularVelocity.z + ANGULAR_SPINNING_ACCEL_COEFF * time;
+      this._angularOrientation.z = this.angularOrientation.z +
+      this.angularVelocity.z * time +
+      0.5 * ANGULAR_SPINNING_ACCEL_COEFF * (time ** 2);
     }
   }
 
-  public removeRecentlyHitRail(rail: string) {
-    this._recentlyHitRails = this._recentlyHitRails.filter(oRail => oRail !== rail);
+  private _evolveAirborneAngular(time: number) {
+    this._angularOrientation = addVectors(this.angularOrientation, scale(this.angularVelocity, time));
   }
 
-  public tick(elapsedTime: number) {
-    if (this._isMoving) {
-      this._updatePosition(elapsedTime);
-      this._updateOrientation(elapsedTime);
-      // decide if ball is airborne, rolling or sliding and update velocities accordingly
-      if (!this._isAirborne) {
-        // frictional forces will only affect velocities if the ball isn't airborne
-        if (
-          this.angularVelocity.x !== this.velocity.x / BALL_RADIUS ||
-          this.angularVelocity.y !== this.velocity.y / BALL_RADIUS
-        ) {
-          // sliding
-          this._updateSlidingBall(elapsedTime);
-        } else {
-          // rolling
-          this._updateRollingBall(elapsedTime);
-        }
+  private _evolveRollingAngular(time: number) {
+    this._angularVelocity.x = -this.velocity.y / BALL_RADIUS;
+    this._angularVelocity.y = this.velocity.x / BALL_RADIUS;
+    this._angularOrientation.x = -this.position.y / BALL_RADIUS;
+    this._angularOrientation.y = this.position.x / BALL_RADIUS;
+    this._evolveSpinningAngular(time);
+  }
+
+  private _evolveSlidingAngular(time: number) {
+    const relativeVelocityUnit: Vector = unitVector(this.relativeVelocity());
+    this._angularVelocity.x = this.angularVelocity.x + ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.y * time;
+    this._angularVelocity.y = this.angularVelocity.y + ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.x * time;
+    this._angularOrientation.x = this._angularOrientation.x +
+    this.angularVelocity.x * time +
+    0.5 * ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.y * (time ** 2);
+    this._angularOrientation.y = this.angularOrientation.y +
+    this.angularVelocity.y * time +
+    0.5 * ANGULAR_SLIDING_ACCEL_COEFF * relativeVelocityUnit.x * (time ** 2);
+    this._evolveSpinningAngular(time);
+  }
+
+  get acceleration(): Vector {
+    let acceleration: Vector = { x: 0, y: 0, z: 0 };
+    switch(this.stateOfMotion) {
+      case MotionState.Stationary:
+          break;
+      case MotionState.Spinning:
+          break;
+      case MotionState.Airborne:
+          acceleration.z = -GRAVITATIONAL_CONSTANT;
+          break;
+      case MotionState.Rolling:
+          const velocityUnit: Vector = unitVector(this.velocity);
+          acceleration = scale(velocityUnit, -ROLLING_FRICTION * GRAVITATIONAL_CONSTANT);
+          break;
+      case MotionState.Sliding:
+          const relativeVelocityUnit: Vector = unitVector(this.relativeVelocity());
+          acceleration = scale(relativeVelocityUnit, -SLIDING_FRICTION * GRAVITATIONAL_CONSTANT);
+          break;
+    }
+    return acceleration;
+  }
+
+  private _updateStateOfMotion() {
+    if (this.velocity.z !== 0) {
+      this.stateOfMotion = MotionState.Airborne;
+    } else if (this.velocity.x !== 0 || this.velocity.y !== 0) {
+      if (this.angularVelocity.x === this.velocity.y / BALL_RADIUS &&
+          this.angularVelocity.y === this.velocity.x / BALL_RADIUS) {
+            this.stateOfMotion = MotionState.Rolling;
+      } else {
+        this.stateOfMotion = MotionState.Sliding;
+      }
+    } else {
+      if (this.angularVelocity.z !== 0) {
+        this.stateOfMotion = MotionState.Spinning;
+      } else {
+        this.stateOfMotion = MotionState.Stationary;
       }
     }
-    if (this.angularVelocity.z !== 0) {
-      this._updateSpinningBall(elapsedTime);
-    }
   }
 
-  private _updateOrientation(elapsedTime: number) {
-    this._angularOrientation = addVectors(
-      this.angularOrientation,
-      scale(this.angularVelocity, elapsedTime),
-    );
-  }
-
-  private _updatePosition(elapsedTime: number) {
-    this._position = addVectors(this.position, scale(this.velocity, elapsedTime));
-  }
-
-  private _updateSpinningBall(elapsedTime: number) {
-    if (this.position.z > 0) {
-      return;
-    }
-    const changeInSpin: number = elapsedTime * BALL_CLOTH_ANGULAR_DECELERATION_RATE;
-    if (changeInSpin > Math.abs(this.angularVelocity.z)) {
-      this._angularVelocity.z = 0;
-    } else {
-      this._angularVelocity.z =
-        this.angularVelocity.z > 0
-          ? this.angularVelocity.z - changeInSpin
-          : this.angularVelocity.z + changeInSpin;
-    }
-  }
-
-  private _updateRollingBall(elapsedTime: number) {
-    const frictionVector: Vector = scale(
-      unitVector(this.velocity),
-      BALL_CLOTH_ROLLING_FRICTION * GRAVITATIONAL_CONSTANT * elapsedTime,
-    );
-    if (magnitude(this.velocity) > magnitude(frictionVector)) {
-      this._velocity = subtractVectors(this.velocity, frictionVector);
-    } else {
-      this._velocity = { x: 0, y: 0, z: 0 };
-      this._isMoving = false;
-    }
-    this._angularVelocity.y = this.velocity.x / BALL_RADIUS;
-    this._angularVelocity.x = this.velocity.y / BALL_RADIUS;
-  }
-
-  private _updateSlidingBall(elapsedTime: number) {
-    // vertical unit vector
-    const kHat: Vector = { x: 0, y: 0, z: 1 };
+  public relativeVelocity(): Vector {
+    const kHat: Vector = { x: 0, y: 0, z: 1 }; // vertical unit vector
     // the "velocity" that must be used when calculating friction, as it accounts for both linear and angular momentum
-    const relativeVelocity: Vector = addVectors(
+    return addVectors(
       this.velocity,
       crossProduct(scale(kHat, BALL_RADIUS), this.angularVelocity),
     );
-    const totalFrictionDirection: Vector = unitVector(relativeVelocity);
-    this.velocity = subtractVectors(
-      this.velocity,
-      scale(
-        totalFrictionDirection,
-        BALL_CLOTH_SLIDING_FRICTION * GRAVITATIONAL_CONSTANT * elapsedTime,
-      ),
-    );
-    const xyPlaneAngularVelocity: Vector = subtractVectors(
-      { x: this.angularVelocity.x, y: this.angularVelocity.y, z: 0 },
-      scale(crossProduct(kHat, relativeVelocity), ANGULAR_SLIDING_DECEL_COEFF * elapsedTime),
-    );
-    if (
-      Math.abs(xyPlaneAngularVelocity.x - this.velocity.x / BALL_RADIUS) < 0.01 &&
-      Math.abs(xyPlaneAngularVelocity.y - this.velocity.y / BALL_RADIUS) < 0.01
-    ) {
-      this._angularVelocity.y = this.velocity.x / BALL_RADIUS;
-      this._angularVelocity.x = this.velocity.y / BALL_RADIUS;
-    } else {
-      this._angularVelocity.x = xyPlaneAngularVelocity.x;
-      this._angularVelocity.y = xyPlaneAngularVelocity.y;
-    }
   }
 
   // Convert to a PoolBallModel suitable for broadcasting
@@ -264,10 +243,16 @@ export default class PoolBall {
       velocity: this.velocity,
       ballNumber: this.ballNumber,
       ballType: this.getBallTypeByNumber(this.ballNumber),
-      isMoving: this.isMoving,
-      isAirborne: this.isAirborne,
       isPocketed: this.isPocketed,
     };
+  }
+
+  public fromModel(model: PoolBallModel) {
+    this.angularVelocity = model.angularVelocity;
+    this.angularOrientation = model.angularOrientation;
+    this.position = model.position;
+    this.velocity = model.velocity;
+    this.ballNumber = model.ballNumber;
   }
 
   /**
