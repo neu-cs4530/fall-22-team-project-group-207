@@ -214,7 +214,7 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
   let c: number = xVelocityAdjusted * Math.cos(theta);
   const pzE: number = BALL_MASS * c * (1 + ballRailRestitution);
   const pzS: number = ((2 * BALL_MASS) / 7) * Math.sqrt(sx ** 2 + sy ** 2);
-  let velocityFinal: Vector = { x: 0, y: 0, z: 0 };
+  const velocityFinal: Vector = { x: 0, y: 0, z: 0 };
   const angularVelocityFinal: Vector = { x: 0, y: 0, z: 0 };
   if (pzS <= pzE) {
     xVelocityAdjusted =
