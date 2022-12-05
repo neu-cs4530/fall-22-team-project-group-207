@@ -79,6 +79,16 @@ export default function PoolGameCanvas({
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      poolGameAreaController.gameTick();
+      setTickToggle(!tickToggle);
+    }, 25);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [poolGameAreaController, tickToggle]);
+
   // Handle mouse events, namely movement and clicking
   useEffect(() => {
     const canvas = boardCanvasRef.current;
@@ -154,7 +164,7 @@ export default function PoolGameCanvas({
                   250,
                 ),
                 15,
-              ) / 5;
+              ) / 3;
 
             const velocity: Vector = scale(velocityUnitVector, velocityScalar);
 
