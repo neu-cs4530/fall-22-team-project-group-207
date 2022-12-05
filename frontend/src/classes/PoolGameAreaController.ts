@@ -6,15 +6,20 @@ import {
   ballBallCollision,
   ballSlateCollision,
   cueBallCollision,
+  cushionBallCollision,
   // cushionBallCollision,
 } from '../components/Town/interactables/GameAreas/PoolGame/Collisions';
-import PoolBall from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
-import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
 import {
-  magnitude,
-  subtractVectors,
-  Vector,
-} from '../components/Town/interactables/GameAreas/PoolGame/Vector';
+  EventType,
+  TimedEvent,
+  timeUntilNextEvent,
+} from '../components/Town/interactables/GameAreas/PoolGame/EventHandler';
+import PoolBall, {
+  MotionState,
+} from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolBall';
+import PoolCue from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolCue';
+import { CushionPlane } from '../components/Town/interactables/GameAreas/PoolGame/PoolObjects/PoolTable';
+import { Vector } from '../components/Town/interactables/GameAreas/PoolGame/Vector';
 import { PoolLeaderboardServiceClient } from '../poolLeaderboardServices/PoolLeaderboardServiceClient';
 import {
   PoolBall as PoolBallModel,
@@ -63,7 +68,6 @@ export type PoolGameAreaEvents = {
 const BALL_RADIUS = 0.028575; // m
 const TICK_RATE = 0.0005; // s
 const POCKET_RADIUS = 0.05; // m
-const RAIL_WIDTH = 0.051; // m
 
 export default class PoolGameAreaController extends (EventEmitter as new () => TypedEmitter<PoolGameAreaEvents>) {
   // Players in bounds of the area
@@ -80,8 +84,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
    */
   public modelHistory: PoolGameAreaModel[] = [];
 
+  private _eventHistory: [number, PoolBallModel[]][] = [];
+
   // The tick the game is currently on, for use indexing the modelHistory
-  public currentTick = 0;
+  public currentTime = 0;
 
   private _player1ID: string | undefined;
 
@@ -365,7 +371,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // resets the pool balls to their starting position and scores to 0.
   resetGame(): void {
     // reset the model history.
-    this.currentTick = 0;
+    this.currentTime = 0;
     this.modelHistory = [this.currentModel];
 
     // set pool balls into break position. Declaring new pool balls is to reset their fields.
@@ -384,6 +390,60 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this.emit('onTick', this.toPoolGameAreaModel());
   }
 
+  constructEvents() {
+    // start at time 0
+    let currentTime = 0;
+    // save the starting ball position
+    this._eventHistory.push([currentTime, this._physicsPoolBalls.map(ball => ball.toModel())]);
+    let nextEvent: TimedEvent = { timeUntil: 0, eventType: EventType.BallToBall, participants: [] };
+    // while the next event is not a resting state
+    while (nextEvent.eventType !== EventType.Rest) {
+      // find the time until the next event
+      nextEvent = timeUntilNextEvent(this._physicsPoolBalls);
+      const time: number = nextEvent.timeUntil;
+      // progress the state of the animation
+      this._physicsPoolBalls.forEach(ball => ball.evolveByTime(time));
+      currentTime += nextEvent.timeUntil;
+      // trigger a different occurance depending on what the event is
+      const eventBall: PoolBall = <PoolBall>nextEvent.participants[0];
+      switch (nextEvent.eventType) {
+        case EventType.SpinningToStationary:
+          eventBall.stateOfMotion = MotionState.Stationary;
+          break;
+        case EventType.SlidingToRolling:
+          eventBall.stateOfMotion = MotionState.Rolling;
+          break;
+        case EventType.RollingToStationary:
+          eventBall.stateOfMotion = MotionState.Stationary;
+          break;
+        case EventType.BallToBall:
+          ballBallCollision(eventBall, <PoolBall>nextEvent.participants[1]);
+          break;
+        case EventType.BallToCushion:
+          cushionBallCollision(eventBall, <CushionPlane>nextEvent.participants[1]);
+          break;
+        case EventType.BallToPocket:
+          eventBall.isPocketed = true;
+          eventBall.position = { x: 1000, y: 1000, z: 1000 };
+          if (eventBall.ballType === 'CueBall') {
+            this.isBallBeingPlaced = true;
+          } else if (eventBall.toModel().ballType === this._player1BallType) {
+            this._player1BallsPocketed += 1;
+          } else {
+            this._player2BallsPocketed += 1;
+          }
+          break;
+        case EventType.BallToSlate:
+          ballSlateCollision(eventBall);
+          break;
+        case EventType.Rest:
+          break;
+      }
+      // update the history
+      this._eventHistory.push([currentTime, this._physicsPoolBalls.map(ball => ball.toModel())]);
+    }
+  }
+
   /**
    * A player makes a move. Runs the onTick function repeatedly until every ball stops moving.
    * @param cue information stored in the cue, which is passed to the physics engine
@@ -393,13 +453,8 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     if (cue) {
       cueBallCollision(cue, this._physicsPoolBalls[this._cueBallIndex]);
     }
-    // Tick until every ball stops moving, whether they roll to a stop or get pocketed.
-    while (this._areAnyPoolBallsMoving()) {
-      this.gameTick();
-    }
 
-    // emits a history update to listeners, passing the new model history.
-    this.emit('onHistoryUpdate', this.modelHistory);
+    this.constructEvents();
 
     // swap the turns
     if (this.isPlayer1Turn) {
@@ -433,7 +488,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // if (!this.player1ID || !this.player2ID) {
     //   return;
     // }
-    this.currentTick = 0;
+    this.currentTime = 0;
     this.modelHistory = [this.currentModel];
     // randomly decide who is first
     this._isPlayer1Turn = Math.random() <= 0.5;
@@ -476,7 +531,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   gameTick(): void {
     // only tick the game if we've actually started it. Assuming we'll start via an input in covey.town.
     if (this.isGameStarted) {
-      this.poolPhysicsGoHere();
+      this.tickAnimation();
       this.currentModel = this.toPoolGameAreaModel();
 
       if (this.isGameOver().isGameOver) {
@@ -484,7 +539,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
       }
       this.emit('onTick', this.currentModel);
       this.modelHistory.push(this.currentModel);
-      this.currentTick++;
+      this.currentTime += TICK_RATE;
     }
   }
 
@@ -540,261 +595,25 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   // whatever else needs to go here, maybe physics
-  poolPhysicsGoHere(): void {
-    // check every pool ball's overlappingBalls list. If not overlapping with any ball, remove them from the list.
-    this._physicsPoolBalls.forEach(ball => {
-      ball.overlappingBalls.forEach(oBall => {
-        if (magnitude(subtractVectors(ball.position, oBall.position)) > BALL_RADIUS * 2) {
-          ball.removeOverlappingBall(oBall);
-        }
-      });
-    });
-
-    // holds all of the currently moving pool balls-- these are the ones we need to check collisions with
-    const movingBalls: PoolBall[] = this._physicsPoolBalls.filter(
-      ball => ball.isMoving && !ball.isPocketed,
-    );
-    // holds all of the pool balls we've already checked for collisions to prevent duplicate collisions
-    const alreadyCheckedBalls: PoolBall[] = [];
-
-    // we can only scratch once per turn, so this boolean represents whether that has happened yet
-    let canScratch = true;
-
-    // loop through every pool ball, calling an update function on them and checking for collisions.
-    // if any collisions, call the collide function on both balls, passing each other as parameters.
-    movingBalls.forEach(ball => {
-      ball.tick(TICK_RATE);
-      if (!alreadyCheckedBalls.includes(ball)) {
-        // ball-table collisions
-        if (ball.position.z <= 0 && ball.velocity.z < 0) {
-          ballSlateCollision(ball);
-        }
-
-        // ball-ball collisions
-        this._physicsPoolBalls.forEach(otherBall => {
-          // check if the two current poolballs are different, not overlapping, and have not already been checked
-          if (
-            !otherBall.isPocketed &&
-            ball !== otherBall &&
-            !alreadyCheckedBalls.includes(otherBall) &&
-            !ball.overlappingBalls.includes(otherBall) &&
-            !otherBall.overlappingBalls.includes(ball)
-          ) {
-            if (magnitude(subtractVectors(ball.position, otherBall.position)) <= BALL_RADIUS * 2) {
-              ballBallCollision(ball, otherBall);
-              alreadyCheckedBalls.push(ball);
-              alreadyCheckedBalls.push(otherBall);
-              ball.addOverlappingBall(otherBall);
-              otherBall.addOverlappingBall(ball);
-
-              // can only scratch on the first cue/ball collision
-              if (
-                canScratch &&
-                (this.getBallTypeByNumber(ball.ballNumber) === 'CueBall' ||
-                  this.getBallTypeByNumber(otherBall.ballNumber) === 'CueBall')
-              ) {
-                // check for scratches
-                if (this._player1BallType) {
-                  // ball is the cue ball
-                  if (
-                    this.isPlayer1Turn &&
-                    ball.ballNumber === 0 &&
-                    this.getBallTypeByNumber(otherBall.ballNumber) !== this._player1BallType
-                  ) {
-                    // player 1 hit the wrong ball, scratch
-                    this._isBallBeingPlaced = true;
-                    this._playerIDToMove = this.player2ID;
-                    canScratch = false;
-                  }
-                  // otherBall is the cue ball
-                  if (
-                    this.isPlayer1Turn &&
-                    otherBall.ballNumber === 0 &&
-                    this.getBallTypeByNumber(ball.ballNumber) !== this._player1BallType
-                  ) {
-                    // player 1 hit the wrong ball, scratch
-                    this._isBallBeingPlaced = true;
-                    this._playerIDToMove = this.player2ID;
-                    canScratch = false;
-                  }
-                }
-                if (this._player2BallType) {
-                  // ball is the cue ball
-                  if (
-                    !this.isPlayer1Turn &&
-                    ball.ballNumber === 0 &&
-                    this.getBallTypeByNumber(otherBall.ballNumber) !== this._player2BallType
-                  ) {
-                    // player 2 hit the wrong ball, scratch
-                    this._isBallBeingPlaced = true;
-                    this._playerIDToMove = this.player1ID;
-                    canScratch = false;
-                  }
-                  // otherBall is the cue ball
-                  if (
-                    !this.isPlayer1Turn &&
-                    otherBall.ballNumber === 0 &&
-                    this.getBallTypeByNumber(ball.ballNumber) !== this._player2BallType
-                  ) {
-                    // player 2 hit the wrong ball, scratch
-                    this._isBallBeingPlaced = true;
-                    this._playerIDToMove = this.player1ID;
-                    canScratch = false;
-                  }
-                }
-              }
-            }
-          }
-        });
-        // at this point we've checked the current moving ball against every other ball, so do other checks
-
-        // check if ball goes in pocket
-        this._pockets.forEach(pocket => {
-          if (
-            magnitude(subtractVectors(ball.position, { x: pocket.posnX, y: pocket.posnY, z: 0 })) <=
-            BALL_RADIUS + pocket.radius
-          ) {
-            // ball goes in pocket, so stop it from moving !!
-            ball.isPocketed = true;
-            ball.isMoving = false;
-            const ballType = this.getBallTypeByNumber(ball.ballNumber);
-
-            // if the players don't have a ball type yet, assign them
-            if (this._player1BallType === undefined && this._player2BallType == undefined) {
-              if (this._isPlayer1Turn) {
-                this._player1BallType = ballType;
-                if (ballType === 'Stripes') {
-                  this._player2BallType = 'Solids';
-                } else {
-                  this._player2BallType = 'Stripes';
-                }
-              } else {
-                this._player2BallType = ballType;
-                if (ballType === 'Stripes') {
-                  this._player1BallType = 'Solids';
-                } else {
-                  this._player1BallType = 'Stripes';
-                }
-              }
-            }
-
-            if (ballType === this._player1BallType) {
-              this._player1BallsPocketed++;
-            } else if (ballType === this._player2BallType) {
-              this._player2BallsPocketed++;
-            } else if (ballType === 'CueBall') {
-              // cue ball went in pocket, scratch
-              this._isBallBeingPlaced = true;
-              if (this.isPlayer1Turn) {
-                this._playerIDToMove = this.player2ID;
-              } else {
-                this._playerIDToMove = this.player1ID;
-              }
-              this._isPlayer1Turn = !this._isPlayer1Turn;
-              canScratch = false;
-            }
-          }
-        });
-
-        // check if the ball has collided with the side rails
-        if (
-          ball.velocity.x > 0 &&
-          magnitude(
-            subtractVectors(ball.position, {
-              x: this._tableLength + RAIL_WIDTH,
-              y: ball.position.y,
-              z: 0,
-            }),
-          ) <=
-            2 * BALL_RADIUS
-        ) {
-          // collided with right rail
-          // cushionBallCollision(ball, 0);
-          ball.velocity.x = -ball.velocity.x * 0.6;
-          alreadyCheckedBalls.push(ball);
-        } else if (
-          ball.velocity.x < 0 &&
-          magnitude(
-            subtractVectors(ball.position, {
-              x: RAIL_WIDTH,
-              y: ball.position.y,
-              z: 0,
-            }),
-          ) <=
-            2 * BALL_RADIUS
-        ) {
-          // collided with left rail
-          // cushionBallCollision(ball, 2);
-          ball.velocity.x = -ball.velocity.x * 0.6;
-          alreadyCheckedBalls.push(ball);
-        } else if (
-          ball.velocity.y > 0 &&
-          !ball.recentlyHitRails.includes('top') &&
-          (ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS ||
-            ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS) &&
-          magnitude(
-            subtractVectors(ball.position, {
-              x: ball.position.x,
-              y: RAIL_WIDTH,
-              z: 0,
-            }),
-          ) <=
-            2 * BALL_RADIUS
-        ) {
-          // collided with top rail, but NOT with the pocket
-          // cushionBallCollision(ball, 1);
-          ball.velocity.y = -ball.velocity.y * 0.6;
-          alreadyCheckedBalls.push(ball);
-        } else if (
-          ball.velocity.y > 0 &&
-          ball.position.x < this._tableLength / 2 - 2 * POCKET_RADIUS &&
-          ball.position.x > this._tableLength / 2 + 2 * POCKET_RADIUS &&
-          magnitude(
-            subtractVectors(ball.position, {
-              x: ball.position.x,
-              y: this._tableWidth + RAIL_WIDTH,
-              z: 0,
-            }),
-          ) <=
-            2 * BALL_RADIUS
-        ) {
-          // collided with bottom rail, but NOT with the pocket
-          // cushionBallCollision(ball, 3);
-          ball.velocity.y = -ball.velocity.y * 0.6;
-          alreadyCheckedBalls.push(ball);
-        }
-
-        // check if the ball has gone off the board/ over the rails
-        let haveWeScratchedOverTable = false;
-        if (ball.position.x > this._tableLength) {
-          ball.position.x = this._tableLength - BALL_RADIUS;
-          alreadyCheckedBalls.push(ball);
-        } else if (ball.position.x < 0) {
-          ball.position.x = RAIL_WIDTH + BALL_RADIUS;
-          alreadyCheckedBalls.push(ball);
-        } else if (ball.position.y > this._tableWidth) {
-          ball.position.y = this._tableWidth - BALL_RADIUS;
-          alreadyCheckedBalls.push(ball);
-        } else if (ball.position.y < 0) {
-          ball.position.y = RAIL_WIDTH + BALL_RADIUS;
-          alreadyCheckedBalls.push(ball);
-        }
-        haveWeScratchedOverTable = ball.ballNumber === 0;
-        if (haveWeScratchedOverTable) {
-          // cue ball went over the table, scratch
-          this._isBallBeingPlaced = true;
-          if (this.isPlayer1Turn) {
-            this._playerIDToMove = this.player2ID;
-          } else {
-            this._playerIDToMove = this.player1ID;
-          }
-          this._isPlayer1Turn = !this._isPlayer1Turn;
-          canScratch = false;
-        }
+  tickAnimation(): void {
+    let currentState: PoolBall[] = [];
+    let timeDifference = 0;
+    for (let ii = 0; ii < this._eventHistory.length; ++ii) {
+      if (this._eventHistory[ii][0] > this.currentTime) {
+        currentState = this._eventHistory[ii - 1][1].map(ballModel =>
+          PoolBall.fromModel(ballModel),
+        );
+        timeDifference = this.currentTime - this._eventHistory[ii - 1][0];
+        break;
       }
-    });
-    // update the poolballmodels
-    this.poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
+    }
+    if (currentState.length === 0) {
+      this.poolBalls = this._eventHistory[this._eventHistory.length - 1][1];
+      this._isPlayer1Turn = !this._isPlayer1Turn;
+    } else {
+      currentState.map(ball => ball.evolveByTime(timeDifference));
+      this.poolBalls = currentState.map(ball => ball.toModel());
+    }
   }
 
   toPoolGameAreaModel(): PoolGameAreaModel {
