@@ -163,12 +163,12 @@ export function ballPocketCollisionTime(ball: PoolBall, pocket: PoolPocket) {
     ball.evolveByTime(roots[ii]);
     if (ball.position.z <= pocketHeight) {
       // restore the ball to its original state
-      ball.fromModel(originalBall);
+      ball = PoolBall.fromModel(originalBall);
       // we can return immediately, roots should be in ascending order
       return roots[ii];
     }
     // restore the ball to its original state
-    ball.fromModel(originalBall);
+    ball = PoolBall.fromModel(originalBall);
   }
   // If no roots work, return POSITIVE_INFINITY
   return Number.POSITIVE_INFINITY;
