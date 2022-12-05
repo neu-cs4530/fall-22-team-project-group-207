@@ -139,9 +139,17 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // bottom left
     { posnX: RAIL_WIDTH, posnY: this._tableWidth, radius: POCKET_RADIUS },
     // bottom middle
-    { posnX: this._tableLength / 2, posnY: this._tableWidth - RAIL_WIDTH / 2, radius: POCKET_RADIUS },
+    {
+      posnX: this._tableLength / 2,
+      posnY: this._tableWidth - RAIL_WIDTH / 2, 
+      radius: POCKET_RADIUS,
+    },
     // bottom right
-    { posnX: this._tableLength - RAIL_WIDTH, posnY: this._tableWidth - RAIL_WIDTH, radius: POCKET_RADIUS },
+    { 
+      posnX: this._tableLength - RAIL_WIDTH,
+      posnY: this._tableWidth - RAIL_WIDTH,
+      radius: POCKET_RADIUS,
+    },
   ];
 
   private _leaderboardService = new PoolLeaderboardServiceClient();
