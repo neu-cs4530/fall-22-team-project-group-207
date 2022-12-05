@@ -418,7 +418,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   }
 
   private _delay(ms: number) {
-    return new Promise( resolve => setTimeout(resolve, ms) );
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   /**
