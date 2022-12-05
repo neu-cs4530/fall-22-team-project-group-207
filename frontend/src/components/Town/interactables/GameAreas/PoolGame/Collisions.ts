@@ -1,5 +1,6 @@
 import PoolBall from './PoolObjects/PoolBall';
 import PoolCue from './PoolObjects/PoolCue';
+import { CushionPlane } from './PoolObjects/PoolTable';
 import {
   Vector,
   scale,
@@ -180,19 +181,19 @@ export function cueBallCollision(cue: PoolCue, ball: PoolBall) {
   console.log(ballFinalVelocity);
 }
 
-export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
+export function cushionBallCollision(ball: PoolBall, cushion: CushionPlane) {
   // Rotate the table frame of reference so it's as if the rail is always perpendicular to the x direction unit vector
-  const rotationAngle: number = (cushionNumber * Math.PI) / 2;
+  const cushionRotation: number = cushion.rotation;
   let xVelocityAdjusted: number =
-    ball.velocity.x * Math.cos(rotationAngle) + ball.velocity.y * Math.sin(rotationAngle);
+    ball.velocity.x * Math.cos(cushionRotation) + ball.velocity.y * Math.sin(cushionRotation);
   let yVelocityAdjusted: number =
-    -ball.velocity.x * Math.sin(rotationAngle) + ball.velocity.y * Math.cos(rotationAngle);
+    -ball.velocity.x * Math.sin(cushionRotation) + ball.velocity.y * Math.cos(cushionRotation);
   let xAngularVelocityAdjusted: number =
-    ball.angularVelocity.x * Math.cos(rotationAngle) +
-    ball.angularVelocity.y * Math.sin(rotationAngle);
+    ball.angularVelocity.x * Math.cos(cushionRotation) +
+    ball.angularVelocity.y * Math.sin(cushionRotation);
   let yAngularVelocityAdjusted: number =
-    -ball.angularVelocity.x * Math.sin(rotationAngle) +
-    ball.angularVelocity.y * Math.cos(rotationAngle);
+    -ball.angularVelocity.x * Math.sin(cushionRotation) +
+    ball.angularVelocity.y * Math.cos(cushionRotation);
   const theta: number = Math.asin((CUSHION_HEIGHT - ball.position.z) / BALL_RADIUS);
   const phi: number = angleBetween(
     { x: 1, y: 0, z: 0 },
@@ -238,15 +239,16 @@ export function cushionBallCollision(ball: PoolBall, cushionNumber: number) {
   // Restore frame of reference
   angularVelocityFinal.z = c * yVelocityAdjusted * Math.cos(theta);
   velocityFinal.x =
-    xVelocityAdjusted * Math.cos(-rotationAngle) + yVelocityAdjusted * Math.sin(-rotationAngle);
+    xVelocityAdjusted * Math.cos(-cushionRotation) + yVelocityAdjusted * Math.sin(-cushionRotation);
   velocityFinal.y =
-    -xVelocityAdjusted * Math.sin(-rotationAngle) + yVelocityAdjusted * Math.cos(-rotationAngle);
+    -xVelocityAdjusted * Math.sin(-cushionRotation) +
+    yVelocityAdjusted * Math.cos(-cushionRotation);
   angularVelocityFinal.x =
-    xAngularVelocityAdjusted * Math.cos(-rotationAngle) +
-    yAngularVelocityAdjusted * Math.sin(-rotationAngle);
+    xAngularVelocityAdjusted * Math.cos(-cushionRotation) +
+    yAngularVelocityAdjusted * Math.sin(-cushionRotation);
   angularVelocityFinal.y =
-    -xAngularVelocityAdjusted * Math.sin(-rotationAngle) +
-    yAngularVelocityAdjusted * Math.cos(-rotationAngle);
+    -xAngularVelocityAdjusted * Math.sin(-cushionRotation) +
+    yAngularVelocityAdjusted * Math.cos(-cushionRotation);
   ball.velocity = addVectors(ball.velocity, velocityFinal);
   ball.angularVelocity = addVectors(ball.angularVelocity, angularVelocityFinal);
 }
