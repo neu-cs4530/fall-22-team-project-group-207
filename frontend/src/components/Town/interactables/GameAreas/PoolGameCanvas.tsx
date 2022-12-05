@@ -462,10 +462,8 @@ export default function PoolGameCanvas({
       </Button>
       <Button
         onClick={() => {
-          for (let i = 0; i < 40; i++) {
-            poolGameAreaController.fastForward();
-            setTickToggle(!tickToggle);
-          }
+          poolGameAreaController.fastForward();
+          setTickToggle(!tickToggle);
         }}>
         Fast Forward Game
       </Button>
