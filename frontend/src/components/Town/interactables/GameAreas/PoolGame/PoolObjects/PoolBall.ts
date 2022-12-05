@@ -95,6 +95,10 @@ export default class PoolBall {
     this._ballNumber = ballNumber;
   }
 
+  get ballType() {
+    return this.getBallTypeByNumber(this.ballNumber);
+  }
+
   set isPocketed(isPocketed: boolean) {
     this._isPocketed = isPocketed;
   }
@@ -243,15 +247,19 @@ export default class PoolBall {
       ballNumber: this.ballNumber,
       ballType: this.getBallTypeByNumber(this.ballNumber),
       isPocketed: this.isPocketed,
+      stateOfMotion: this.stateOfMotion,
     };
   }
 
-  public fromModel(model: PoolBallModel) {
-    this.angularVelocity = model.angularVelocity;
-    this.angularOrientation = model.angularOrientation;
-    this.position = model.position;
-    this.velocity = model.velocity;
-    this.ballNumber = model.ballNumber;
+  public static fromModel(model: PoolBallModel): PoolBall {
+    const newBall: PoolBall = new PoolBall(0, 0, 0);
+    newBall.angularVelocity = model.angularVelocity;
+    newBall.angularOrientation = model.angularOrientation;
+    newBall.position = model.position;
+    newBall.velocity = model.velocity;
+    newBall.ballNumber = model.ballNumber;
+    newBall.stateOfMotion = model.stateOfMotion;
+    return newBall;
   }
 
   /**
