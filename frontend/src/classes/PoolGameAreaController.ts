@@ -417,6 +417,10 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     this.emit('onTick', this.toPoolGameAreaModel());
   }
 
+  private _delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+  }
+
   /**
    * A player makes a move. Runs the onTick function repeatedly until every ball stops moving.
    * @param cue information stored in the cue, which is passed to the physics engine
@@ -434,9 +438,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // play out the animations until they are done
     for (let i = 0; i < 40; i++) {
       this.fastForward();
-      async () => {
-        return await new Promise(f => setTimeout(f, TICK_RATE));
-      };
+      this._delay(TICK_RATE);
     }
 
     // emits a history update to listeners, passing the new model history.
