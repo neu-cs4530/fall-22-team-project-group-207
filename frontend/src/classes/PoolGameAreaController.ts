@@ -133,7 +133,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // top left
     { posnX: RAIL_WIDTH, posnY: RAIL_WIDTH, radius: POCKET_RADIUS },
     // top middle
-    { posnX: this._tableLength / 2, posnY: RAIL_WIDTH / 2, radius: POCKET_RADIUS },
+    { posnX: this._tableLength / 2, posnY: RAIL_WIDTH, radius: POCKET_RADIUS },
     // top right
     { posnX: this._tableLength - RAIL_WIDTH, posnY: RAIL_WIDTH, radius: POCKET_RADIUS },
     // bottom left
@@ -141,7 +141,7 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
     // bottom middle
     {
       posnX: this._tableLength / 2,
-      posnY: this._tableWidth - RAIL_WIDTH / 2,
+      posnY: this._tableWidth - RAIL_WIDTH,
       radius: POCKET_RADIUS,
     },
     // bottom right
@@ -361,6 +361,9 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
 
     // unset the flag
     this._isBallBeingPlaced = false;
+
+    // make sure its visible
+    this._physicsPoolBalls[this._cueBallIndex].isPocketed = false;
 
     // update the model list
     this.poolBalls = this._physicsPoolBalls.map(ball => ball.toModel());
