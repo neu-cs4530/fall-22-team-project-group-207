@@ -79,6 +79,7 @@ export default function PoolGameCanvas({
   const inputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const inputCanvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
 
+  // call gameTick on a timed loop
   useEffect(() => {
     const interval = setInterval(() => {
       poolGameAreaController.gameTick();
