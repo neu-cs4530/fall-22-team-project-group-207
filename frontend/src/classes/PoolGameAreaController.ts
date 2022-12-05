@@ -131,21 +131,17 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
   // list of all pockets, which hold their own location and radius
   private _pockets: Pocket[] = [
     // top left
-    { posnX: RAIL_WIDTH, posnY: RAIL_WIDTH, radius: POCKET_RADIUS * 2 },
+    { posnX: RAIL_WIDTH, posnY: RAIL_WIDTH, radius: POCKET_RADIUS },
     // top middle
-    { posnX: this._tableLength / 2, posnY: RAIL_WIDTH, radius: POCKET_RADIUS },
+    { posnX: this._tableLength / 2, posnY: RAIL_WIDTH / 2, radius: POCKET_RADIUS },
     // top right
-    { posnX: this._tableLength - RAIL_WIDTH, posnY: RAIL_WIDTH, radius: POCKET_RADIUS * 2 },
+    { posnX: this._tableLength - RAIL_WIDTH, posnY: RAIL_WIDTH, radius: POCKET_RADIUS },
     // bottom left
-    { posnX: RAIL_WIDTH, posnY: this._tableWidth - RAIL_WIDTH, radius: POCKET_RADIUS * 2 },
+    { posnX: RAIL_WIDTH, posnY: this._tableWidth, radius: POCKET_RADIUS },
     // bottom middle
-    { posnX: this._tableLength / 2, posnY: this._tableWidth - RAIL_WIDTH, radius: POCKET_RADIUS },
+    { posnX: this._tableLength / 2, posnY: this._tableWidth - RAIL_WIDTH / 2, radius: POCKET_RADIUS },
     // bottom right
-    {
-      posnX: this._tableLength - RAIL_WIDTH,
-      posnY: this._tableWidth - RAIL_WIDTH,
-      radius: POCKET_RADIUS * 2,
-    },
+    { posnX: this._tableLength - RAIL_WIDTH, posnY: this._tableWidth - RAIL_WIDTH, radius: POCKET_RADIUS },
   ];
 
   private _leaderboardService = new PoolLeaderboardServiceClient();
