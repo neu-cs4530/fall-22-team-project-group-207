@@ -829,7 +829,6 @@ export default class PoolGameAreaController extends (EventEmitter as new () => T
               } else {
                 this._playerIDToMove = this.player1ID;
               }
-              this._isPlayer1Turn = !this._isPlayer1Turn;
               canScratch = false;
             }
           }
