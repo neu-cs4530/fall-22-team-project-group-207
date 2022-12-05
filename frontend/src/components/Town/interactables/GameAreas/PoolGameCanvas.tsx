@@ -7,6 +7,7 @@ import { POOL_BALL_IMAGES, POOL_TABLE_IMAGE } from './PoolGameAssets/assets';
 import useTownController from '../../../../hooks/useTownController';
 import PoolCue from './PoolGame/PoolObjects/PoolCue';
 import { Button } from '@chakra-ui/react';
+import { MotionState } from './PoolGame/PoolObjects/PoolBall';
 
 const BALL_RADIUS = 0.028575; // m
 const OUTSIDE_BORDER_WIDTH = 0.18; // m
@@ -186,7 +187,8 @@ export default function PoolGameCanvas({
 
       if (
         poolGameAreaController.isGameStarted &&
-        poolGameAreaController.poolBalls.find(p => p.isMoving) === undefined
+        poolGameAreaController.poolBalls.find(p => p.stateOfMotion !== MotionState.Stationary) ===
+          undefined
       ) {
         // Draw the player's inputs based on the current state of the game
         // If the the previous player scratched, the current player gets to place the cue ball
@@ -378,7 +380,8 @@ export default function PoolGameCanvas({
 
     if (
       poolGameAreaController.isGameStarted &&
-      poolGameAreaController.poolBalls.find(p => p.isMoving) === undefined
+      poolGameAreaController.poolBalls.find(p => p.stateOfMotion !== MotionState.Stationary) ===
+        undefined
     ) {
       // Draw the player's inputs based on the current state of the game
       // If the the previous player scratched, the current player gets to place the cue ball
