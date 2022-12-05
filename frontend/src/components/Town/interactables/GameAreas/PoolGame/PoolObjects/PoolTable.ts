@@ -15,6 +15,7 @@ const SIDE_POCKET_SHELF_DEPTH = 0.009525; // m
 export type CushionPlane = {
   point1: Vector;
   point2: Vector;
+  rotation: number;
 };
 
 export type PoolPocket = {
@@ -28,16 +29,19 @@ export type PoolPocket = {
 const cushion1: CushionPlane = {
   point1: { x: 0, y: TABLE_WIDTH - Math.sin(0.7853982) * CORNER_POCKET_ENTRANCE_WIDTH, z: 0 },
   point2: { x: 0, y: Math.sin(0.7853982) * CORNER_POCKET_ENTRANCE_WIDTH, z: 0 },
+  rotation: Math.PI,
 };
 
 const cushion4: CushionPlane = {
   point1: { x: Math.sin(0.7853982) * CORNER_POCKET_ENTRANCE_WIDTH, y: 0, z: 0 },
   point2: { x: TABLE_LENGTH / 2 - SIDE_POCKET_ENTRANCE_WIDTH / 2, y: 0, z: 0 },
+  rotation: Math.PI / 2,
 };
 
 const cushion7: CushionPlane = {
   point1: { x: TABLE_LENGTH / 2 + SIDE_POCKET_ENTRANCE_WIDTH / 2, y: 0, z: 0 },
   point2: { x: TABLE_LENGTH - Math.sin(0.7853982) * CORNER_POCKET_ENTRANCE_WIDTH, y: 0, z: 0 },
+  rotation: Math.PI / 2,
 };
 
 const cushion10: CushionPlane = {
@@ -47,6 +51,7 @@ const cushion10: CushionPlane = {
     y: TABLE_WIDTH - Math.sin(0.7853982) * CORNER_POCKET_ENTRANCE_WIDTH,
     z: 0,
   },
+  rotation: 0,
 };
 
 const cushion13: CushionPlane = {
@@ -56,11 +61,13 @@ const cushion13: CushionPlane = {
     z: 0,
   },
   point2: { x: TABLE_LENGTH / 2 + SIDE_POCKET_ENTRANCE_WIDTH / 2, y: TABLE_WIDTH, z: 0 },
+  rotation: (3 * Math.PI) / 2,
 };
 
 const cushion16: CushionPlane = {
   point1: { x: TABLE_LENGTH / 2 - SIDE_POCKET_ENTRANCE_WIDTH / 2, y: TABLE_WIDTH, z: 0 },
   point2: { x: Math.sin(0.7853982) * CORNER_POCKET_ENTRANCE_WIDTH, y: TABLE_WIDTH, z: 0 },
+  rotation: (3 * Math.PI) / 2,
 };
 
 // pocket cushionS:
@@ -72,6 +79,7 @@ const cushion2: CushionPlane = {
     y: cushion1.point2.y - Math.tan(CORNER_POCKET_ANGLE - Math.PI / 2) * CUSHION_WIDTH,
     z: 0,
   },
+  rotation: Math.PI + (Math.PI - CORNER_POCKET_ANGLE),
 };
 
 const cushion3: CushionPlane = {
@@ -81,6 +89,7 @@ const cushion3: CushionPlane = {
     z: 0,
   },
   point2: cushion4.point1,
+  rotation: Math.PI / 2 - (Math.PI - CORNER_POCKET_ANGLE),
 };
 
 const cushion5: CushionPlane = {
@@ -90,6 +99,7 @@ const cushion5: CushionPlane = {
     y: -CUSHION_WIDTH,
     z: 0,
   },
+  rotation: Math.PI / 2 + (Math.PI - SIDE_POCKET_ANGLE),
 };
 
 const cushion6: CushionPlane = {
@@ -99,6 +109,7 @@ const cushion6: CushionPlane = {
     z: 0,
   },
   point2: cushion7.point1,
+  rotation: Math.PI / 2 - (Math.PI - SIDE_POCKET_ANGLE),
 };
 
 const cushion8: CushionPlane = {
@@ -108,6 +119,7 @@ const cushion8: CushionPlane = {
     y: -CUSHION_WIDTH,
     z: 0,
   },
+  rotation: Math.PI / 2 + (Math.PI - CORNER_POCKET_ANGLE),
 };
 
 const cushion9: CushionPlane = {
@@ -117,6 +129,7 @@ const cushion9: CushionPlane = {
     z: 0,
   },
   point2: cushion4.point1,
+  rotation: -(Math.PI - CORNER_POCKET_ANGLE),
 };
 
 const cushion11: CushionPlane = {
@@ -126,6 +139,7 @@ const cushion11: CushionPlane = {
     y: cushion10.point2.y + Math.tan(CORNER_POCKET_ANGLE - Math.PI / 2) * CUSHION_WIDTH,
     z: 0,
   },
+  rotation: Math.PI - CORNER_POCKET_ANGLE,
 };
 
 const cushion12: CushionPlane = {
@@ -135,6 +149,7 @@ const cushion12: CushionPlane = {
     z: 0,
   },
   point2: cushion13.point1,
+  rotation: (3 * Math.PI) / 2 - (Math.PI - CORNER_POCKET_ANGLE),
 };
 
 const cushion14: CushionPlane = {
@@ -144,6 +159,7 @@ const cushion14: CushionPlane = {
     y: TABLE_WIDTH + CUSHION_WIDTH,
     z: 0,
   },
+  rotation: (3 * Math.PI) / 2 + (Math.PI - SIDE_POCKET_ANGLE),
 };
 
 const cushion15: CushionPlane = {
@@ -153,6 +169,7 @@ const cushion15: CushionPlane = {
     z: 0,
   },
   point2: cushion16.point1,
+  rotation: (3 * Math.PI) / 2 - (Math.PI - SIDE_POCKET_ANGLE),
 };
 
 const cushion17: CushionPlane = {
@@ -162,6 +179,7 @@ const cushion17: CushionPlane = {
     y: TABLE_WIDTH + CUSHION_WIDTH,
     z: 0,
   },
+  rotation: (3 * Math.PI) / 2 + (Math.PI - CORNER_POCKET_ANGLE),
 };
 
 const cushion18: CushionPlane = {
@@ -171,6 +189,7 @@ const cushion18: CushionPlane = {
     z: 0,
   },
   point2: cushion1.point1,
+  rotation: Math.PI - (Math.PI - CORNER_POCKET_ANGLE),
 };
 
 export const CUSHIONS: CushionPlane[] = [
